@@ -1,10 +1,12 @@
 [project]
-name = "instagram"
+name = "instagram-catalog-pipeline"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.14"
+description = "POC: cascade AI pipeline turning a vendor Instagram feed into a structured catalog + attention flags"
+requires-python = ">=3.11"
 dependencies = [
-    "python-dotenv>=1.2.3",
-    "requests>=2.34.2",
+    "requests>=2.32",
+    "python-dotenv>=1.0",
 ]
+
+[tool.uv]
+dev-dependencies = []
