@@ -1,0 +1,14 @@
+{
+    "stage2_triage": {
+        "module": "pipeline.stages.stage2_triage",
+        "function": "triage_post",
+        "model": "dummy-heuristic",
+        "cost_per_call_usd": 0.0
+    },
+    "stage3_extract": {
+        "module": "pipeline.stages.stage3_extract",
+        "function": "extract_product",
+        "model": "dummy-heuristic",
+        "cost_per_call_usd": 0.0
+    }
+}

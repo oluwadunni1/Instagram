@@ -48,7 +48,7 @@ from dotenv import load_dotenv
 load_dotenv()  # reads .env in the working directory into os.environ
 
 GRAPH_BASE = "https://graph.instagram.com"
-API_VERSION = "v23.0"  # bump as Meta ships new versions; check current in their docs
+API_VERSION = "v26.0"  # bump as Meta ships new versions; check current in their docs
 RATE_LIMIT_SLEEP_SECONDS = 2  # gentle default pause between paginated calls
 MAX_RETRIES = 5
 
@@ -94,12 +94,13 @@ def fetch_media_list() -> list[dict]:
     return all_media
 
 
-def fetch_comments(media_id: str) -> list[dict]:
+def fetch_comments(media_id: str, debug: bool = False) -> list[dict]:
     """Paginate through comments for a single media item."""
     fields = "id,text,username,timestamp,like_count"
     url = f"{GRAPH_BASE}/{API_VERSION}/{media_id}/comments"
     params = {"fields": fields, "limit": 50}
     all_comments = []
+    first_call = True
     while url:
         try:
             data = _get(url, params)
@@ -107,6 +108,13 @@ def fetch_comments(media_id: str) -> list[dict]:
             # Comments can be disabled on some posts — don't kill the whole run
             print(f"  [warn] comments fetch failed for {media_id}: {e}")
             break
+        if debug and first_call:
+            # Prints the RAW response so you can see exactly what the API
+            # returned — an empty {"data": []} means the request succeeded
+            # but genuinely found nothing (often a scope issue), whereas an
+            # "error" object here means something else is wrong entirely.
+            print(f"  [debug] raw response for {media_id}: {json.dumps(data)}")
+            first_call = False
         all_comments.extend(data.get("data", []))
         next_url = data.get("paging", {}).get("next")
         url = next_url
@@ -133,7 +141,7 @@ def ingest_account(account_label: str) -> Path:
 
     print("[3/3] Fetching comments per post (this is the slow part)...")
     for i, post in enumerate(media_list, start=1):
-        post["comments"] = fetch_comments(post["id"])
+        post["comments"] = fetch_comments(post["id"], debug=(i == 1))
         print(f"  -> [{i}/{len(media_list)}] {post['id']}: {len(post['comments'])} comments")
         time.sleep(RATE_LIMIT_SLEEP_SECONDS)
 
@@ -145,7 +153,7 @@ def ingest_account(account_label: str) -> Path:
     }
 
     out_path = run_dir / f"dump_{pulled_at.replace(':', '-')}.json"
-    out_path.write_text(json.dumps(dump, indent=2, ensure_ascii=False))
+    out_path.write_text(json.dumps(dump, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nDone. Raw dump cached at: {out_path}")
     print("Re-run the pipeline against this file offline — no need to re-hit the API.")
     return out_path
