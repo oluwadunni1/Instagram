@@ -1,0 +1,28 @@
+name: stage2_gpt4o_mini_cascade
+description: >-
+  Stage 2 Triage — GPT-4o Mini Cascade (OpenRouter). Same comparison as
+  stage2_llama_cascade.yaml/stage2_qwen_cascade.yaml/stage2_gemini_cascade.yaml -
+  swaps only Stage 2's Pass A (text) / Pass B (vision) models, confidence_threshold
+  held at 0.7 for a fair comparison. gpt-4o-mini is natively multimodal, so the
+  same model string handles both passes (no separate vision-only slug needed the
+  way Qwen's cascade required).
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/openai/gpt-4o-mini
+  vision_model: openrouter/openai/gpt-4o-mini
+  confidence_threshold: 0.7
+  model: GPT-4o Mini Cascade (OpenRouter)
+  cost_per_call_usd: 0.0002
+  note: >-
+    $0.15 / $0.60 per 1M prompt/completion tokens on OpenRouter (confirmed live
+    2026-09-05) - i.e. $0.00000015/$0.0000006 per token. cost_per_call_usd here is
+    a rough single-call estimate; report/token_log.csv has the real per-call token
+    counts for exact cost math.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

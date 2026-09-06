@@ -1,0 +1,32 @@
+name: stage1_qwen2_7b
+description: >-
+  Stage 1 model comparison snapshot - account profiling on Qwen 2.5 7B Instruct via
+  OpenRouter. Stage 2/3 left at default.yaml's settings so this isolates the Stage 1
+  model swap; compare against stage1_llama3_8b.yaml and default.yaml's stealth model.
+
+stage1_profile:
+  module: pipeline.stages.stage1_profile
+  function: get_or_create_profile
+  model: openrouter/qwen/qwen-2.5-7b-instruct
+  cost_per_call_usd: 0.0003
+  note: >-
+    OpenRouter retired the :free variant of this model (404 as of 2026-09-01,
+    "This model is unavailable for free") - using the paid slug instead
+    ($0.0000001/$0.0000002 per prompt/completion token). At Stage 1's ~1-2k tokens
+    per call the real cost is a fraction of a cent. Requires OPENROUTER_API_KEY (see
+    .env.example).
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/google/gemini-flash-1.5-8b
+  vision_model: openrouter/google/gemini-flash-1.5-8b
+  confidence_threshold: 0.7
+  model: cascade (see text_model/vision_model)
+  cost_per_call_usd: 0.0001
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

@@ -1,0 +1,36 @@
+name: stage3_qwen_cascade
+description: >-
+  Stage 3 Extraction — Qwen Cascade (OpenRouter). Text Pass A on Qwen3 14B,
+  vision Pass B on Qwen3-VL 8B. Uses response_format: json_object (same as
+  every other stage) - both models support OpenRouter's stricter
+  structured_outputs mode too, not enabled here per request. Stage 2 uses a
+  known-working pairing (default.yaml's stage2_triage model is currently
+  retired/404s) rather than isolating Stage 2, purely so the harness run
+  isn't 100% Stage 2 errors - see stage3_gemini_flash_8b.yaml for the same
+  convention.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  confidence_threshold: 0.7
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Google's smallest and fastest multimodal model. Free tier on AI Studio gives
+    15 requests per minute.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: openrouter/qwen/qwen3-14b
+  vision_model: openrouter/qwen/qwen3-vl-8b-instruct
+  model: Qwen Cascade (OpenRouter)
+  cost_per_call_usd: 0.0003
+  note: >-
+    qwen/qwen-2.5-14b-instruct doesn't exist on OpenRouter (no direct 2.5-series
+    14B) - substituted qwen3-14b (newer generation, $0.00000012/$0.00000024 per
+    prompt/completion token). Vision escalation on qwen3-vl-8b-instruct, same
+    family, already validated in stage2_qwen_cascade.yaml. Real cost per call is
+    a fraction of a cent.

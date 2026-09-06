@@ -1,0 +1,26 @@
+name: stage2_vision_only
+description: >-
+  Experiment snapshot for run_stage2_experiments.ps1 (Stage 2 model comparison). Not
+  the active default; see default.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  confidence_threshold: 1.1
+  model: gemini-3.5-flash-lite (vision-only forced escalation)
+  cost_per_call_usd: 0.0
+  note: >-
+    confidence_threshold is set above 1.0 so every post with a media_url escalates to
+    Pass B (vision) regardless of Pass A's confidence - isolates vision-only accuracy
+    from the cascade's blended Pass A/B number, for comparison against
+    stage2_gemini_flash_8b.yaml's real cascade run. Requires golden entries to carry
+    media_url (see eval/update_golden_skeleton.py's backfill). Still Google AI
+    Studio's free tier.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

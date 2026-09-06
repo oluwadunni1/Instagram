@@ -1,0 +1,39 @@
+name: stage4_gemini
+description: >-
+  Stage 4 Signals — Gemini Flash-Lite (Google AI Studio). Business signal
+  detection with a free-cost regex prefilter gating the LLM call. Stage
+  2/3 entries copied from default.yaml so the harness can load all stages
+  (Stage 2's model there is a known-retired placeholder - see its own note).
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/google/gemini-flash-1.5-8b
+  vision_model: openrouter/google/gemini-flash-1.5-8b
+  confidence_threshold: 0.7
+  model: cascade (see text_model/vision_model)
+  cost_per_call_usd: 0.0001
+  note: >-
+    Cascade: Pass A (text_model) runs first; escalates to Pass B (vision_model) only
+    when confidence < confidence_threshold or caption is empty/emoji-only. Check
+    openrouter.ai/models before locking in real model choices - placeholders here, not
+    verified picks. Track escalation rate once running against the real golden set -
+    brief section 5 flags >40% escalation as a sign the text prompt needs work, not the
+    model.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  model: gemini/gemini-3.5-flash-lite
+  cost_per_call_usd: 0.0
+  note: >-
+    gemini/gemini-1.5-flash-8b is retired from Google AI Studio's model list (the
+    entire 1.5 line is gone, current lineup is 2.5/3.x - same finding as the Stage 2/3
+    Gemini cascade experiments). Substituted gemini-3.5-flash-lite. Google AI Studio's
+    free tier.

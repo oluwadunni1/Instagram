@@ -1,0 +1,16 @@
+name: dummy_baseline
+description: >-
+  Experiment snapshot - zero-cost heuristic baseline, for comparing against real-model
+  experiments. Not the active default; see default.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage_dummy
+  function: triage_post
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

@@ -1,0 +1,23 @@
+name: stage2_gemini_pro
+description: >-
+  Experiment snapshot for run_stage2_experiments.ps1 (Stage 2 model comparison). Not
+  the active default; see default.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.1-pro-preview
+  vision_model: gemini/gemini-3.1-pro-preview
+  confidence_threshold: 0.7
+  model: gemini-3.1-pro-preview (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Google's heaviest reasoning model. Will have the highest accuracy ceiling, but
+    free tier is limited to 2 requests per minute (will take ~15 minutes to eval 30
+    posts).
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

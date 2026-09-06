@@ -1,0 +1,31 @@
+name: stage3_gpt4o_mini
+description: >-
+  Stage 3 Extraction — GPT-4o Mini (OpenRouter). Text Pass A and vision Pass B
+  both on gpt-4o-mini (multimodal, single model for both passes). Stage 2 uses a
+  known-working pairing (default.yaml's stage2_triage model is currently
+  retired/404s) rather than isolating Stage 2, purely so the harness run isn't
+  100% Stage 2 errors - see stage3_qwen_cascade.yaml for the same convention.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  confidence_threshold: 0.7
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Google's smallest and fastest multimodal model. Free tier on AI Studio gives
+    15 requests per minute.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: openrouter/openai/gpt-4o-mini
+  vision_model: openrouter/openai/gpt-4o-mini
+  model: GPT-4o Mini (OpenRouter)
+  cost_per_call_usd: 0.0002
+  note: >-
+    $0.15 / $0.60 per 1M prompt/completion tokens on OpenRouter (confirmed live
+    2026-09-05) - i.e. $0.00000015/$0.0000006 per token. Real per-call cost is a
+    fraction of a cent; see report/token_log.csv for exact token counts.

@@ -1,0 +1,28 @@
+name: stage2_llama_cascade
+description: >-
+  Stage 2 Triage — Llama Cascade (OpenRouter). Groq currently has no
+  vision-capable model in its catalog at all, so a Groq-only Pass A/B
+  cascade isn't buildable - routed both passes through OpenRouter instead.
+  Not the active default; see default.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/meta-llama/llama-3.1-8b-instruct
+  vision_model: openrouter/meta-llama/llama-4-scout
+  confidence_threshold: 0.7
+  model: Llama Cascade (OpenRouter)
+  cost_per_call_usd: 0.0002
+  note: >-
+    groq/llama3-8b-8192 and groq/llama-3.2-11b-vision-preview both 404 on Groq's
+    current API - Groq has retired its Llama chat/vision models entirely (only
+    prompt-guard safety models remain). Substituted meta-llama/llama-3.1-8b-instruct
+    (text) and meta-llama/llama-4-scout (natively multimodal) via OpenRouter. Not
+    free, but at ~$0.0000001-0.0000002/token the real cost is a fraction of a cent
+    per call. Requires OPENROUTER_API_KEY (see .env.example).
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

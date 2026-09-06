@@ -28,6 +28,26 @@ SCHEMA SHAPE:
     more than one, in slide order.
 
 FIELD GUIDE:
+    media_url                  pre-filled hero-image URL from the raw dump.
+                             For an IMAGE/CAROUSEL_ALBUM post this is a real
+                             image; for a VIDEO post (Reels included) it's
+                             the video FILE itself, not an image - never
+                             hand-edit it. Instagram's CDN URLs expire, so
+                             this gets refreshed (not just filled once) by
+                             update_golden_skeleton.py's sync_known_fields()
+                             on every run.
+    thumbnail_url               pre-filled, only non-null for VIDEO posts -
+                             the static cover image the Graph API provides
+                             for video/Reel media. products[].images and
+                             Stage 2/3's vision escalation both use this
+                             (via vision_image_url() in pipeline/types.py)
+                             in preference to media_url whenever it's
+                             present - this is what actually makes vision
+                             escalation reachable for a Reel. Never hand-edit.
+    media_product_type          pre-filled, informational only - "FEED" |
+                             "REELS" | "STORY" | "AD" | "IGTV". Not scored,
+                             just lets you see at a glance which posts are
+                             Reels when labeling/reviewing.
     post_type               one of: product_listing | announcement |
                              testimonial_repost | meme_personal | ad_creative
     carousel_classification    one of: not_carousel | gallery | colorway |
@@ -108,8 +128,16 @@ FIELD GUIDE:
 """
 
 import json
+import logging
 import sys
 from pathlib import Path
+
+from pipeline.exceptions import MissingRawDumpError
+from pipeline.logging_config import configure_logging
+from pipeline.types import Post, vision_image_url
+
+logger = logging.getLogger(__name__)
+
 
 def make_product_entry(images: list | None = None) -> dict:
     """One product skeleton, EXACT top-level field match to the brief's
@@ -161,20 +189,26 @@ def make_product_entry(images: list | None = None) -> dict:
     }
 
 
-def collect_images(post: dict) -> list:
+def collect_images(post: Post) -> list[str]:
     """All images for this post, in order - ONE image for a normal post,
-    N slides for a carousel. Pre-filled into the product's images[]."""
+    N slides for a carousel. Pre-filled into the product's images[].
+
+    Uses vision_image_url() rather than raw media_url directly: for a Reel
+    or any other VIDEO-type post/slide, media_url is the video file itself,
+    not an image - thumbnail_url is the static cover image the Graph API
+    provides instead, and is what Stage 2/3's vision passes actually use."""
     images = []
-    if post.get("media_url"):
-        images.append(post["media_url"])
+    hero = vision_image_url(post)
+    if hero:
+        images.append(hero)
     for child in post.get("children", {}).get("data", []):
-        if child.get("media_url"):
-            images.append(child["media_url"])
+        child_image = vision_image_url(child)
+        if child_image:
+            images.append(child_image)
     return images
 
 
-
-def build_comments_list(post: dict, vendor_username: str | None) -> list:
+def build_comments_list(post: Post, vendor_username: str | None) -> list[dict]:
     """Structured {username, text, is_vendor_reply} per comment - not just
     bare text. The vendor's OWN reply ("sold", "gone") is a much stronger
     staleness/stock signal than the same word from a random commenter
@@ -191,14 +225,22 @@ def build_comments_list(post: dict, vendor_username: str | None) -> list:
 
 
 def latest_dump(account_label: str) -> Path:
+    """Most recent raw dump for account_label.
+
+    Raises:
+        MissingRawDumpError: If no raw dump exists yet.
+    """
     raw_dir = Path("runs") / account_label / "raw"
     dumps = sorted(raw_dir.glob("dump_*.json"))
     if not dumps:
-        raise SystemExit(f"No raw dumps found in {raw_dir}. Run ingest.py first.")
+        raise MissingRawDumpError(f"No raw dumps found in {raw_dir}. Run ingest.py first.")
     return dumps[-1]
 
 
 def build_skeleton(account_label: str) -> None:
+    """Writes eval/golden/<account_label>.json - one skeleton entry per
+    post in the latest raw dump. Refuses to overwrite an existing golden
+    file; use update_golden_skeleton.py once one already exists."""
     dump_path = latest_dump(account_label)
     data = json.loads(dump_path.read_text(encoding="utf-8"))
     vendor_username = data.get("profile", {}).get("username")
@@ -211,6 +253,9 @@ def build_skeleton(account_label: str) -> None:
             "post_id": post["id"],
             "media_type": post.get("media_type"),
             "caption": post.get("caption", ""),
+            "media_url": post.get("media_url"),
+            "thumbnail_url": post.get("thumbnail_url"),
+            "media_product_type": post.get("media_product_type"),
             "permalink": post.get("permalink"),
             "timestamp": post.get("timestamp"),
             "has_carousel_children": is_carousel,
@@ -238,17 +283,22 @@ def build_skeleton(account_label: str) -> None:
     out_path = out_dir / f"{account_label}.json"
 
     if out_path.exists():
-        print(f"[warn] {out_path} already exists - not overwriting. "
-              f"Delete it first if you want a fresh skeleton.")
+        logger.warning("[warn] %s already exists - not overwriting. Delete it first if you want a fresh skeleton.",
+                        out_path)
         return
 
     out_path.write_text(json.dumps(entries, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"Skeleton written: {out_path} ({len(entries)} posts to label)")
-    print("Open each permalink, fill in the null fields, save.")
+    logger.info("Skeleton written: %s (%d posts to label)", out_path, len(entries))
+    logger.info("Open each permalink, fill in the null fields, save.")
 
 
 if __name__ == "__main__":
+    configure_logging()
+
     if len(sys.argv) != 2:
-        print("Usage: uv run eval/make_golden_skeleton.py <account_label>")
+        logger.info("Usage: uv run eval/make_golden_skeleton.py <account_label>")
         sys.exit(1)
-    build_skeleton(sys.argv[1])
+    try:
+        build_skeleton(sys.argv[1])
+    except MissingRawDumpError as exc:
+        sys.exit(str(exc))

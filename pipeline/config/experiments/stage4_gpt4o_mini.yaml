@@ -1,0 +1,37 @@
+name: stage4_gpt4o_mini
+description: >-
+  Stage 4 Signals — GPT-4o Mini (OpenRouter). Business signal detection with a
+  free-cost regex prefilter gating the LLM call. Stage 2 uses a known-working
+  pairing (default.yaml's stage2_triage model is currently retired/404s) rather
+  than the literal default.yaml entry, purely so the harness run isn't 100%
+  Stage 2 errors - see stage3_qwen_cascade.yaml for the same convention. Stage 3
+  stays on the zero-cost dummy heuristic, matching stage4_gemini.yaml/
+  stage4_llama.yaml/stage4_qwen.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  confidence_threshold: 0.7
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Google's smallest and fastest multimodal model. Free tier on AI Studio gives
+    15 requests per minute.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  model: openrouter/openai/gpt-4o-mini
+  cost_per_call_usd: 0.0002
+  note: >-
+    $0.15 / $0.60 per 1M prompt/completion tokens on OpenRouter (confirmed live
+    2026-09-05) - i.e. $0.00000015/$0.0000006 per token. Requires
+    OPENROUTER_API_KEY (see .env.example).

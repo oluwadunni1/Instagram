@@ -1,30 +1,208 @@
 """
-Stage 2 — Post triage (DUMMY / heuristic stub).
+Stage 2 - Post triage (brief section 5), REAL cascade implementation.
 
-This is not the real Stage 2. It's a zero-cost placeholder so the
-eval harness has something to score before any model is wired up —
-satisfies the Week 1 milestone ("eval harness scores a dummy
-pipeline"). Swap this for a real cascade (cheap text model -> vision
-escalation, per brief §5) once the harness loop is proven out.
+Pass A (cheap, text-only): caption + Stage 1's account profile -> a
+small text model classifies the post. Handles the majority of posts
+at minimum cost.
 
-Contract: every real stage implementation must match this same
-function signature (post_dict, profile) -> result_dict, so swapping
-dummy -> real is a config change (see pipeline/config/registry.json),
-not a harness rewrite.
+Pass B (vision, escalation ONLY): triggered when Pass A's confidence
+is below threshold, OR the caption is empty/emoji-only (no text
+signal to work with at all). Sends the post's hero image to a vision
+model instead. This should be the minority path - brief section 5
+flags that if more than 40% of posts escalate, the TEXT PROMPT needs
+work before reaching for a bigger model.
+
+Every result reports whether it escalated, so the harness can compute
+and print the escalation rate - the brief treats this as a cost
+signal to watch, not just a debugging detail.
 """
 
-PRODUCT_HINTS = ("₦", "$", "price", "swap possible", "negotiable")
-ANNOUNCEMENT_HINTS = ("clearance", "0% down", "financing", "dm \"finance\"", "promo")
+import json
+import re
+from typing import Literal
+
+import litellm
+from pydantic import BaseModel
+
+from pipeline.llm_client import complete_structured, log_token_usage
+from pipeline.types import Post, vision_image_url
+
+POST_TYPES = Literal[
+    "product_listing", "announcement", "testimonial_repost", "meme_personal", "ad_creative"
+]
+
+# Caption is "non-informative" if, after stripping emoji/punctuation/whitespace,
+# fewer than this many characters remain - triggers escalation regardless of
+# Pass A's stated confidence, since there was barely any text to classify from.
+MIN_INFORMATIVE_CAPTION_CHARS = 3
+
+_WORD_CHARS_RE = re.compile(r"[^\w]", flags=re.UNICODE)
 
 
-def triage_post(post: dict, profile: dict | None = None) -> dict:
-    caption = (post.get("caption") or "").lower()
+class TriageResult(BaseModel):
+    post_type: POST_TYPES
+    confidence: float
+    escalated: bool = False  # set by OUR code after the call, not the model - default lets
+                              # model_validate() succeed on the model's raw {post_type,
+                              # confidence} response before we override this ourselves
 
-    if any(hint in caption for hint in ANNOUNCEMENT_HINTS):
-        return {"post_type": "announcement", "confidence": 0.6}
 
-    if any(hint in caption for hint in PRODUCT_HINTS):
-        return {"post_type": "product_listing", "confidence": 0.6}
+PASS_A_SYSTEM_PROMPT = """You are triaging an Instagram post for a vendor \
+account, to decide whether it's a product listing or something else. Use \
+the account profile for context (e.g. a "food" account's "portions left" \
+language differs from a "fashion" account's "sizes 10-16").
 
-    # Genuinely unsure — real Stage 2 would escalate to vision here (§5 Pass B)
-    return {"post_type": "product_listing", "confidence": 0.3}
+Return ONLY a JSON object with exactly these fields:
+- post_type: one of product_listing, announcement, testimonial_repost, meme_personal, ad_creative
+- confidence: a float 0.0-1.0 reflecting how sure you are, based ONLY on \
+the caption text provided. If the caption is vague, short, or could \
+plausibly be more than one category, give a LOW confidence rather than \
+guessing - a downstream step will look at the image when confidence is low."""
+
+PASS_B_SYSTEM_PROMPT = """You are triaging an Instagram post for a vendor \
+account. The caption text was not enough to classify this post confidently, \
+so you are being shown the actual photo instead. Use the account profile \
+for context.
+
+Return ONLY a JSON object with exactly these fields:
+- post_type: one of product_listing, announcement, testimonial_repost, meme_personal, ad_creative
+- confidence: a float 0.0-1.0 reflecting how sure you are, now that you \
+can see the image."""
+
+
+def _is_uninformative_caption(caption: str) -> bool:
+    """True if, after stripping emoji/punctuation/whitespace, the caption
+    has too little text to classify from - regardless of what Pass A's
+    confidence would say."""
+    stripped = _WORD_CHARS_RE.sub("", caption or "")
+    return len(stripped) < MIN_INFORMATIVE_CAPTION_CHARS
+
+
+def _pass_a(
+    post: Post,
+    profile: dict | None,
+    text_model: str,
+    run_id: str | None,
+    vendor_id: str | None,
+    post_id: str,
+) -> TriageResult:
+    """Cheap text-only classification pass."""
+    caption = post.get("caption") or ""
+    profile_context = f"Account profile: {profile}" if profile else "Account profile: unavailable"
+    user_prompt = f"{profile_context}\n\nCaption:\n{caption}"
+
+    result = complete_structured(
+        model=text_model,
+        system_prompt=PASS_A_SYSTEM_PROMPT,
+        user_prompt=user_prompt,
+        schema=TriageResult,
+        stage_name="stage2_triage_pass_a",
+        run_id=run_id,
+        vendor_id=vendor_id,
+        post_id=post_id,
+        escalated=False,
+    )
+    result.escalated = False
+    return result
+
+
+def _pass_b(
+    post: Post,
+    profile: dict | None,
+    vision_model: str,
+    run_id: str | None,
+    vendor_id: str | None,
+    post_id: str,
+) -> TriageResult:
+    """Vision escalation. NOTE: complete_structured() currently only sends
+    text messages - this constructs a multimodal message directly via
+    litellm's OpenAI-compatible image_url format, since Pass B is the one
+    call site in the pipeline that needs it. If more stages need vision
+    later, this multimodal message-building belongs in llm_client.py
+    instead of being duplicated per stage. Since this bypasses
+    complete_structured(), it logs token usage itself instead of getting it
+    for free."""
+    image_url = vision_image_url(post)
+    caption = post.get("caption") or "(no caption)"
+    profile_context = f"Account profile: {profile}" if profile else "Account profile: unavailable"
+
+    messages = [
+        {"role": "system", "content": PASS_B_SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": f"{profile_context}\n\nCaption: {caption}"},
+                {"type": "image_url", "image_url": {"url": image_url}},
+            ],
+        },
+    ]
+
+    response = litellm.completion(
+        model=vision_model,
+        messages=messages,
+        temperature=0.0,
+        response_format={"type": "json_object"},
+        metadata={"run_name": "stage2_triage_pass_b", "tags": ["stage2_triage_pass_b"]},
+    )
+    parsed = json.loads(response.choices[0].message.content)
+    result = TriageResult.model_validate(parsed)
+    result.escalated = True
+
+    if run_id is not None:
+        usage = getattr(response, "usage", None)
+        log_token_usage(
+            run_id=run_id,
+            vendor_id=vendor_id or "unknown",
+            post_id=post_id,
+            stage="stage2_triage_pass_b",
+            model=vision_model,
+            prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
+            completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
+            total_tokens=getattr(usage, "total_tokens", None),
+            escalated=True,
+        )
+
+    return result
+
+
+def triage_post(
+    post: Post,
+    profile: dict | None = None,
+    text_model: str = "openrouter/google/gemini-flash-1.5-8b",
+    vision_model: str = "openrouter/google/gemini-flash-1.5-8b",
+    confidence_threshold: float = 0.7,
+    run_id: str | None = None,
+    vendor_id: str | None = None,
+) -> dict:
+    """Classifies one post via the Pass A -> Pass B cascade.
+
+    Pass B only runs when the caption is uninformative or Pass A's
+    confidence is below confidence_threshold, AND the post has a
+    media_url to escalate to.
+
+    Args:
+        post: Post dict with at least "caption"; "media_url" required for
+            escalation to be possible at all.
+        profile: Stage 1's AccountProfile (as a dict), or None.
+        text_model: litellm model string for Pass A.
+        vision_model: litellm model string for Pass B.
+        confidence_threshold: Pass A confidence below this triggers escalation.
+        run_id: Groups this call's report/token_log.csv row with the rest of
+            one eval/harness.py run - token usage is only logged when this
+            is set (see complete_structured() in pipeline/llm_client.py).
+        vendor_id: Account label, for the token log's "vendor_id" column.
+
+    Returns:
+        dict matching TriageResult's fields (post_type, confidence, escalated).
+    """
+    caption = post.get("caption") or ""
+    post_id = post.get("post_id") or post.get("id") or ""
+
+    if _is_uninformative_caption(caption) and vision_image_url(post):
+        result = _pass_b(post, profile, vision_model, run_id, vendor_id, post_id)
+    else:
+        result = _pass_a(post, profile, text_model, run_id, vendor_id, post_id)
+        if result.confidence < confidence_threshold and vision_image_url(post):
+            result = _pass_b(post, profile, vision_model, run_id, vendor_id, post_id)
+
+    return result.model_dump()

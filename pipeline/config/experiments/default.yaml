@@ -1,0 +1,42 @@
+name: default
+description: >-
+  Active default experiment - what eval/harness.py and pipeline/stages/stage1_profile.py
+  use when no --config/model is passed explicitly. Sibling experiment YAMLs in this
+  directory are experiment snapshots, not alternatives that need to stay in sync with
+  this one.
+
+stage1_profile:
+  module: pipeline.stages.stage1_profile
+  function: get_or_create_profile
+  model: openrouter/stealth/ox-alpha
+  cost_per_call_usd: 0.0
+  note: >-
+    Stealth models on OpenRouter are anonymized test releases - may rotate/disappear
+    without notice. Confirm current availability at openrouter.ai/models before relying
+    on this for a real run, not just a one-off test.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/google/gemini-flash-1.5-8b
+  vision_model: openrouter/google/gemini-flash-1.5-8b
+  confidence_threshold: 0.7
+  model: cascade (see text_model/vision_model)
+  cost_per_call_usd: 0.0001
+  note: >-
+    Cascade: Pass A (text_model) runs first; escalates to Pass B (vision_model) only
+    when confidence < confidence_threshold or caption is empty/emoji-only. Check
+    openrouter.ai/models before locking in real model choices - placeholders here, not
+    verified picks. Track escalation rate once running against the real golden set -
+    brief section 5 flags >40% escalation as a sign the text prompt needs work, not the
+    model.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Real LLM extraction via Pass A (text) → Pass B (vision) cascade. Model is
+    hardcoded in-module (pipeline/stages/stage3_extract.py) — this label is
+    for reporting/token_log identification only.

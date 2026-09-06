@@ -1,0 +1,25 @@
+name: stage2_qwen_cascade
+description: >-
+  Stage 2 Triage — Qwen Cascade (OpenRouter). Not the active default; see
+  default.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/qwen/qwen-2.5-7b-instruct
+  vision_model: openrouter/qwen/qwen3-vl-8b-instruct
+  confidence_threshold: 0.7
+  model: Qwen Cascade (OpenRouter)
+  cost_per_call_usd: 0.0002
+  note: >-
+    Both qwen/qwen-2.5-7b-instruct:free and qwen/qwen-2-vl-7b-instruct:free 404 on
+    OpenRouter as of 2026-09-01 ("This model is unavailable for free"). Substituted
+    the paid qwen-2.5-7b-instruct (text, $0.0000001/token) and qwen3-vl-8b-instruct
+    (vision, $0.000000117/token) - same family/size tier, real cost is a fraction of
+    a cent per call. Requires OPENROUTER_API_KEY (see .env.example).
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

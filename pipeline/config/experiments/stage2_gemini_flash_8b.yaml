@@ -1,0 +1,22 @@
+name: stage2_gemini_flash_8b
+description: >-
+  Experiment snapshot for run_stage2_experiments.ps1 (Stage 2 model comparison). Not
+  the active default; see default.yaml.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  confidence_threshold: 0.7
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Google's smallest and fastest multimodal model. Free tier on AI Studio gives 15
+    requests per minute.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

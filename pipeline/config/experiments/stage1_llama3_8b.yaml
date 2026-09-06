@@ -1,0 +1,32 @@
+name: stage1_llama3_8b
+description: >-
+  Stage 1 model comparison snapshot - account profiling on Llama 3.1 8B. Stage 2/3
+  left at default.yaml's settings so this isolates the Stage 1 model swap; compare
+  against stage1_qwen2_7b.yaml and default.yaml's stealth model.
+
+stage1_profile:
+  module: pipeline.stages.stage1_profile
+  function: get_or_create_profile
+  model: openrouter/meta-llama/llama-3.1-8b-instruct
+  cost_per_call_usd: 0.0001
+  note: >-
+    Groq retired llama-3.1-8b-instant from its catalog (404 model_not_found as of
+    2026-09-01) - routed through OpenRouter instead. Not a free-tier model there
+    ($0.00000005/$0.00000008 per prompt/completion token), but at Stage 1's ~1-2k
+    tokens per call the real cost is a fraction of a cent. Requires
+    OPENROUTER_API_KEY (see .env.example).
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/google/gemini-flash-1.5-8b
+  vision_model: openrouter/google/gemini-flash-1.5-8b
+  confidence_threshold: 0.7
+  model: cascade (see text_model/vision_model)
+  cost_per_call_usd: 0.0001
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  model: dummy-heuristic
+  cost_per_call_usd: 0.0

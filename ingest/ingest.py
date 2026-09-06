@@ -13,7 +13,7 @@ can be re-run offline without re-hitting the API.
 
 Usage:
     1. Copy .env.example to .env and fill in IG_ACCESS_TOKEN
-    2. python ingest.py <account_label>
+    2. python ingest.py <account_label> [--token-env ENV_VAR_NAME]
 
     account_label is a folder name YOU choose to identify this
     vendor account locally (e.g. "vendor_fashion_01"). It does not
@@ -25,6 +25,12 @@ Usage:
     per §11 — no need to add more surface area than the API itself
     requires).
 
+    --token-env lets a second (or third) connected account's token
+    live in .env under its own name (e.g. IG_ACCESS_TOKEN_GADGETS)
+    instead of overwriting IG_ACCESS_TOKEN every time you switch
+    vendors - defaults to IG_ACCESS_TOKEN so existing single-account
+    setups are unaffected.
+
 Notes:
   - Uses graph.instagram.com per the "Instagram API with Instagram
     Login" product (not graph.facebook.com).
@@ -35,36 +41,37 @@ Notes:
     stay out of git (see .gitignore note at bottom of this file).
 """
 
+import argparse
 import json
-import os
+import logging
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()  # reads .env in the working directory into os.environ
+from pipeline.exceptions import MissingCredentialsError
+from pipeline.settings import get_ig_access_token
+
+logger = logging.getLogger(__name__)
 
 GRAPH_BASE = "https://graph.instagram.com"
 API_VERSION = "v26.0"  # bump as Meta ships new versions; check current in their docs
 RATE_LIMIT_SLEEP_SECONDS = 2  # gentle default pause between paginated calls
 MAX_RETRIES = 5
 
-ACCESS_TOKEN = os.environ.get("IG_ACCESS_TOKEN")
 
-
-def _get(url: str, params: dict) -> dict:
+def _get(url: str, params: dict, token: str) -> dict:
     """GET with basic 429/5xx backoff."""
-    params = {**params, "access_token": ACCESS_TOKEN}
+    params = {**params, "access_token": token}
     for attempt in range(1, MAX_RETRIES + 1):
         resp = requests.get(url, params=params, timeout=30)
         if resp.status_code == 200:
             return resp.json()
         if resp.status_code == 429 or resp.status_code >= 500:
             wait = RATE_LIMIT_SLEEP_SECONDS * (2 ** (attempt - 1))
-            print(f"  [backoff] {resp.status_code} on {url} — retry {attempt}/{MAX_RETRIES} in {wait}s")
+            logger.warning("[backoff] %s on %s - retry %d/%d in %ds", resp.status_code, url, attempt, MAX_RETRIES, wait)
             time.sleep(wait)
             continue
         # Non-retryable error — surface it immediately
@@ -72,19 +79,24 @@ def _get(url: str, params: dict) -> dict:
     raise RuntimeError(f"Gave up after {MAX_RETRIES} retries: {url}")
 
 
-def fetch_profile() -> dict:
+def fetch_profile(token: str) -> dict:
     fields = "id,username,name,biography,account_type,media_count"
-    return _get(f"{GRAPH_BASE}/{API_VERSION}/me", {"fields": fields})
+    return _get(f"{GRAPH_BASE}/{API_VERSION}/me", {"fields": fields}, token)
 
 
-def fetch_media_list() -> list[dict]:
+def fetch_media_list(token: str) -> list[dict]:
     """Paginate through /me/media."""
-    fields = "id,caption,timestamp,media_type,media_url,permalink,children{media_type,media_url}"
+    # thumbnail_url/media_product_type: only populated for media_type=VIDEO
+    # (Reels included) - media_url there is the video file, not an image.
+    # See pipeline/types.py::vision_image_url() for which field downstream
+    # vision calls/pHash actually use.
+    fields = ("id,caption,timestamp,media_type,media_url,thumbnail_url,media_product_type,"
+              "permalink,children{media_type,media_url,thumbnail_url}")
     url = f"{GRAPH_BASE}/{API_VERSION}/me/media"
     params = {"fields": fields, "limit": 50}
     all_media = []
     while url:
-        data = _get(url, params)
+        data = _get(url, params, token)
         all_media.extend(data.get("data", []))
         next_url = data.get("paging", {}).get("next")
         url = next_url
@@ -94,7 +106,7 @@ def fetch_media_list() -> list[dict]:
     return all_media
 
 
-def fetch_comments(media_id: str, debug: bool = False) -> list[dict]:
+def fetch_comments(media_id: str, token: str, debug: bool = False) -> list[dict]:
     """Paginate through comments for a single media item."""
     fields = "id,text,username,timestamp,like_count"
     url = f"{GRAPH_BASE}/{API_VERSION}/{media_id}/comments"
@@ -103,17 +115,17 @@ def fetch_comments(media_id: str, debug: bool = False) -> list[dict]:
     first_call = True
     while url:
         try:
-            data = _get(url, params)
+            data = _get(url, params, token)
         except RuntimeError as e:
             # Comments can be disabled on some posts — don't kill the whole run
-            print(f"  [warn] comments fetch failed for {media_id}: {e}")
+            logger.warning("[warn] comments fetch failed for %s: %s", media_id, e)
             break
         if debug and first_call:
-            # Prints the RAW response so you can see exactly what the API
+            # Logs the RAW response so you can see exactly what the API
             # returned — an empty {"data": []} means the request succeeded
             # but genuinely found nothing (often a scope issue), whereas an
             # "error" object here means something else is wrong entirely.
-            print(f"  [debug] raw response for {media_id}: {json.dumps(data)}")
+            logger.debug("[debug] raw response for %s: %s", media_id, json.dumps(data))
             first_call = False
         all_comments.extend(data.get("data", []))
         next_url = data.get("paging", {}).get("next")
@@ -124,25 +136,40 @@ def fetch_comments(media_id: str, debug: bool = False) -> list[dict]:
     return all_comments
 
 
-def ingest_account(account_label: str) -> Path:
-    if not ACCESS_TOKEN:
-        raise SystemExit("Set IG_ACCESS_TOKEN in your environment first.")
+def ingest_account(account_label: str, token_env: str = "IG_ACCESS_TOKEN") -> Path:
+    """Pulls profile + media + comments for the connected IG account and
+    caches the result to runs/<account_label>/raw/dump_<timestamp>.json.
+
+    Args:
+        account_label: Local folder name for this vendor's runs/ and
+            eval/golden/ files - see the module docstring.
+        token_env: .env variable name holding this account's access token.
+            Defaults to IG_ACCESS_TOKEN; pass a different name (e.g.
+            IG_ACCESS_TOKEN_GADGETS) to ingest a second connected account
+            without overwriting the first one's token in .env.
+
+    Raises:
+        MissingCredentialsError: If the resolved token env var isn't set.
+    """
+    token = get_ig_access_token(token_env)
+    if not token:
+        raise MissingCredentialsError(f"Set {token_env} in your environment first.")
 
     run_dir = Path("runs") / account_label / "raw"
     run_dir.mkdir(parents=True, exist_ok=True)
     pulled_at = datetime.now(timezone.utc).isoformat()
 
-    print(f"[1/3] Fetching profile for '{account_label}'...")
-    profile = fetch_profile()
+    logger.info("[1/3] Fetching profile for '%s'...", account_label)
+    profile = fetch_profile(token)
 
-    print("[2/3] Fetching media list (paginated)...")
-    media_list = fetch_media_list()
-    print(f"  -> {len(media_list)} posts found")
+    logger.info("[2/3] Fetching media list (paginated)...")
+    media_list = fetch_media_list(token)
+    logger.info("  -> %d posts found", len(media_list))
 
-    print("[3/3] Fetching comments per post (this is the slow part)...")
+    logger.info("[3/3] Fetching comments per post (this is the slow part)...")
     for i, post in enumerate(media_list, start=1):
-        post["comments"] = fetch_comments(post["id"], debug=(i == 1))
-        print(f"  -> [{i}/{len(media_list)}] {post['id']}: {len(post['comments'])} comments")
+        post["comments"] = fetch_comments(post["id"], token, debug=(i == 1))
+        logger.info("  -> [%d/%d] %s: %d comments", i, len(media_list), post["id"], len(post["comments"]))
         time.sleep(RATE_LIMIT_SLEEP_SECONDS)
 
     dump = {
@@ -154,13 +181,26 @@ def ingest_account(account_label: str) -> Path:
 
     out_path = run_dir / f"dump_{pulled_at.replace(':', '-')}.json"
     out_path.write_text(json.dumps(dump, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"\nDone. Raw dump cached at: {out_path}")
-    print("Re-run the pipeline against this file offline — no need to re-hit the API.")
+    logger.info("Done. Raw dump cached at: %s", out_path)
+    logger.info("Re-run the pipeline against this file offline — no need to re-hit the API.")
     return out_path
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python ingest.py <account_label>")
-        sys.exit(1)
-    ingest_account(sys.argv[1])
+    from pipeline.exceptions import PipelineError
+    from pipeline.logging_config import configure_logging
+
+    configure_logging()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("account_label", help="Local folder name for this vendor's runs/ and eval/golden/ files")
+    parser.add_argument("--token-env", default="IG_ACCESS_TOKEN",
+                         help="Env var holding this account's access token (default: IG_ACCESS_TOKEN) - "
+                              "use a different name to ingest a second connected account without "
+                              "overwriting the first one's token in .env")
+    args = parser.parse_args()
+
+    try:
+        ingest_account(args.account_label, token_env=args.token_env)
+    except PipelineError as exc:
+        sys.exit(str(exc))
