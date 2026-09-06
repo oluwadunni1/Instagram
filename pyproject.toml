@@ -15,7 +15,9 @@ dependencies = [
 ]
 
 [tool.uv]
-dev-dependencies = []
+dev-dependencies = [
+    "dvc[s3]>=3.67.1",
+]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

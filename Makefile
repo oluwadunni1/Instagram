@@ -22,7 +22,7 @@ STAGE3    ?= report/stage3_gemini-3.5-flash-lite_Google_AI_Studio_predictions.js
 STAGE4    ?= report/stage4_gemini_gemini-3.5-flash-lite_predictions.json
 
 .DEFAULT_GOAL := help
-.PHONY: help ingest golden update-golden harness stage5 snapshot sync simulate-sync
+.PHONY: help ingest golden update-golden harness stage5 snapshot sync simulate-sync dvc-setup data-push data-pull data-status
 
 help:
 	@echo "Targets (each wraps an existing uv run script - see README for the full workflow):"
@@ -34,6 +34,12 @@ help:
 	@echo "  snapshot        uv run scripts/run_build_snapshot.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN)"
 	@echo "  sync            uv run scripts/run_stage6.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN) --changes \$$(CHANGES) --token-env \$$(TOKEN_ENV)"
 	@echo "  simulate-sync   uv run scripts/simulate_stage6.py"
+	@echo ""
+	@echo "Data (DVC -> Cloudflare R2; tracks eval/golden, runs, data/snapshots, report):"
+	@echo "  dvc-setup       one-time: read R2_* from .env, configure the remote"
+	@echo "  data-push       upload local data to R2"
+	@echo "  data-pull       download data from R2 (use on a fresh clone)"
+	@echo "  data-status     show what differs between local, cache, and R2"
 	@echo ""
 	@echo "Variables (override with VAR=value): ACCOUNT TOKEN_ENV VENDOR GOLDEN CONFIG CHANGES LABEL STAGE2 STAGE3 STAGE4 APPEND"
 	@echo "Current defaults: ACCOUNT=$(ACCOUNT) TOKEN_ENV=$(TOKEN_ENV) VENDOR=$(VENDOR) GOLDEN=$(GOLDEN) CONFIG=$(CONFIG)"
@@ -61,3 +67,24 @@ sync:
 
 simulate-sync:
 	uv run scripts/simulate_stage6.py
+
+# --- Data versioning (DVC -> Cloudflare R2) -------------------------------
+# The four data paths are DVC-tracked, not in git (see .gitignore). Each has
+# a committed *.dvc pointer, so `git checkout <commit> && make data-pull`
+# restores the exact data that commit was produced against.
+#
+# dvc-setup is one-time (or after credentials rotate); it reads R2_ACCOUNT_ID,
+# R2_BUCKET, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY from .env. After it
+# runs, plain `uv run dvc push/pull` work too - these are just shorthand.
+
+dvc-setup:
+	uv run scripts/setup_dvc_remote.py
+
+data-push:
+	uv run dvc push
+
+data-pull:
+	uv run dvc pull
+
+data-status:
+	uv run dvc status --cloud
