@@ -166,7 +166,15 @@ vendors into one accuracy number (tagging the token log `all_vendors`). Always p
 **Comments always come back empty from the Graph API.** Every post, every account. This is
 not a bug and not fixable in code: `instagram_business_manage_comments` is at Standard Access
 while the Meta app is in Development mode, and comment text belongs to third-party users, so
-Meta withholds it until App Review grants Advanced Access. `comments_count` reads 0 too.
+Meta withholds it until App Review grants Advanced Access.
+
+**Updated 2026-09-10: `comments_count` now returns a real number; only the text is still
+withheld.** Verified live on post `18128205745669337` — `comments_count: 2`, comments
+array empty. This is why Stage 6 detects a `comment_delta` at all: it diffs
+`comments_count`, not text. The consequence is a half-signal — sync can tell you
+comments arrived on a post, but Stage 4 gets a count with nothing to read, so it cannot
+say whether they mean "sold" or "how much?". Do not read a `comment_delta` as evidence
+Stage 4 acted on real comment content.
 Golden-set comments are therefore **hand-authored** (their IDs are a giveaway: a tidy
 `1785889326900001x` sequence), and `simulate_stage6.py` injects synthetic ones. This is the
 sanctioned workaround, not something to re-investigate — see `FINDINGS.md` 2026-09-04.
