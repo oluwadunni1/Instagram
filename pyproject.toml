@@ -17,7 +17,17 @@ dependencies = [
 [tool.uv]
 dev-dependencies = [
     "dvc[s3]>=3.67.1",
+    "pytest>=8.0",
 ]
+
+# There is still no broad test suite by design - eval/harness.py is the
+# verification mechanism for model quality (see CLAUDE.md). tests/ covers
+# only what the harness structurally cannot: credential handling, the
+# harness's own error isolation, and deterministic Stage 5 routing. Every
+# test is offline - no network, no .env, no golden-set reads.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

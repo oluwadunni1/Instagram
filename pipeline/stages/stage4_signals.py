@@ -34,16 +34,28 @@ logger = logging.getLogger(__name__)
 
 MODEL = "gemini/gemini-3.5-flash-lite"
 
+# NOTE ON \b: both word boundaries are load-bearing - the leading one stops "sold"
+# matching "resold", the trailing one stops it matching "soldier". The original bug
+# was not the boundaries themselves but pairing them with STEM-PREFIXES: \bfinanc\b
+# can never match "financing", \bnegotiat\b can never match "negotiable", \bbank\b
+# misses "banks", \bslash\b misses "slashed". Those were dead alternatives that
+# could not fire on any real word, and the signals they gate reached the LLM only by
+# accident, via unrelated tokens like "still available" (FINDINGS.md 2026-09-07).
+# The fix keeps both boundaries and adds \w* to the stems that need inflection -
+# \bfinanc\w*\b matches "financing" because \w* consumes the suffix before the
+# trailing boundary applies.
 PREFILTER_RE = re.compile(
-    r"\b(sold|gone|out of stock|sold out|"
+    r"\b("
+    r"sold|gone|out of stock|sold out|"
     r"still available|still up|"
-    r"units? left|in stock|units? (landed|available)|"
-    r"restocked|back in stock|pre.?order|"
-    r"negotiat|flexible|room to|serious buyer|"
-    r"financ|bank|installment|"
-    r"swap|exchange|"
-    r"clearance|price drop|slash|"
-    r"going fast|hurry|limited|last (unit|one|chance))\b",
+    r"units? left|in stock|units? (?:landed|available)|only \d+ units?|exactly \d+ units?|"
+    r"restock\w*|back in stock|pre.?order\w*|"
+    r"negotia\w*|flexib\w*|room to|serious buyer\w*|"
+    r"financ\w*|bank\w*|instal?lment\w*|deposit\w*|spread the|pay later|part payment|"
+    r"swap\w*|exchang\w*|"
+    r"clearanc\w*|price drop\w*|slash\w*|"
+    r"going fast|hurry\w*|limit\w*|last (?:unit|one|chance|few)|first come"
+    r")\b",
     re.IGNORECASE,
 )
 
@@ -167,7 +179,7 @@ def _build_user_prompt(post: Post, profile: dict | None) -> str:
 def detect_signals(
     post: Post,
     profile: dict | None = None,
-    model: str = MODEL,
+    signals_model: str = MODEL,
     run_id: str | None = None,
     vendor_id: str | None = None,
 ) -> list[dict]:
@@ -179,7 +191,14 @@ def detect_signals(
         profile: Stage 1's AccountProfile, as a dict or the pydantic model
             itself (both are accepted here, see _vendor_username). Used to
             label comments [VENDOR] vs [BUYER].
-        model: litellm model string for the LLM extraction call.
+        signals_model: litellm model string for the LLM extraction call.
+            Named `signals_model`, NOT `model`, deliberately: `model` is a
+            reserved key in the experiment YAMLs (a human-readable label used
+            for reporting and prediction filenames, e.g. "Gemini Cascade
+            (Google AI Studio)") and is stripped by
+            eval/harness.py::load_stage_fn() before kwargs are bound. A
+            parameter called `model` therefore silently never receives its
+            configured value - see FINDINGS.md 2026-09-07.
         run_id: Groups this call's report/token_log.csv row with the rest of
             one eval/harness.py run - token usage is only logged when this
             is set (see log_token_usage() in pipeline/llm_client.py).
@@ -206,7 +225,7 @@ def detect_signals(
     user_prompt = _build_user_prompt(post, profile)
 
     result = complete_structured(
-        model=model,
+        model=signals_model,
         system_prompt=SYSTEM_PROMPT,
         user_prompt=user_prompt,
         schema=SignalExtractionResult,

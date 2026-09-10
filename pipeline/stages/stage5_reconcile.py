@@ -6,7 +6,7 @@ products into one of three buckets for the POC catalog import flow.
 
 from typing import Literal
 
-from pipeline.types import Post
+from pipeline.types import Post, vision_image_url
 
 Bucket = Literal["auto_import", "needs_attention", "auto_exclude"]
 
@@ -37,7 +37,11 @@ def route_post(
          -> needs_attention if any flag fires, else auto_import
     """
     post_id = post.get("post_id") or post.get("id") or ""
-    thumbnail_url = post.get("media_url")
+    # vision_image_url(), not media_url: for a Reel/VIDEO post media_url is
+    # the .mp4 itself, and this value is handed to a human reviewer as the
+    # post's thumbnail. Stage 5 was missed by the 2026-09-05 sweep that
+    # threaded this helper through Stage 2/3 and the pHash call sites.
+    thumbnail_url = vision_image_url(post)
 
     if stage2_result.get("post_type") != "product_listing":
         return {
@@ -79,6 +83,16 @@ def route_post(
         extraction_confidence = product.get("extraction_confidence")
         if extraction_confidence is not None and extraction_confidence < LOW_CONFIDENCE_THRESHOLD:
             flags.append(LOW_CONFIDENCE_FLAG)
+
+    # Deduplicate, preserving first-seen order. The loop above runs per
+    # product, so a 3-product post with no prices appended MISSING_PRICE_FLAG
+    # three times. That never changed the bucket (only emptiness is checked),
+    # but flags feeds two things it did corrupt: run_stage5.py's
+    # `flag_counts.update(r["flags"])` frequency table, whose "[Nx] reason"
+    # lines get quoted verbatim into FINDINGS.md, and the per-post
+    # needs-attention line, which repeated the same sentence to the reviewer.
+    # Flags are post-level reasons, so one entry per distinct reason.
+    flags = list(dict.fromkeys(flags))
 
     bucket: Bucket = "needs_attention" if flags else "auto_import"
 

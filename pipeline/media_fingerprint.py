@@ -20,6 +20,7 @@ import requests
 from PIL import Image
 
 import pipeline.settings  # noqa: F401 - import side effect: load_dotenv()
+from pipeline.settings import gemini_auth_headers, redact_tokens
 
 logger = logging.getLogger(__name__)
 
@@ -85,9 +86,13 @@ def compute_caption_embedding(caption: str | None, post_id: str = "") -> tuple[l
         return [0.0] * EMBEDDING_DIM, True
 
     try:
+        # The key goes in an x-goog-api-key header, never `?key=` - requests
+        # embeds the full request URL in HTTPError, and this call's failure
+        # path logs at WARNING (visible at any LOG_LEVEL), so a quota 429
+        # here used to print the live Gemini key. See FINDINGS.md 2026-09-08.
         resp = requests.post(
             GEMINI_EMBED_URL,
-            params={"key": GEMINI_API_KEY},
+            headers=gemini_auth_headers(GEMINI_API_KEY),
             json={
                 "content": {"parts": [{"text": caption}]},
                 "taskType": "SEMANTIC_SIMILARITY",
@@ -99,7 +104,9 @@ def compute_caption_embedding(caption: str | None, post_id: str = "") -> tuple[l
         values = resp.json()["embedding"]["values"]
         return values, True
     except Exception as exc:  # noqa: BLE001 - any failure degrades to a zero vector
-        logger.warning("[embedding] %s: Gemini embedding call failed: %s", post_id, exc)
+        # redact_tokens(exc), not the bare exception: defence in depth for
+        # anything that still manages to carry a credential into an error.
+        logger.warning("[embedding] %s: Gemini embedding call failed: %s", post_id, redact_tokens(exc))
         return [0.0] * EMBEDDING_DIM, False
     finally:
         time.sleep(EMBEDDING_SLEEP_SECONDS)

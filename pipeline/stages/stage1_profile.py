@@ -145,20 +145,31 @@ def _default_model_from_config() -> str:
     return config.stage1_profile.model
 
 
-def get_or_create_profile(account_label: str, model: str | None = None, force_refresh: bool = False) -> AccountProfile:
+def get_or_create_profile(
+    account_label: str, profile_model: str | None = None, force_refresh: bool = False
+) -> AccountProfile:
     """Entry point for downstream stages. Loads the cached profile if
     it exists; only calls the model if it doesn't, or force_refresh=True.
     This is what makes Stage 1 genuinely 'once per account' in practice,
     not just in intent.
 
-    model=None (the default) reads pipeline/config/experiments/default.yaml's
-    stage1_profile.model - pass a model string explicitly only when
-    deliberately testing something OTHER than default.yaml's current
-    configured choice (e.g. comparing two candidates).
+    profile_model=None (the default) reads
+    pipeline/config/experiments/default.yaml's stage1_profile.model - pass a
+    model string explicitly only when deliberately testing something OTHER
+    than default.yaml's current configured choice (e.g. comparing two
+    candidates).
+
+    Named `profile_model`, NOT `model`, to satisfy the invariant enforced by
+    eval/harness.py::load_stage_fn(): `model` is a reserved YAML key holding a
+    display label, and a stage parameter of that name can never be bound from
+    config. Stage 1 resolves its own model from config so it was never
+    actually broken by this, unlike Stage 4 was - see FINDINGS.md 2026-09-07 -
+    but the naming is now uniform across every stage.
 
     Raises:
         MissingRawDumpError: If no raw dump exists yet for account_label.
     """
+    model = profile_model
     if model is None:
         model = _default_model_from_config()
 
@@ -199,12 +210,12 @@ if __name__ == "__main__":
     if len(sys.argv) not in (2, 3):
         logger.info("Usage: uv run pipeline/stages/stage1_profile.py <account_label> [model]")
         logger.info("  If [model] is omitted, uses pipeline/config/experiments/default.yaml's stage1_profile.model")
-        logger.info("Example: uv run pipeline/stages/stage1_profile.py vendor_autos_01 openrouter/google/gemini-flash-1.5-8b")
+        logger.info("Example: uv run pipeline/stages/stage1_profile.py vendor_autos_01 gemini/gemini-3.5-flash-lite")
         sys.exit(1)
     account = sys.argv[1]
-    model = sys.argv[2] if len(sys.argv) == 3 else None
+    cli_model = sys.argv[2] if len(sys.argv) == 3 else None
     try:
-        result = get_or_create_profile(account, model, force_refresh=True)
+        result = get_or_create_profile(account, profile_model=cli_model, force_refresh=True)
     except PipelineError as exc:
         sys.exit(str(exc))
     print(result.model_dump_json(indent=2))

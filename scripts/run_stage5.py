@@ -4,18 +4,16 @@ Stage 5 - Flags & Routing
 Loads cached Stage 2/3/4 prediction JSONs and routes each post into a bucket.
 Zero LLM calls. Run with: uv run scripts/run_stage5.py
 
-Defaults reproduce the original vendor_autos_01 / Gemini Cascade run. To
-route a different vendor's cached predictions (e.g. after running
-eval/harness.py against eval/golden/vendor_gadgets_01.json), pass the golden
-file and the three prediction paths explicitly - prediction filenames are
-keyed by model label, not by vendor, so there's no way to infer them from
-the vendor name alone:
+Defaults reproduce the original vendor_autos_01 / Gemini Cascade run.
+eval/harness.py writes predictions to report/<vendor_id>/, where vendor_id
+is the golden file's stem - but the filename within that directory is keyed
+by model label, so the model half still has to be named explicitly:
 
     uv run scripts/run_stage5.py \\
         --golden eval/golden/vendor_gadgets_01.json \\
-        --stage2 report/stage2_<model>_predictions.json \\
-        --stage3 report/stage3_<model>_predictions.json \\
-        --stage4 report/stage4_<model>_predictions.json \\
+        --stage2 report/vendor_gadgets_01/stage2_<model>_predictions.json \\
+        --stage3 report/vendor_gadgets_01/stage3_<model>_predictions.json \\
+        --stage4 report/vendor_gadgets_01/stage4_<model>_predictions.json \\
         --label "GPT-4o Mini" --append-findings
 """
 
@@ -30,9 +28,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pipeline.stages.stage5_reconcile import route_post  # noqa: E402
 
-DEFAULT_STAGE2_PATH = Path("report/stage2_Gemini_Cascade_Google_AI_Studio_predictions.json")
-DEFAULT_STAGE3_PATH = Path("report/stage3_gemini-3.5-flash-lite_Google_AI_Studio_predictions.json")
-DEFAULT_STAGE4_PATH = Path("report/stage4_gemini_gemini-3.5-flash-lite_predictions.json")
+DEFAULT_STAGE2_PATH = Path("report/vendor_autos_01/stage2_Gemini_Cascade_Google_AI_Studio_predictions.json")
+DEFAULT_STAGE3_PATH = Path("report/vendor_autos_01/stage3_gemini-3.5-flash-lite_Google_AI_Studio_predictions.json")
+DEFAULT_STAGE4_PATH = Path("report/vendor_autos_01/stage4_gemini_gemini-3.5-flash-lite_predictions.json")
 DEFAULT_GOLDEN_PATH = Path("eval/golden/vendor_autos_01.json")
 DEFAULT_LABEL = "Gemini Cascade"
 
@@ -48,11 +46,11 @@ def main() -> None:
     parser.add_argument("--golden", type=Path, default=DEFAULT_GOLDEN_PATH,
                          help="Golden-set file to route (default: vendor_autos_01)")
     parser.add_argument("--stage2", type=Path, default=DEFAULT_STAGE2_PATH,
-                         help="Stage 2 report/stage2_*_predictions.json to route")
+                         help="Stage 2 report/<vendor>/stage2_*_predictions.json to route")
     parser.add_argument("--stage3", type=Path, default=DEFAULT_STAGE3_PATH,
-                         help="Stage 3 report/stage3_*_predictions.json to route")
+                         help="Stage 3 report/<vendor>/stage3_*_predictions.json to route")
     parser.add_argument("--stage4", type=Path, default=DEFAULT_STAGE4_PATH,
-                         help="Stage 4 report/stage4_*_predictions.json to route")
+                         help="Stage 4 report/<vendor>/stage4_*_predictions.json to route")
     parser.add_argument("--label", default=DEFAULT_LABEL,
                          help="Label for the console header and FINDINGS.md section title")
     parser.add_argument("--append-findings", action="store_true",

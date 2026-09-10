@@ -37,7 +37,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from pipeline.exceptions import MissingCredentialsError  # noqa: E402
 from pipeline.logging_config import configure_logging  # noqa: E402
 from pipeline.media_fingerprint import compute_caption_embedding, compute_image_phash  # noqa: E402
-from pipeline.settings import get_ig_access_token  # noqa: E402
+from pipeline.settings import (  # noqa: E402
+    get_ig_access_token,
+    ig_auth_headers,
+    redact_tokens,
+    strip_url_credentials,
+)
 from pipeline.stages.stage6_sync import (  # noqa: E402
     compute_content_hash,
     compute_lifecycle_state,
@@ -116,16 +121,44 @@ AUTO_MERGE_PHASH_MAX_DISTANCE = 0
 def _fetch_all_media(token: str) -> list[dict]:
     """Paginates /me/media for the connected account (the same "Instagram
     Login" pattern ingest.py uses - there is no way to query an arbitrary
-    handle directly, only the account the token is connected to)."""
+    handle directly, only the account the token is connected to).
+
+    The token goes in an Authorization header rather than the query string,
+    and every failure path is redacted before it reaches a log or an
+    exception message - `raise_for_status()` and requests' connection errors
+    both embed the request URL, which is how a live token used to reach the
+    console on an expired token, a 429, or any transient 5xx.
+    """
     url = f"{GRAPH_BASE}/{API_VERSION}/me/media"
-    params = {"fields": MEDIA_FIELDS, "limit": 50, "access_token": token}
+    params = {"fields": MEDIA_FIELDS, "limit": 50}
+    headers = ig_auth_headers(token)
     all_media: list[dict] = []
     while url:
-        resp = requests.get(url, params=params, timeout=REQUEST_TIMEOUT_SECONDS)
-        resp.raise_for_status()
+        try:
+            resp = requests.get(url, params=params, headers=headers, timeout=REQUEST_TIMEOUT_SECONDS)
+            resp.raise_for_status()
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else "?"
+            body = redact_tokens(exc.response.text)[:300] if exc.response is not None else ""
+            raise RuntimeError(f"Graph API media fetch failed (HTTP {status}): {body}") from None
+        except requests.RequestException as exc:
+            raise RuntimeError(f"Graph API media fetch failed: {redact_tokens(exc)}") from None
         data = resp.json()
         all_media.extend(data.get("data", []))
-        url = data.get("paging", {}).get("next")
+        # Strip any credential Graph echoed into paging.next before following
+        # it - pagination reuses that URL verbatim, so an echoed
+        # `access_token=` would put the token back in the query string even
+        # though this call authenticated with a header. Mirrors
+        # ingest.py::_next_page_url(); see FINDINGS.md 2026-09-08.
+        next_url = (data.get("paging") or {}).get("next")
+        if next_url:
+            next_url, had_credential = strip_url_credentials(next_url)
+            if had_credential:
+                logger.warning(
+                    "[paging] Graph echoed a credential query param into paging.next; "
+                    "stripped it before following. Record this in FINDINGS.md."
+                )
+        url = next_url
         params = {}  # next_url already carries all query params
         if url:
             time.sleep(PAGE_SLEEP_SECONDS)

@@ -1,0 +1,12 @@
+# Optional: for anyone who already uses the pre-commit framework
+# (`uv run pre-commit install`). The framework is NOT a dependency of this
+# repo - `make install-hooks` installs the same check as a plain git hook
+# with nothing to install first. Both run scripts/scan_secrets.py.
+repos:
+  - repo: local
+    hooks:
+      - id: scan-secrets
+        name: scan for credentials and DVC-tracked data
+        entry: uv run scripts/scan_secrets.py
+        language: system
+        pass_filenames: true

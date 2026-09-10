@@ -52,7 +52,12 @@ from pathlib import Path
 import requests
 
 from pipeline.exceptions import MissingCredentialsError
-from pipeline.settings import get_ig_access_token
+from pipeline.settings import (
+    get_ig_access_token,
+    ig_auth_headers,
+    redact_tokens,
+    strip_url_credentials,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -63,20 +68,54 @@ MAX_RETRIES = 5
 
 
 def _get(url: str, params: dict, token: str) -> dict:
-    """GET with basic 429/5xx backoff."""
-    params = {**params, "access_token": token}
+    """GET with basic 429/5xx backoff.
+
+    The token goes in an Authorization header, never the query string - a
+    token in the URL leaks into urllib3's DEBUG log line and into requests'
+    exception messages (see pipeline/settings.py::ig_auth_headers).
+    """
+    headers = ig_auth_headers(token)
     for attempt in range(1, MAX_RETRIES + 1):
-        resp = requests.get(url, params=params, timeout=30)
+        resp = requests.get(url, params=params, headers=headers, timeout=30)
         if resp.status_code == 200:
             return resp.json()
         if resp.status_code == 429 or resp.status_code >= 500:
             wait = RATE_LIMIT_SLEEP_SECONDS * (2 ** (attempt - 1))
-            logger.warning("[backoff] %s on %s - retry %d/%d in %ds", resp.status_code, url, attempt, MAX_RETRIES, wait)
+            logger.warning("[backoff] %s on %s - retry %d/%d in %ds",
+                            resp.status_code, redact_tokens(url), attempt, MAX_RETRIES, wait)
             time.sleep(wait)
             continue
-        # Non-retryable error — surface it immediately
-        raise RuntimeError(f"Request failed ({resp.status_code}): {resp.text}")
-    raise RuntimeError(f"Gave up after {MAX_RETRIES} retries: {url}")
+        # Non-retryable error — surface it immediately. Both the URL and the
+        # response body are redacted: a paginated `next` URL echoed back by
+        # the API can itself carry the token.
+        raise RuntimeError(f"Request failed ({resp.status_code}): {redact_tokens(resp.text)}")
+    raise RuntimeError(f"Gave up after {MAX_RETRIES} retries: {redact_tokens(url)}")
+
+
+def _next_page_url(data: dict, context: str) -> str | None:
+    """The `paging.next` URL to follow, with any credential query param
+    stripped.
+
+    Pagination follows Graph's own URL verbatim, so if Meta echoes an
+    `access_token=` param into it, the follow-up request carries the token
+    in its query string even though the first call used a header. Stripping
+    it costs nothing (the Authorization header still authenticates) and the
+    log line below answers, on the next real run, whether Graph does this -
+    an open question as of 2026-09-08, since raw dumps only persist the
+    merged media list, not the paging envelope. Logs the fact, never the URL.
+    """
+    next_url = (data.get("paging") or {}).get("next")
+    if not next_url:
+        return None
+    clean_url, had_credential = strip_url_credentials(next_url)
+    if had_credential:
+        logger.warning(
+            "[paging] %s: Graph echoed a credential query param into paging.next; "
+            "stripped it before following. Header auth still applies. "
+            "Record this in FINDINGS.md - it resolves the 2026-09-08 open question.",
+            context,
+        )
+    return clean_url
 
 
 def fetch_profile(token: str) -> dict:
@@ -98,8 +137,7 @@ def fetch_media_list(token: str) -> list[dict]:
     while url:
         data = _get(url, params, token)
         all_media.extend(data.get("data", []))
-        next_url = data.get("paging", {}).get("next")
-        url = next_url
+        url = _next_page_url(data, "me/media")
         params = {}  # next_url already carries all query params
         if url:
             time.sleep(RATE_LIMIT_SLEEP_SECONDS)
@@ -128,8 +166,7 @@ def fetch_comments(media_id: str, token: str, debug: bool = False) -> list[dict]
             logger.debug("[debug] raw response for %s: %s", media_id, json.dumps(data))
             first_call = False
         all_comments.extend(data.get("data", []))
-        next_url = data.get("paging", {}).get("next")
-        url = next_url
+        url = _next_page_url(data, f"{media_id}/comments")
         params = {}
         if url:
             time.sleep(RATE_LIMIT_SLEEP_SECONDS)

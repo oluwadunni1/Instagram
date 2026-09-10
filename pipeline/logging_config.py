@@ -39,6 +39,10 @@ def configure_logging(level: str | None = None) -> None:
     root = logging.getLogger()
     root.setLevel(resolved_level)
 
+    # Before the early return below, so a second configure_logging() call
+    # re-applies it rather than silently skipping it.
+    _suppress_http_wire_logs()
+
     existing = next((h for h in root.handlers if isinstance(h, logging.StreamHandler)), None)
     if existing is not None:
         existing.setLevel(resolved_level)
@@ -48,3 +52,22 @@ def configure_logging(level: str | None = None) -> None:
     handler.setLevel(resolved_level)
     handler.setFormatter(_PlainInfoFormatter())
     root.addHandler(handler)
+
+
+def _suppress_http_wire_logs() -> None:
+    """Keep urllib3's per-request DEBUG line out of the log.
+
+    urllib3 logs `"GET /path?query HTTP/1.1" 200` at DEBUG, i.e. the full
+    query string. Historically that printed live Instagram access tokens to
+    the console on any LOG_LEVEL=DEBUG run, because the token was passed as
+    an `access_token` query param. Calls now use an Authorization header
+    (see pipeline/settings.py::ig_auth_headers), so the URL no longer carries
+    the token - this floor is the belt-and-braces half of that fix, and also
+    stops DEBUG runs drowning real output in wire noise. Mirrors the existing
+    litellm suppression in pipeline/llm_client.py.
+
+    Raising the level to INFO (not disabling) keeps genuine urllib3 warnings,
+    like retry/connection-pool messages, visible.
+    """
+    for noisy in ("urllib3", "urllib3.connectionpool", "requests.packages.urllib3"):
+        logging.getLogger(noisy).setLevel(logging.INFO)

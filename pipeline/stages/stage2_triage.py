@@ -31,6 +31,15 @@ POST_TYPES = Literal[
     "product_listing", "announcement", "testimonial_repost", "meme_personal", "ad_creative"
 ]
 
+# In-module fallback for triage_post()'s text_model/vision_model, mirroring
+# stage3_extract.py's and stage4_signals.py's MODEL constants. Was previously
+# the literal "openrouter/google/gemini-flash-1.5-8b" - a model that has since
+# been retired and 404s. That was dormant only because every shipping config
+# sets both text_model and vision_model explicitly; the first config to omit
+# either, or any direct triage_post(post) call, would have 404'd on every
+# Stage 2 call with no loud failure (2026-09-08 audit).
+MODEL = "gemini/gemini-3.5-flash-lite"
+
 # Caption is "non-informative" if, after stripping emoji/punctuation/whitespace,
 # fewer than this many characters remain - triggers escalation regardless of
 # Pass A's stated confidence, since there was barely any text to classify from.
@@ -168,8 +177,8 @@ def _pass_b(
 def triage_post(
     post: Post,
     profile: dict | None = None,
-    text_model: str = "openrouter/google/gemini-flash-1.5-8b",
-    vision_model: str = "openrouter/google/gemini-flash-1.5-8b",
+    text_model: str = MODEL,
+    vision_model: str = MODEL,
     confidence_threshold: float = 0.7,
     run_id: str | None = None,
     vendor_id: str | None = None,
