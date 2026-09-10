@@ -1,0 +1,47 @@
+name: family_gemini
+description: >-
+  END-TO-END family config: every LLM stage on the Gemini family, for a chained
+  Stage 2-5 comparison via scripts/run_pipeline.py. Unlike the stage2_*/stage3_*/
+  stage4_* snapshots - which swap ONE stage and leave the others on Gemini, so none
+  of them is a same-family run - this file holds one family across all three stages.
+  Identical in content to default.yaml; kept as a separate file so the four family
+  configs read as a set and the comparison names its configs explicitly.
+
+  Stage 1 is deliberately absent from every family_*.yaml. get_or_create_profile()
+  caches to runs/<account>/profile.json, so all four families would silently share
+  whichever profile was generated first - a per-family Stage 1 number would be
+  fiction. Stage 1 is one call per account (~1% of tokens) and has no gold set.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash
+  confidence_threshold: 0.7
+  model: Gemini Family (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Same cascade as default.yaml and stage2_gemini_cascade.yaml - cheap text Pass A,
+    stronger vision Pass B. Scored 38/41 on vendor_gadgets_01 and 27/30 on
+    vendor_autos_01 in the per-stage harness runs.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  model: Gemini Family (Google AI Studio)
+  cost_per_call_usd: 0.0
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  signals_model: gemini/gemini-3.5-flash-lite
+  model: Gemini Family (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    signals_model, not model - see the invariant in CLAUDE.md. A parameter named
+    "model" is stripped by load_stage_fn() and would silently never bind.
+
+  # VERIFIED: this is the only family config that has actually run end-to-end.
+  # Free tier, so no credit required. See FINDINGS.md 2026-09-09.

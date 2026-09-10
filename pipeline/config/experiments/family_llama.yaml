@@ -1,0 +1,59 @@
+name: family_llama
+description: >-
+  END-TO-END family config: every LLM stage on the Llama family, for a chained
+  Stage 2-5 comparison via scripts/run_pipeline.py. Stage 1 is deliberately absent
+  from every family_*.yaml - see family_gemini.yaml for why.
+
+  NOTE: this file supplies the FIRST Llama Stage 3 entry in the repo. FINDINGS.md
+  (2026-09-08) records "Llama has no Stage 5 row: no stage3_llama* config exists, so
+  there is no same-family Stage 3 prediction to route from" - this closes that gap.
+  The Stage 3 pairing mirrors the Stage 2 one from stage2_llama_cascade.yaml
+  (llama-3.1-8b text, llama-4-scout vision, which is the multimodal member).
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/meta-llama/llama-3.1-8b-instruct
+  vision_model: openrouter/meta-llama/llama-4-scout
+  confidence_threshold: 0.7
+  model: Llama Family (OpenRouter)
+  cost_per_call_usd: 0.0
+  note: >-
+    UNRUN AS OF 2026-09-09. OpenRouter balance is negative (credits 0, usage $0.197,
+    confirmed live) so no call from this family can succeed. Do NOT publish any number
+    from this config until it has passed a smoke test - `make pipeline ACCOUNT=<acct>
+    CONFIG=pipeline/config/experiments/<this file> LIMIT=2` - and report/token_log.csv
+    shows THIS family's model strings for that run_id. The whole reason that check
+    exists: every Stage 4 comparison published before 2026-09-07 reported four models
+    while running one, and the token log was the only thing that could prove it.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: openrouter/meta-llama/llama-3.1-8b-instruct
+  vision_model: openrouter/meta-llama/llama-4-scout
+  model: Llama Family (OpenRouter)
+  cost_per_call_usd: 0.0
+  note: >-
+    UNRUN AS OF 2026-09-09. OpenRouter balance is negative (credits 0, usage $0.197,
+    confirmed live) so no call from this family can succeed. Do NOT publish any number
+    from this config until it has passed a smoke test - `make pipeline ACCOUNT=<acct>
+    CONFIG=pipeline/config/experiments/<this file> LIMIT=2` - and report/token_log.csv
+    shows THIS family's model strings for that run_id. The whole reason that check
+    exists: every Stage 4 comparison published before 2026-09-07 reported four models
+    while running one, and the token log was the only thing that could prove it.
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  signals_model: openrouter/meta-llama/llama-3.1-8b-instruct
+  model: Llama Family (OpenRouter)
+  cost_per_call_usd: 0.0
+  note: >-
+    UNRUN AS OF 2026-09-09. OpenRouter balance is negative (credits 0, usage $0.197,
+    confirmed live) so no call from this family can succeed. Do NOT publish any number
+    from this config until it has passed a smoke test - `make pipeline ACCOUNT=<acct>
+    CONFIG=pipeline/config/experiments/<this file> LIMIT=2` - and report/token_log.csv
+    shows THIS family's model strings for that run_id. The whole reason that check
+    exists: every Stage 4 comparison published before 2026-09-07 reported four models
+    while running one, and the token log was the only thing that could prove it.

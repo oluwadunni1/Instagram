@@ -32,6 +32,10 @@ stage4_signals:
   model: gemini-3.5-flash-lite (Google AI Studio)
   cost_per_call_usd: 0.0
   note: >-
-    Real LLM signal detection (see pipeline/stages/stage4_signals.py) - model is
-    hardcoded in-module, not overridable via config, since detect_signals()'s
-    signature can't take a model kwarg. Text-only, no vision escalation.
+    Real LLM signal detection (see pipeline/stages/stage4_signals.py). Text-only,
+    no vision escalation. This snapshot deliberately sets no `signals_model`, so
+    detect_signals() falls back to its in-module default - `model` here is a
+    display label only. (The older claim that detect_signals() "can't take a model
+    kwarg" was wrong even when written; the parameter existed but was named
+    `model`, which load_stage_fn() reserves and strips, so it silently never
+    bound - see FINDINGS.md 2026-09-07.)

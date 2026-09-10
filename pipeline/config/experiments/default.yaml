@@ -8,35 +8,55 @@ description: >-
 stage1_profile:
   module: pipeline.stages.stage1_profile
   function: get_or_create_profile
-  model: openrouter/stealth/ox-alpha
+  model: gemini/gemini-3.5-flash-lite
   cost_per_call_usd: 0.0
   note: >-
-    Stealth models on OpenRouter are anonymized test releases - may rotate/disappear
-    without notice. Confirm current availability at openrouter.ai/models before relying
-    on this for a real run, not just a one-off test.
+    Changed 2026-09-07 from openrouter/stealth/ox-alpha. Stage 1 is the first step
+    run against every new account, so an anonymized stealth model that "may
+    rotate/disappear without notice" (the previous note's own warning) was the wrong
+    default. gemini-3.5-flash-lite is free-tier, is what Stage 2/3/4 already use, and
+    won the 2026-09-07 Stage 4 comparison at 78% macro F1. Verified on
+    vendor_gadgets_01: 4 of 5 profile fields correct against independently-known
+    ground truth (see FINDINGS.md 2026-09-07). NOTE: Stage 1 still has no scored
+    evaluation - the harness does not score it - so this is a reasoned default, not
+    a measured winner.
 
 stage2_triage:
   module: pipeline.stages.stage2_triage
   function: triage_post
-  text_model: openrouter/google/gemini-flash-1.5-8b
-  vision_model: openrouter/google/gemini-flash-1.5-8b
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash
   confidence_threshold: 0.7
-  model: cascade (see text_model/vision_model)
-  cost_per_call_usd: 0.0001
+  model: Gemini Cascade (Google AI Studio)
+  cost_per_call_usd: 0.0
   note: >-
-    Cascade: Pass A (text_model) runs first; escalates to Pass B (vision_model) only
-    when confidence < confidence_threshold or caption is empty/emoji-only. Check
-    openrouter.ai/models before locking in real model choices - placeholders here, not
-    verified picks. Track escalation rate once running against the real golden set -
-    brief section 5 flags >40% escalation as a sign the text prompt needs work, not the
-    model.
+    Fixed 2026-09-07. Previously openrouter/google/gemini-flash-1.5-8b, which has been
+    retired and 404s - so the ACTIVE DEFAULT config failed every Stage 2 call, and a
+    bare `make harness` was broken. Now the same cascade as stage2_gemini_cascade.yaml
+    (cheap text Pass A, stronger vision Pass B), which scored 27/30 in the 2026-09-01
+    comparison. confidence_threshold 0.7 matches every other cascade config.
 
 stage3_extract:
   module: pipeline.stages.stage3_extract
   function: extract_product
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
   model: gemini-3.5-flash-lite (Google AI Studio)
   cost_per_call_usd: 0.0
   note: >-
-    Real LLM extraction via Pass A (text) → Pass B (vision) cascade. Model is
-    hardcoded in-module (pipeline/stages/stage3_extract.py) — this label is
-    for reporting/token_log identification only.
+    Real LLM extraction via Pass A (text) → Pass B (vision) cascade. text_model/
+    vision_model are now set explicitly (2026-09-07) rather than relying on the
+    in-module MODEL constant, so the config is the single source of truth per the
+    brief's "swapping a model is a YAML edit" requirement.
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  signals_model: gemini/gemini-3.5-flash-lite
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Added 2026-09-07 - default.yaml previously had no stage4_signals block at all, so
+    the active default never scored Stage 4. gemini-3.5-flash-lite won the 2026-09-07
+    Stage 4 re-run at 78% macro F1 (vs GPT-4o Mini 68%, Llama 40%, Qwen 10%) and is
+    free-tier. Note signals_model, not model - see the invariant in CLAUDE.md.

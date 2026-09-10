@@ -1,0 +1,58 @@
+name: family_gpt4o_mini
+description: >-
+  END-TO-END family config: every LLM stage on GPT-4o Mini, for a chained
+  Stage 2-5 comparison via scripts/run_pipeline.py. Stage 1 is deliberately absent
+  from every family_*.yaml - see family_gemini.yaml for why.
+
+  Expect this family to be the token outlier, not the cost bargain: its vision Pass B
+  tokenizes an image at ~25-30k tokens, measured on BOTH vendors (Stage 2 totals of
+  61,904 and 184,082 against ~11,000-20,000 for every other family at identical
+  accuracy). A chained run escalates at both Stage 2 and Stage 3, so budget for it.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: openrouter/openai/gpt-4o-mini
+  vision_model: openrouter/openai/gpt-4o-mini
+  confidence_threshold: 0.7
+  model: GPT-4o Mini Family (OpenRouter)
+  cost_per_call_usd: 0.0
+  note: >-
+    UNRUN AS OF 2026-09-09. OpenRouter balance is negative (credits 0, usage $0.197,
+    confirmed live) so no call from this family can succeed. Do NOT publish any number
+    from this config until it has passed a smoke test - `make pipeline ACCOUNT=<acct>
+    CONFIG=pipeline/config/experiments/<this file> LIMIT=2` - and report/token_log.csv
+    shows THIS family's model strings for that run_id. The whole reason that check
+    exists: every Stage 4 comparison published before 2026-09-07 reported four models
+    while running one, and the token log was the only thing that could prove it.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: openrouter/openai/gpt-4o-mini
+  vision_model: openrouter/openai/gpt-4o-mini
+  model: GPT-4o Mini Family (OpenRouter)
+  cost_per_call_usd: 0.0
+  note: >-
+    UNRUN AS OF 2026-09-09. OpenRouter balance is negative (credits 0, usage $0.197,
+    confirmed live) so no call from this family can succeed. Do NOT publish any number
+    from this config until it has passed a smoke test - `make pipeline ACCOUNT=<acct>
+    CONFIG=pipeline/config/experiments/<this file> LIMIT=2` - and report/token_log.csv
+    shows THIS family's model strings for that run_id. The whole reason that check
+    exists: every Stage 4 comparison published before 2026-09-07 reported four models
+    while running one, and the token log was the only thing that could prove it.
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  signals_model: openrouter/openai/gpt-4o-mini
+  model: GPT-4o Mini Family (OpenRouter)
+  cost_per_call_usd: 0.0
+  note: >-
+    UNRUN AS OF 2026-09-09. OpenRouter balance is negative (credits 0, usage $0.197,
+    confirmed live) so no call from this family can succeed. Do NOT publish any number
+    from this config until it has passed a smoke test - `make pipeline ACCOUNT=<acct>
+    CONFIG=pipeline/config/experiments/<this file> LIMIT=2` - and report/token_log.csv
+    shows THIS family's model strings for that run_id. The whole reason that check
+    exists: every Stage 4 comparison published before 2026-09-07 reported four models
+    while running one, and the token log was the only thing that could prove it.

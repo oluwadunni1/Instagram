@@ -29,6 +29,7 @@ stage3_extract:
 stage4_signals:
   module: pipeline.stages.stage4_signals
   function: detect_signals
+  signals_model: openrouter/openai/gpt-4o-mini
   model: openrouter/openai/gpt-4o-mini
   cost_per_call_usd: 0.0002
   note: >-
