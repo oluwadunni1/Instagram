@@ -56,10 +56,34 @@ USD_RE = re.compile(r"\$\s?([\d,]+)")
 # saying "DM for price" in the post's own caption/comments, the price isn't
 # sitting on the photo either; escalating just re-asks the same unanswerable
 # question at 2x cost (see FINDINGS.md's Stage 3 root-cause analysis).
+#
+# price(s|ing): the plural matters in practice - a multi-variant listing
+# ("iPhone 12 64GB / 128GB / 256GB ... send us a DM for prices!") naturally
+# pluralizes, and the singular-only pattern silently missed every such post.
 DM_FOR_PRICE_RE = re.compile(
-    r"\b(dm|inbox|call)\b[^.!?\n]{0,25}\bfor\b[^.!?\n]{0,10}\bprice\b",
+    r"\b(dm|inbox|call)\b[^.!?\n]{0,25}\bfor\b[^.!?\n]{0,10}\bpric(e|es|ing)\b",
     re.IGNORECASE,
 )
+
+# A multi-product catalog post needs room for one JSON object PER product, and
+# complete_structured()'s own default is 1024 - enough for the 1-3 products a
+# typical single-item listing carries, and silently not enough beyond that.
+#
+# Measured 2026-09-09: one extracted product serialises to ~94 tokens, so a
+# 9-product post needs ~850 (marginal once the wrapper is counted) and the
+# 15-product post in vendor_gadgets_01 needs ~1,400. Over the limit the model
+# emits truncated JSON, schema validation fails, complete_structured() burns its
+# 3 repair retries, and extract_product() falls back to _regex_fallback() - so
+# the post is answered by a heuristic and the run reports a clean score.
+#
+# This is model-independent: the SAME three vendor_gadgets_01 posts fell back on
+# Gemini (twice) and on GPT-4o Mini. vendor_autos_01 tops out at 3 products/post
+# and never hit it, which is why it validated first time and hid the bug.
+#
+# Overridable per experiment via a `max_tokens:` key in the stage3_extract block
+# of any pipeline/config/experiments/*.yaml - load_stage_fn() binds it like any
+# other non-reserved config key.
+DEFAULT_MAX_TOKENS = 4096
 
 SYSTEM_PROMPT = """You are extracting structured product-listing data from a single Instagram post for
 a vendor account. The account may sell any kind of product; for an automotive vendor,
@@ -255,6 +279,7 @@ def _pass_a(
     run_id: str | None,
     vendor_id: str | None,
     post_id: str,
+    max_tokens: int = DEFAULT_MAX_TOKENS,
 ) -> ProductExtractionResult:
     """Cheap text-only pass."""
     return complete_structured(
@@ -267,6 +292,7 @@ def _pass_a(
         vendor_id=vendor_id,
         post_id=post_id,
         escalated=False,
+        max_tokens=max_tokens,
     )
 
 
@@ -345,6 +371,7 @@ def extract_product(
     vision_model: str = MODEL,
     run_id: str | None = None,
     vendor_id: str | None = None,
+    max_tokens: int = DEFAULT_MAX_TOKENS,
 ) -> list[ProductPrediction]:
     """Extracts one or more products from a post via the Pass A -> Pass B
     vision-escalation cascade.
@@ -387,7 +414,7 @@ def extract_product(
     confirmed_no_price = bool(DM_FOR_PRICE_RE.search(search_text))
 
     try:
-        result = _pass_a(user_prompt, text_model, run_id, vendor_id, post_id)
+        result = _pass_a(user_prompt, text_model, run_id, vendor_id, post_id, max_tokens)
         if _needs_escalation(result) and vision_image_url(post) and not confirmed_no_price:
             logger.info("[stage3_extract] %s: escalating to vision Pass B", post_id)
             result = _pass_b(post, user_prompt, vision_model, run_id, vendor_id, post_id)
@@ -396,6 +423,24 @@ def extract_product(
             "[stage3_extract] LLM extraction failed (%s: %s) - falling back to regex heuristic",
             type(exc).__name__, exc,
         )
+        # Record the degradation in the token log. Without this the fallback is
+        # invisible to every downstream measurement: no row is written, so a
+        # run that quietly regex-extracted several posts is indistinguishable
+        # in report/token_log.csv from one where those posts never existed.
+        # Zero tokens because no call succeeded - fallback_used is the signal,
+        # and this is the first caller to set it.
+        if run_id and vendor_id:
+            log_token_usage(
+                run_id=run_id,
+                vendor_id=vendor_id,
+                post_id=post_id,
+                stage="stage3_extract_fallback",
+                model=text_model,
+                prompt_tokens=0,
+                completion_tokens=0,
+                total_tokens=0,
+                fallback_used=True,
+            )
         return _regex_fallback(post, profile)
 
     return _to_predictions(result)
