@@ -231,6 +231,24 @@ Pass B succeeded at - filling in the actual number.
 
 ## Stage 4 Signals — Model Comparison (2026-09-02)
 
+> **⚠️ INVALIDATED 2026-09-07 — do not cite the per-model numbers below.**
+> All three runs in this section executed `gemini/gemini-3.5-flash-lite`,
+> regardless of the model each config named. `detect_signals()`'s model
+> parameter was called `model`, which `load_stage_fn()` reserves and strips,
+> so the configured value never reached the function and it silently used its
+> in-module default every time. Proven from `report/token_log.csv`, which
+> records the model string at call time: all 14 calls in each of the
+> `stage4_gemini` / `stage4_llama` / `stage4_qwen` runs logged
+> `gemini/gemini-3.5-flash-lite`. The F1 differences below are run-to-run
+> nondeterminism on one model, not model differences. The binding is fixed
+> (see "Fixed: Stage 4's configured model never reached the code" below);
+> this section is kept unedited as a record of what was originally reported.
+> **Superseded by "Stage 4 Signals — Model Comparison, RE-RUN with working
+> model binding (2026-09-07)"**, which reverses the ranking. Note also that
+> this section's `stock_count_known` root-cause conclusion - "identical
+> across all three models, therefore a prompt/labeling mismatch" - was an
+> artifact of the same bug and does not hold.
+
 New stage: `pipeline/stages/stage4_signals.py`, a two-layer cascade -
 a free, zero-LLM regex prefilter (`PREFILTER_RE`) scans caption + every
 comment for candidate keywords; only a hit escalates to an LLM call that
@@ -613,6 +631,17 @@ token counts at OpenRouter's published rate.
 
 ### Stage 4 comparison table
 
+> **⚠️ INVALIDATED 2026-09-07.** The GPT-4o Mini column here is not GPT-4o
+> Mini — like the three columns it was compared against, it ran
+> `gemini/gemini-3.5-flash-lite` (see the invalidation notice on the
+> 2026-09-02 Stage 4 section). The "GPT-4o Mini wins Stage 4 on macro F1"
+> conclusion drawn in the analysis below is therefore unsupported. The
+> near-identical token totals across all four columns (15,242-15,507, under
+> 2% spread, where Stage 2/3 varied 4-6x between genuinely different models)
+> were the tell, and were mistakenly explained away at the time as Stage 4
+> having no vision path. **Superseded by the 2026-09-07 re-run**, in which
+> GPT-4o Mini actually scores 68% and places *second* to free-tier Gemini.
+
 | Signal | Gemini F1 | Llama F1 | Qwen F1 | GPT-4o Mini F1 |
 |---|---|---|---|---|
 | clearance | 50% | 50% | 50% | 67% |
@@ -728,3 +757,1094 @@ pre-filled (never hand-labeled) fields for visibility.
 Not yet verified against a real Reel (the automotive account has none) -
 first real check happens once the gadgets/electronics account has a Reel
 ingested.
+
+## Fixed: harness predictions are now scoped per vendor (2026-09-06)
+
+Prompted by preparing to ingest a second vendor account
+(gadgets/electronics). `eval/harness.py` wrote its per-post predictions to
+`report/stage{2,3,4}_<MODEL>_predictions.json` - keyed by **model label
+only, with no vendor in the path**. Running the harness for a second vendor
+under the same config would therefore have silently overwritten the first
+vendor's cached predictions, which is exactly what `scripts/run_stage5.py`
+routes from. Nothing in the pipeline would have reported an error; vendor
+1's Stage 5 inputs would just quietly become vendor 2's data.
+
+**Fixed**: the three `score_stage*()` functions now take the `vendor_id`
+`main()` already computes for the token log (the golden file's stem) and
+write to `report/<vendor_id>/stage{N}_<model>_predictions.json`. The 14
+existing vendor-1 prediction files were moved to `report/vendor_autos_01/`,
+and `run_stage5.py`'s three `DEFAULT_STAGE*_PATH` constants plus the
+`Makefile`'s `STAGE2/3/4` variables (now `report/$(ACCOUNT)/...`, so they
+follow `ACCOUNT`) were repointed to match. **Historical note**: the
+prediction filenames cited in the sections above (Stage 2 cascade
+comparison, Stage 3 schema upgrade, Stage 5 routing) now live under
+`report/vendor_autos_01/` rather than the `report/` root.
+
+Two related footguns handled at the same time:
+- `eval/harness.py` with no `--golden` globs *every* `eval/golden/*.json`,
+  so a bare run now that a second golden set exists would merge both
+  vendors into one accuracy number and tag the token log `all_vendors`.
+  Not code-fixed (the glob is deliberate for the single-vendor case) -
+  always pass `--golden`/`GOLDEN=` from here on.
+- `scripts/refresh_media_urls.py` hardcoded vendor 1's golden path and
+  `IG_ACCESS_TOKEN`; it now takes `--golden`/`--token-env` like the other
+  scripts. It also requested only `id,media_url` from the API while its
+  `_resolve_url()` claimed to fall back to `thumbnail_url` - a fallback
+  that could never fire. It now requests `thumbnail_url` too, so Reel/video
+  entries actually refresh instead of silently keeping a stale URL.
+
+## Fixed: `DM_FOR_PRICE_RE` missed the plural "prices" (2026-09-07)
+
+Surfaced immediately on the second vendor's real data. The pattern ended in
+`\bprice\b`, so "Kindly send us a DM for **prices**!" did not match - the
+trailing `s` defeats the word boundary. Both of `vendor_gadgets_01`'s
+DM-for-price posts (`18047192480810719`, `17966735571148449`) use the
+plural, and for a structural reason: they are multi-variant listings
+("iPhone 12 64GB / 128GB / 256GB ... send us a DM for prices!"), and a
+vendor listing several storage tiers naturally pluralizes. The singular-only
+pattern was fine for vendor 1 purely by accident of phrasing.
+
+Consequence had it shipped: both posts would escalate to vision Pass B on
+every run - precisely the wasted-cost path the 2026-09-01 fix above was
+written to prevent - while `FINDINGS.md` claimed the case was handled.
+
+**Fixed**: pattern now ends `\bpric(e|es|ing)\b`, also covering "DM for
+pricing". Verified three ways: the singular cases still match (no
+regression), the plural/gerund now match, and "Send a DM to order" /
+"Send us a Dm or visit our stores" still correctly do *not* match.
+`vendor_autos_01` matches the same 5 posts before and after, so every number
+recorded in the sections above is unaffected.
+
+**Worth noting for future prompt/regex work**: this class of bug - a
+matcher tuned against one vendor's phrasing silently failing on another's -
+is exactly what a second vendor was supposed to surface, and it did so
+before a single LLM call was made.
+
+## Fixed: Stage 4's configured model never reached the code (2026-09-07)
+
+Found by a read-only audit subagent. **Every Stage 4 model comparison ever
+recorded in this file ran the same model.**
+
+`eval/harness.py::load_stage_fn()` strips a fixed `reserved` set of keys -
+`module`, `function`, `cost_per_call_usd`, `note`, `model` - before binding
+the rest of the YAML entry as kwargs. `model` is reserved because it usually
+holds a *display label*, not a model string (`"Gemini Cascade (Google AI
+Studio)"`, `"dummy-heuristic"`), used for log lines and the predictions
+filename. Stage 2 and 3 put their real model strings in `text_model` /
+`vision_model`, so they were unaffected.
+
+Stage 4 broke that convention: `detect_signals()`'s real parameter was
+literally named `model`. So the configured value was stripped every time,
+the function fell back to its in-module `MODEL =
+"gemini/gemini-3.5-flash-lite"`, and the harness went on to report the
+config's label - producing output that *looked* like four different models.
+
+Proof, from `report/token_log.csv` (which records the model string passed to
+litellm at call time, so it cannot be fooled by labels):
+
+```
+14 stage4_gemini     -> gemini/gemini-3.5-flash-lite
+14 stage4_llama      -> gemini/gemini-3.5-flash-lite
+14 stage4_qwen       -> gemini/gemini-3.5-flash-lite
+14 stage4_gpt4o_mini -> gemini/gemini-3.5-flash-lite
+```
+
+**Invalidated**: the 2026-09-02 "Stage 4 Signals — Model Comparison" table
+and the GPT-4o Mini Stage 4 column added 2026-09-05, both now carry
+invalidation notices. The per-signal F1 spread across those columns is
+run-to-run nondeterminism on a single model.
+
+**The tell that was missed**: Stage 4's token totals across the four
+"different models" were 15,321 / 15,242 / 15,507 / 15,415 - under 2% spread,
+where Stage 2/3 varied 4-6x between genuinely different model families.
+Different tokenizers do not agree to within 2%. This was noted at the time
+and explained away as "Stage 4 has no vision path", which fit the numbers
+without being the cause.
+
+**Fixed**:
+- `detect_signals()`'s parameter renamed `model` -> `signals_model`, and
+  `signals_model:` added to `stage4_gemini/llama/qwen/gpt4o_mini.yaml`.
+  `model:` stays in each file as the display label, so predictions filenames
+  and the `Makefile`'s `STAGE4` default are unchanged.
+- `stage4_gemini_flash_8b.yaml` deliberately sets no `signals_model` (it is a
+  stale snapshot that falls back to the default); its note - which claimed
+  `detect_signals()` "can't take a model kwarg" - was wrong even when written
+  and has been corrected.
+- **Tripwire added** in `load_stage_fn()`: it now raises if the target
+  function's signature declares any reserved key, naming the offending
+  parameter and telling the author to rename it. A config value that can
+  never bind must fail loudly rather than silently produce plausible wrong
+  numbers.
+- The tripwire immediately caught a second violation:
+  `stage1_profile.get_or_create_profile()` also declared `model`. Stage 1 was
+  **not** actually broken - it resolves its own model from config via
+  `_default_model_from_config()` and never goes through `load_stage_fn()` -
+  but its parameter is renamed `profile_model` so the invariant holds
+  uniformly: no stage function may declare a parameter named `model`; real
+  model strings go in `text_model` / `vision_model` / `signals_model` /
+  `profile_model`.
+
+**Not yet done**: Stage 4 has not been re-run against real models. The four
+Stage 4 rows will stay invalidated until someone re-runs the comparison -
+which, unlike last time, will actually bill OpenRouter for the Llama, Qwen
+and GPT-4o Mini configs.
+
+## Fixed: live Instagram token leaked into logs and exception messages (2026-09-07)
+
+Same audit. All three Graph API callers passed the token as an
+`access_token` **query parameter**, which put a live credential into the URL
+and therefore into several places that print it:
+
+- **urllib3's DEBUG log line** - `"GET /path?query HTTP/1.1" 200` includes
+  the full query string. `LOG_LEVEL=DEBUG` is a documented, supported flag,
+  and nothing suppressed urllib3 the way `pipeline/llm_client.py` explicitly
+  suppresses litellm. This was not hypothetical: a `LOG_LEVEL=DEBUG`
+  ingest run earlier in the same session printed the account's live token to
+  the console once per request, ~40 times.
+- **`raise_for_status()`** - embeds the request URL in the exception
+  message. `scripts/run_stage6.py::_fetch_all_media()` had no try/except at
+  all, so any expired token, 429, or transient 5xx produced an **uncaught**
+  traceback containing the token.
+- **`requests.RequestException`** - same, and
+  `scripts/refresh_media_urls.py` logged `str(exc)` directly at WARNING,
+  which is always visible regardless of `LOG_LEVEL`.
+
+The trigger conditions are ordinary operations, not edge cases: an expired
+token, a rate limit, a network blip, or simply running with DEBUG.
+
+**Fixed**:
+- New `pipeline/settings.py::ig_auth_headers(token)` - the token now travels
+  as an `Authorization: Bearer` header, so it never enters a URL. Verified
+  live against `graph.instagram.com` (HTTP 200, and `access_token` absent
+  from `request.url`) before switching the callers over.
+- New `pipeline/settings.py::redact_tokens(text)` - strips `access_token=…`
+  and `Bearer …` from any string. Defence in depth for the exception path,
+  since a paginated `next` URL echoed back by the API can itself carry a
+  token. Applied at every log/raise site in `ingest.py`, `run_stage6.py`,
+  and `refresh_media_urls.py`.
+- `_fetch_all_media()` now catches `HTTPError`/`RequestException` and
+  re-raises a redacted `RuntimeError`, using `raise ... from None` - without
+  suppressing the chain, the original unredacted exception still prints in
+  the traceback.
+- `pipeline/logging_config.py::_suppress_http_wire_logs()` raises the
+  urllib3 loggers to INFO, mirroring the litellm suppression. Deliberately
+  placed *before* `configure_logging()`'s early return, so a repeat call
+  re-applies it. Raised to INFO rather than disabled, so genuine urllib3
+  retry/connection warnings still surface.
+
+**Verified**: a `LOG_LEVEL=DEBUG` profile fetch no longer contains the live
+token anywhere in its output, and all three failure paths, exercised with a
+canary token against a real 401, redact it - `ingest._get`,
+`run_stage6._fetch_all_media`, and `refresh_media_urls.fetch_fresh_media`.
+
+**Residual**: the tokens that were already printed to terminals and to
+`report/run_output_*.txt` during earlier DEBUG runs are still real. Rotating
+`IG_ACCESS_TOKEN` / `IG_ACCESS_TOKEN_GADGETS` in the Meta App Dashboard is
+the only way to invalidate what already leaked; this fix stops new leaks
+only.
+
+## Fixed: two more `media_url`-vs-`thumbnail_url` sites missed by the Reels sweep (2026-09-07)
+
+The 2026-09-05 fix threaded `vision_image_url()` through Stage 2/3's vision
+passes, both pHash call sites, and `collect_images()` - but missed two
+places, both found by the audit and a follow-up sweep for remaining
+`media_url` consumers.
+
+**1. `pipeline/stages/stage5_reconcile.py:40` - reviewer thumbnail.**
+`route_post()` set `thumbnail_url = post.get("media_url")` and returned it in
+every bucket. For a Reel that hands a human reviewer an `.mp4` in a field
+named `thumbnail_url`, in the `needs_attention` queue that exists precisely
+so a person can eyeball the item before importing. Fixed to
+`vision_image_url(post)`. Verified: a real Reel from the gadgets dump now
+routes a `.jpg` (its `media_url` ends `.mp4`), image posts are unchanged, and
+`vendor_autos_01`'s routing is still 17/30 - 10/30 - 3/30.
+
+**2. `scripts/refresh_media_urls.py` - actively corrupting the golden set.**
+Worse than a display bug. `_resolve_url()` resolves `media_url or
+thumbnail_url` - correct for refreshing the `media_url` *field*, wrong for
+`products[].images[]`. For a Reel, `children` is empty, so the code
+synthesised `children = [{"media_url": <the .mp4>}]` and wrote that into
+`images[0]`, **overwriting the correct `.jpg` cover with the video file on
+every refresh** - silently undoing the Reels fix inside `eval/golden/`, which
+`CLAUDE.md` flags as irreplaceable. The script also never refreshed
+`thumbnail_url` at all, despite now requesting it, so that field would go
+stale on CDN expiry while `media_url` beside it stayed fresh.
+
+Fixed: `images[]` now resolves via `vision_image_url()` (thumbnail-preferring)
+while the `media_url` field keeps using `_resolve_url()`; `thumbnail_url` is
+refreshed alongside `media_url`; and the synthesised single "child" carries
+`thumbnail_url` through so the resolution can see it. `_resolve_url()`'s
+docstring now states which of the two jobs it is and is not for. Verified on
+a synthetic Reel (images[] stays `.jpg`, `media_url` correctly stays `.mp4`,
+`thumbnail_url` refreshes) and a synthetic carousel (unchanged).
+
+**Pattern worth noting**: three separate bugs this week
+(`DM_FOR_PRICE_RE`'s plural, Stage 4's `model` binding, and these two) share
+a shape - a fix or convention verified against one code path or one vendor,
+assumed to hold everywhere. The sweep that found these was a plain grep for
+the *remaining* consumers of the raw field, which is cheap and would have
+caught both on 2026-09-05.
+
+## Stage 4 Signals — Model Comparison, RE-RUN with working model binding (2026-09-07)
+
+Supersedes both invalidated Stage 4 tables above. First Stage 4 comparison in
+which the four configs actually ran four different models - verified per run
+against `report/token_log.csv`'s recorded model string, not the config label.
+
+Golden set: `eval/golden/vendor_autos_01.json`, 17 posts carrying
+`expected_signals`. Prefilter short-circuit is unchanged and identical across
+configs (deterministic regex): 3/17, so 14 posts reach the LLM.
+
+| Signal | Gemini 3.5 Flash-Lite | Llama 3.1 8B | Qwen 2.5 7B | GPT-4o Mini |
+|---|---|---|---|---|
+| clearance | **67%** | 20% | 0% | 50% |
+| finance_available | **80%** | 36% | 0% | **80%** |
+| price_negotiable | **67%** | 31% | 0% | 44% |
+| sold | 67% | 40% | 0% | **100%** |
+| stock_count_known | **73%** | 37% | 33% | 50% |
+| swap_deal | **100%** | 40% | 0% | 67% |
+| urgent | **93%** | 74% | 40% | 86% |
+| **Macro F1** | **78%** | **40%** | **10%** | **68%** |
+| Errored posts | 0/17 | 1/17 | 0/17 | 0/17 |
+| Real cost | $0.00 (free tier) | $0.00033 | $0.00062 | $0.00277 |
+
+Total real spend for the whole comparison: **$0.0037**.
+
+**The published conclusion is reversed.** The invalidated table claimed
+GPT-4o Mini won Stage 4 at 83% macro F1. With models actually bound, **Gemini
+3.5 Flash-Lite wins at 78%** - and it is the only free-tier option of the
+four. GPT-4o Mini is second at 68%, costing ~8x Llama and ~4x Qwen per run to
+place below a free model.
+
+**Llama and Qwen fail in opposite directions, and both are unusable here.**
+Llama 3.1 8B (40%) over-fires massively - 9 predicted `clearance` against 1
+gold, 10 `price_negotiable` against 3, giving 11-29% precision on six of
+seven signals with recall that is often fine. It is not failing to see the
+signals; it is asserting them everywhere. Qwen 2.5 7B (10%) does the
+opposite, emitting *zero* predictions for five of seven signal types - its
+two non-zero scores are 100% precision at 20-25% recall. For a stage whose
+output feeds Stage 5's routing, Llama's behaviour is the more dangerous:
+false signals push posts into `needs_attention` (or worse, propose
+`out_of_stock` via a spurious `sold`), whereas Qwen mostly just says nothing.
+
+**A prior "finding" was also an artifact of the same bug.** The 2026-09-02
+section concluded that `stock_count_known`'s 33% precision being *identical
+across all three models* proved a prompt/gold-labeling mismatch rather than a
+model-quality problem. It was identical because it was literally the same
+model three times. With real models the spread is 73% / 37% / 33% / 50% - so
+model choice clearly does matter for this signal, and that root-cause claim
+should be treated as unproven rather than established. The underlying
+caption-vs-comment labeling ambiguity described there may still be real; it
+simply was not demonstrated by that evidence.
+
+### Noise floor: what a re-run of the *same* model tells us
+
+The Gemini re-run scored 78% against the previously recorded 77% - reassuring
+in aggregate, but the per-signal numbers moved a lot for an identical model
+on an identical golden set: `stock_count_known` 44% -> 73%, `sold` 100% ->
+67%, `clearance` 50% -> 67%, `price_negotiable` 80% -> 67%.
+
+With 1-3 gold instances per signal, one flipped post moves a per-signal F1 by
+20-35 points. So: the Gemini-vs-GPT-4o-Mini gap (78 vs 68) is suggestive but
+within an order of magnitude of the noise and should not be treated as
+settled; the gaps to Llama (40) and Qwen (10) are far outside it and are
+real. **Per-signal cells in this table should not be quoted as precise
+measurements** - only the macro ordering is safe to rely on, and only for the
+large gaps. Fixing this needs more gold instances per signal, not better
+models (see `eval/TEST_CONTENT_PLAN.md`, which targets exactly this).
+
+## Stage 1 Profiling — first run for vendor 2, and a bad default replaced (2026-09-07)
+
+Prompted by a fair question while preparing to label vendor 2: which model
+does Stage 1 actually use? Stage 1 is the first step run against every new
+account in production, so the answer matters more than for any experiment
+stage.
+
+**Two things were wrong.** `default.yaml`'s `stage1_profile.model` was
+`openrouter/stealth/ox-alpha` - an anonymized stealth test release, carrying
+its own note warning that such models "may rotate/disappear without notice.
+Confirm current availability ... before relying on this for a real run." And
+**Stage 1 has never been evaluated**: `eval/harness.py` does not score it
+(`stage1_profile` is optional in `ExperimentConfig` and `main()` never loads
+it), and no Stage 1 result appears anywhere in this file. So the first step
+of the production pipeline was an unevaluated model explicitly flagged as
+unstable.
+
+**Changed** `default.yaml` to `gemini/gemini-3.5-flash-lite`: free-tier,
+already used by Stage 2/3/4, and the winner of the same-day Stage 4
+comparison (78% macro F1, vs Llama 3.1 8B at 40% and Qwen 2.5 7B at 10% -
+both of which are the alternatives offered by `stage1_llama3_8b.yaml` /
+`stage1_qwen2_7b.yaml`, and both of which handled structured extraction on
+this data poorly).
+
+**First Stage 1 output for `vendor_gadgets_01`**, checked against
+independently-known ground truth:
+
+| Field | Model output | Correct? |
+|---|---|---|
+| business_category | `gadgets` | yes - iPhones, laptops, JBL, PS5 |
+| seller_style | `catalog_poster` | yes - structured price-list posts |
+| language_mix | `english` | **arguable** - 3/35 captions carry Nigerian slang ("awoof", "gbanjo"), so `mixed` is defensible |
+| pricing_behavior | `mixed` | yes - most prices in captions, 2 DM-for-price, several on-image |
+| vendor_username | `oluwadunnioluajayi` | yes |
+
+4 of 5 clearly right, 1 judgment call. `language_mix` is the interesting one:
+at 3/35 posts the slang is real but marginal, and the schema offers no
+"predominantly english" option - a genuine ambiguity in the label vocabulary
+rather than a model error.
+
+**This is a reasoned default, not a measured one.** Nothing scores Stage 1,
+so the choice rests on the model's performance at adjacent stages plus a
+single qualitative check on one account. A proper Stage 1 evaluation would
+need gold profiles per account, which do not exist. Flagging rather than
+overstating.
+
+Side effect: `runs/vendor_gadgets_01/` now contains `profile.json`, so both
+vendors' run directories have the same shape. The earlier asymmetry was not a
+structural inconsistency - Stage 1 had simply never been run for vendor 2.
+
+## Audit round 2: three more silently-dormant model defaults (2026-09-08)
+
+Second read-only audit, scoped to code changed since 2026-09-07. It re-verified
+the three earlier fixes (Stage 4 `model` binding, the token-in-URL leak,
+`stage5_reconcile`'s `media_url`) and found them sound. Three new issues, all
+the same species as the ones already recorded: a value that is silently ignored
+or silently wrong, with no loud failure.
+
+**Fixed - `triage_post()`'s in-module defaults were the retired model.**
+`pipeline/stages/stage2_triage.py` defaulted `text_model`/`vision_model` to
+`openrouter/google/gemini-flash-1.5-8b`, which is retired and 404s - the very
+model `default.yaml` was changed away from on 2026-09-07. Dormant only because
+every shipping config sets both keys explicitly; the first config to omit
+either, or any direct `triage_post(post)` call, would 404 on every Stage 2 call
+without a loud failure. Stage 3 and Stage 4 both keep a current in-module
+`MODEL` constant; Stage 2 had none and hardcoded a stale literal instead. Now
+has `MODEL = "gemini/gemini-3.5-flash-lite"` with both defaults referencing it,
+matching the other two stages. Also corrected `stage1_profile.py`'s CLI help,
+which advertised the retired model as its copy-paste example.
+
+**Fixed - one unredacted error log missed by the 2026-09-07 token-leak sweep.**
+`scripts/refresh_media_urls.py:85` logged the parsed Graph API error object raw
+(`data["error"]`) while the branch five lines above correctly used
+`redact_tokens(resp.text)`. Not a live leak - Graph error payloads don't echo
+the token back - but it broke the file's own stated rule, and the sweep that
+fixed its sibling lines missed it. Now redacted; all four `logger.warning` error
+paths in that file are consistent.
+
+**NOT a bug - `gemini-3.6-flash` in `stage2_gemini_flash.yaml`.** The audit
+flagged this as very likely a typo for `3.5-flash`, on the reasoning that the
+string appears nowhere else in the repo while every other Gemini reference uses
+`3.5-flash-lite`/`3.5-flash`/`3.1-pro-preview`. Checked against a live
+`GET v1beta/models` call rather than accepting the inference:
+`gemini-3.6-flash` **exists and supports generateContent** (as do `3.7-flash`
+and `3.8-flash`). Config left unchanged. Worth recording as a case where the
+"appears nowhere else, therefore wrong" heuristic - which correctly caught real
+bugs elsewhere in this file - produced a false positive, and a one-call check
+settled it.
+
+**Open, not fixed - Stage 1 configs are dead.**
+`pipeline/stages/stage1_profile.py::_default_model_from_config()` hardcodes
+`load_experiment_config(DEFAULT_EXPERIMENT_PATH)`, so it reads `default.yaml`
+regardless of which `--config` is in play. `stage1_llama3_8b.yaml` and
+`stage1_qwen2_7b.yaml` therefore set a `stage1_profile.model` that **no code
+path ever reads** - pointing at them to "compare Stage 1 models" silently runs
+whatever `default.yaml` configures. Same failure shape as the Stage 4 binding
+bug (config value ignored, run looks successful) but a different mechanism -
+a hardcoded path rather than a stripped reserved key - so `load_stage_fn()`'s
+tripwire cannot catch it, because Stage 1 never goes through `load_stage_fn()`
+at all. This also sharpens the earlier note that "Stage 1 has never been
+evaluated": through those two configs it could not have been. Needs a decision -
+either thread the active config path into `_default_model_from_config()`, or
+delete the two snapshots, since today they claim to do something they cannot.
+
+## Vendor 2 (gadgets/electronics) — Full Stage 1-5 Model Comparison (2026-09-08)
+
+First multi-model sweep against a **second vendor**, and the first chance to ask
+whether any vendor-1 conclusion generalises. Golden set:
+`eval/golden/vendor_gadgets_01.json` — 41 posts, 98 products, hand-labelled
+2026-09-07 (36 posts from captions alone, 5 from vendor-supplied on-image text).
+
+**Read the caveats at the bottom before quoting any number.** Two of the runs
+had to be discarded and re-run, and the Stage 4 macro-F1 row is not computed
+over a constant denominator.
+
+### Stage 1 — Profiling
+
+Not scored; `eval/harness.py` has no Stage 1 path. Run once on
+`gemini/gemini-3.5-flash-lite`, output checked against independently-known
+ground truth: 4 of 5 fields correct (`business_category`, `seller_style`,
+`pricing_behavior`, `vendor_username`); `language_mix` arguable — 3/35 captions
+carry Nigerian slang ("awoof", "gbanjo"), so `english` vs `mixed` is a coin-flip
+the label vocabulary cannot express. No model comparison is possible here: see
+the 2026-09-08 audit entry — `_default_model_from_config()` hardcodes
+`default.yaml`, so `stage1_llama3_8b.yaml` / `stage1_qwen2_7b.yaml` set a model
+nothing reads.
+
+### Stage 2 — Triage
+
+| Config | Pass A / Pass B | Accuracy | Pass A only | Pass B vision | Escalation | Tokens |
+|---|---|---|---|---|---|---|
+| `stage2_gemini_cascade` | Gemini 3.5 Flash-Lite / 3.5 Flash | **38/41 = 93%** | 33/35 = 94% | 5/6 = 83% | 6/41 = 15% | 20,316 |
+| `stage2_llama_cascade` | Llama 3.1 8B / Llama 4 Scout | **38/41 = 93%** | 33/36 = 92% | 5/5 = 100% | 5/41 = 12% | 20,665 |
+| `stage2_qwen_cascade` | Qwen 2.5 7B / Qwen3-VL 8B | 36/41 = 88% | 31/36 = 86% | 5/5 = 100% | 5/41 = 12% | 20,828 |
+| `stage2_gpt4o_mini_cascade` | GPT-4o Mini (both passes) | **38/41 = 93%** | 33/36 = 92% | 5/5 = 100% | 5/41 = 12% | **184,082** |
+
+**A three-way tie, which contradicts vendor 1.** On `vendor_autos_01` GPT-4o
+Mini looked like a clear Stage 2 winner (97% vs 90%); here it merely ties
+free-tier Gemini *and* Llama, which had trailed at 90%. A single-vendor ranking
+was carrying more weight than it could bear.
+
+**The token column is the real result.** GPT-4o Mini spent **9x** everyone
+else's tokens for identical accuracy — its vision escalations tokenize images at
+~25-30k each and this vendor has 5-6 of them. The same effect was recorded for
+vendor 1, so it is now confirmed as a property of the model rather than of one
+dataset. Every model escalated on essentially the same 5-6 posts (the
+caption-less, image-priced ones) and vision Pass B scored 100% for three of four
+models — the cascade doing exactly what it was designed to do.
+
+### Stage 3 — Extraction
+
+| Config | Pass A / Pass B | Price accuracy | Name sim. | Name sim. excl. nulls | Returned no name | Missing-price recall |
+|---|---|---|---|---|---|---|
+| `default` (Gemini 3.5 Flash-Lite) | text+vision same | **28/31 = 90%** | **74%** | 81% | 3/34 | 3/3 = 100% |
+| `stage3_qwen_cascade` | Qwen3 14B / Qwen3-VL 8B | 26/31 = 84% | 64% | 77% | 6/34 | 3/3 = 100% |
+| `stage3_gpt4o_mini` | GPT-4o Mini (both passes) | 19/31 = 61% | 44% | 72% | **13/34** | 3/3 = 100% |
+
+**The headline name-similarity numbers are misleading; the last two columns are
+the real story.** GPT-4o Mini's 44% is overwhelmingly a failure to *answer*, not
+to name — it returned no product name on 13 of 34 products (38%). Excluding
+nulls, all three sit in a 72-81% band, and most of that residual gap is a
+labelling artifact: gold names carry condition prefixes ("Premium UK used iPhone
+11 64GB") that models reasonably omit, costing ~35 points on an
+otherwise-correct answer. The genuine differentiator is omission rate: 3 vs 6
+vs 13.
+
+All three hit 100% missing-price recall — none invented a price (brief section
+11's hard requirement) on the vendor with 7 genuinely price-less products.
+
+### Stage 4 — Signals
+
+| Signal | Gemini 3.5 Flash-Lite | Llama 3.1 8B | Qwen 2.5 7B | GPT-4o Mini |
+|---|---|---|---|---|
+| clearance | **100%** | 40% | 0% | **100%** |
+| finance_available | **100%** | 50% | 0% | **100%** |
+| price_negotiable | **100%** | 40% | 0% | **100%** |
+| sold | **100%** | **100%** | 0% | **100%** |
+| stock_count_known | 0% (FP, no gold) | 0% (FP, no gold) | — | — |
+| swap_deal | — | 0% (FP, no gold) | — | — |
+| urgent | 0% (FP, no gold) | 0% (FP, no gold) | — | — |
+| **Macro F1 (as reported)** | **67%** (over 6) | **33%** (over 7) | **0%** (over 4) | **100%** (over 4) |
+| **Macro F1, gold-covered signals only** | **100%** (over 4) | 58% (over 4) | 0% (over 4) | **100%** (over 4) |
+| Real cost | $0.00 (free tier) | ~$0.0003 | ~$0.001 | $0.0082 |
+
+**The reported macro-F1 row is not like-for-like** — the denominator differs per
+model, because `score_stage4()` includes any signal that was *predicted*, even
+one with zero gold instances, and scores it 0%. Gemini's 67% and GPT-4o Mini's
+100% both mean "100% on all four signals that have gold coverage"; the entire
+difference is that Gemini also false-positived on `urgent` /
+`stock_count_known` and GPT-4o Mini did not. The added row is the honest
+comparison.
+
+All four of Gemini's false positives trace to one recurring caption template,
+`"ONE LUCKY BUYER"`, read as scarcity and as a count of one. On the two posts
+that also say SOLD that is arguably incoherent (urgency about a sold item); on
+the available one it is a defensible reading the gold rejected.
+
+**Qwen's 0% is genuine, not a failed run**: all 8 calls succeeded against the
+correct model with zero errors and 41 clean prediction entries — it simply
+emitted no signals at all. That reproduces its vendor-1 behaviour exactly (10%
+macro F1, zero predictions for five of seven signal types). Llama again fails
+the opposite way — high recall, poor precision (1/4, 1/3, 1/4), 12 false
+positives — reproducing its vendor-1 over-firing.
+
+### Stage 5 — Routing
+
+| Config | auto_import | needs_attention | auto_exclude | Attention rate |
+|---|---|---|---|---|
+| Gemini Cascade | 25/41 = 61% | 9/41 = 22% | 7/41 = 17% | **22%** |
+| Qwen | 24/41 = 59% | 8/41 = 20% | 9/41 = 22% | **20%** |
+| GPT-4o Mini | 16/41 = 39% | 17/41 = 41% | 8/41 = 20% | **41%** |
+| *(vendor 1, Gemini, for reference)* | 17/30 = 57% | 10/30 = 33% | 3/30 = 10% | 33% |
+
+Llama has no Stage 5 row: no `stage3_llama*` config exists, so there is no
+same-family Stage 3 prediction to route from, and substituting another model's
+Stage 3 would not be a Llama result.
+
+**Stage 5 inverts the Stage 4 ranking, and that is the most useful finding
+here.** GPT-4o Mini won Stage 4 outright yet produces the *worst* attention rate
+(41%, nearly double Gemini's) — because Stage 5 routes on Stage 3's output, and
+GPT-4o Mini's 13 missing product names become "Product name unknown" and
+"Missing price" flags. Qwen's 20% looks best but is an artifact: detecting no
+`sold` signals means never raising the sold flag, so it auto-imports items a
+human should check. **No model reaches the POC's <=10% target on either
+vendor**; the binding constraint is Stage 3 completeness and Stage 5's flag
+rules, not model choice at Stage 4.
+
+### Caveats — two runs discarded, and why
+
+- **`stage4_gpt4o_mini`, first attempt: discarded.** All 8 Stage 4 calls died
+  with `getaddrinfo failed` (DNS/network loss), exhausting 6 retries each, and
+  the run reported 0% macro F1. Re-running with `--only-stage 4` gave **100%**.
+  A run that reports a clean 0% because the machine lost its network is
+  indistinguishable, in harness output, from a model that answers nothing — the
+  only tell was zero rows in `report/token_log.csv`. **Check the token log
+  before believing a 0%.**
+- **Gemini free-tier quota exhaustion** (432 quota errors) wrecked Stage 2 in
+  the later runs, which is why several show 38-41 errored posts at Stage 2.
+  Stage 4 is scored independently so those Stage 4 numbers stand, but the Stage
+  2 column comes only from the four dedicated `stage2_*` runs made before the
+  quota ran out.
+- **`--only-stage` was added to `eval/harness.py`** as a direct result: a
+  Stage 4 comparison previously paid for Stage 2 and Stage 3 on every run
+  (~75 wasted calls out of ~83 — and it was those Gemini calls that exhausted
+  the quota). The GPT-4o Mini re-run took **31 seconds instead of ~8 minutes**.
+- **Signal coverage remains thin**: only 4 of 7 signal types have any gold
+  instance in this golden set (5 instances total); `urgent`, `swap_deal` and
+  `stock_count_known` have none — so no model can be scored on them here, and
+  every prediction against them is necessarily counted a false positive.
+  `eval/TEST_CONTENT_PLAN.md` drafts the posts that would close this.
+
+### Artifact caveat — GPT-4o Mini Stage 4 result is valid but not currently reproducible
+
+The **100%** figure for GPT-4o Mini in the Stage 4 table above came from a real,
+verified run: `stage4_gpt4o_mini_20260908T070314Z`, 8 calls recorded in
+`report/token_log.csv`, 41 clean prediction entries, zero errors, 31 seconds
+wall time with `--only-stage 4`. That run is the basis for both its Stage 4 row
+and its Stage 5 row (41% attention rate), which was computed while those
+predictions were on disk.
+
+**The on-disk artifacts no longer match.** A queued batch job re-ran the same
+config afterwards and overwrote both
+`report/gadgets_runs/stage4_gpt4o_mini.txt` and
+`report/vendor_gadgets_01/stage4_openrouter_openai_gpt-4o-mini_predictions.json`
+with a failed run (8/41 errored, 0% macro F1). Two attempts to regenerate the
+good state failed for two *different* reasons:
+
+1. First failure: `litellm.APIError ... getaddrinfo failed` - transient DNS/
+   network loss, 6 retries exhausted per call.
+2. Second failure: **HTTP 402, OpenRouter credits exhausted** (16x `402`,
+   account usage $0.197 with no remaining balance). A 5-token probe call still
+   returns 200, but Stage 4's ~900-token requests are rejected on estimated
+   cost.
+
+**To regenerate**: add OpenRouter credit, then
+`uv run eval/harness.py --golden eval/golden/vendor_gadgets_01.json --config
+pipeline/config/experiments/stage4_gpt4o_mini.yaml --only-stage 4` (~31s, ~$0.008).
+Until then the predictions JSON on disk is the errored version and must not be
+fed to Stage 5.
+
+**Process lesson, and the third instance this session**: a harness run that
+loses its network or its credit reports a clean `0%` macro F1 that is
+indistinguishable, in the printed output, from a model that genuinely answers
+nothing. The only reliable tell is **zero rows in `report/token_log.csv` for
+that run_id**. Qwen's 0% is real (8 calls logged, 41 clean entries, reproduced
+across two independent runs); GPT-4o Mini's 0% was not. Check the token log
+before believing any 0%, and never let a queued batch silently overwrite a
+verified result - `--only-stage` exists partly to make targeted re-runs cheap
+enough that this is avoidable.
+
+## Cost analysis — token economics and production viability (2026-09-08)
+
+All token counts below are measured from `report/token_log.csv` for
+`vendor_gadgets_01` (41 posts), not estimated. Per-token prices were pulled
+live from OpenRouter's `/api/v1/models` on 2026-09-08, not taken from the
+config `note` fields (several of which are stale).
+
+### Tokens per post
+
+Full pipeline, all four stages, from the `default` config run plus the one-off
+Stage 1 call amortised across the account:
+
+| Stage | Calls | Prompt | Completion | Tokens/post | Share |
+|---|---|---|---|---|---|
+| Stage 1 (profile, amortised over 41) | 1 | 1,038 | 46 | 26 | 1% |
+| Stage 2 (triage) | 42 | 17,647 | 2,850 | 500 | 18% |
+| **Stage 3 (extraction)** | 37 | 69,673 | 12,789 | **2,011** | **74%** |
+| Stage 4 (signals) | 8 | 7,574 | 490 | 197 | 7% |
+| **Total** | 88 | 95,932 | 16,175 | **2,734** | |
+
+**Stage 3 is three quarters of all token spend.** Stage 4 is the cheapest stage
+despite having the longest prompt, because its regex prefilter lets only 8 of 41
+posts reach the model - the two-layer design is doing exactly what it was built
+for. Stage 1 is rounding error, since it runs once per account rather than per
+post.
+
+### Cost per post at PAID rates
+
+Live OpenRouter pricing, $/1M tokens (prompt / completion):
+Gemini 3.5 Flash-Lite `0.30 / 2.50` · GPT-4o Mini `0.15 / 0.60` ·
+Qwen 2.5 7B `0.10 / 0.20` · Llama 3.1 8B `0.05 / 0.08`.
+
+| Model | $/post | $/1,000 posts | $/100,000 posts |
+|---|---|---|---|
+| Gemini 3.5 Flash-Lite | $0.001688 | $1.69 | $168.82 |
+| GPT-4o Mini | $0.000588 | $0.59 | $58.77 |
+| Qwen 2.5 7B | $0.000313 | $0.31 | $31.29 |
+| Llama 3.1 8B | $0.000149 | $0.15 | $14.86 |
+
+**The free tier has been concealing a cost inversion.** Every `Cost: $0.0000`
+line in this file is a Gemini free-tier artifact. At paid rates Gemini
+3.5 Flash-Lite is the *most expensive* option measured here - its completion
+tokens cost $2.50/M, more than 4x GPT-4o Mini's $0.60/M and 31x Llama's $0.08/M.
+The model that wins on quality is 11x the price of the cheapest one. Any
+production costing that carries the recorded `$0.0000` forward is wrong.
+
+### The finding that actually decides viability: human review dominates
+
+Attention rate drives reviewer time, which dwarfs inference. Assuming **45
+seconds** of reviewer time per flagged item (see caveat):
+
+| Model | LLM /1k posts | Flagged /1k | Human @$6/hr | Human @$25/hr | Human ÷ LLM |
+|---|---|---|---|---|---|
+| Gemini Cascade | $1.69 | 220 | $16.50 | $68.75 | **10x / 41x** |
+| GPT-4o Mini | $0.59 | 410 | $30.75 | $128.12 | **52x / 217x** |
+| Qwen | $0.31 | 200 | $15.00 | $62.50 | **48x / 202x** |
+
+Break-even - the attention rate at which reviewer cost would merely *equal*
+inference cost, at $6/hr:
+
+| Model | Break-even attention rate | Actual |
+|---|---|---|
+| Gemini 3.5 Flash-Lite | 2.25% | 22% |
+| GPT-4o Mini | 0.79% | 41% |
+| Qwen 2.5 7B | 0.41% | 20% |
+
+Every model is one to two orders of magnitude away from the point where token
+price matters at all.
+
+### Three consequences for a production/enterprise case
+
+**1. Optimising model choice for token price optimises the wrong variable.**
+Switching Gemini to Llama saves $1.54 per 1,000 posts. Cutting the attention
+rate from 22% to the POC's 10% target saves ~$9 per 1,000 - roughly six times
+more, and it is the stated goal anyway. Engineering effort belongs in Stage 3
+completeness and Stage 5's flag rules, not in model shopping.
+
+**2. GPT-4o Mini is the trap case.** It is ~3x cheaper per token than Gemini and
+won Stage 4 outright, yet produces the highest *total* cost of the three - its
+13 missing product names (of 34) become "Product name unknown" and "Missing
+price" flags, pushing attention to 41%. Cheapest inference, most expensive
+system. This is the clearest evidence in the project that per-stage benchmarks
+do not compose into a system-level ranking.
+
+**3. Unit economics are comfortable; the leverage is elsewhere.** At 30 new
+posts/vendor/month, a vendor costs roughly **$0.55/month all-in** (Gemini,
+$6/hr review), of which ~90% is labour. 10,000 vendors is on the order of
+$5.5k/month. The model is affordable at enterprise scale - the question is
+whether attention rate can be driven down, not whether inference is affordable.
+
+### Caveats
+
+- **45 seconds per reviewed item is an assumption, not a measurement**, and it
+  is the single most load-bearing number here - every human-cost figure scales
+  linearly with it. Worth timing against real `needs_attention` items before
+  quoting any of this externally.
+- Costs assume the vendor-2 token profile (2,734 tokens/post). A vendor with
+  longer captions, more carousels, or more caption-less image-priced posts
+  (which force vision escalation) will differ. GPT-4o Mini in particular is
+  highly sensitive to escalation rate: its Stage 2 vision passes tokenize images
+  at ~25-30k each, which is why its Stage 2 total was 184,082 tokens against
+  everyone else's ~20,000 for identical accuracy.
+- No Stage 6 sync cost is modelled. Sync is zero-LLM except caption embeddings
+  on changed posts, so it is small, but it recurs per sync rather than per post.
+- Llama has no attention-rate row: no `stage3_llama*` config exists, so it has
+  no same-family Stage 5 result.
+
+---
+
+## Audit round 3: Gemini key leak, Stage 3 error isolation, duplicate Stage 5 flags (2026-09-08)
+
+A read-only audit of the pipeline stages, config loading, token handling, and
+the eval harness. Five findings acted on, one left open pending a live run.
+No model calls were made; every number below comes from cached predictions.
+
+### 1. The Gemini API key was passed in the URL and logged on failure (critical)
+
+`pipeline/media_fingerprint.py::compute_caption_embedding()` authenticated with
+`params={"key": GEMINI_API_KEY}` and logged the raw exception on failure:
+
+```python
+except Exception as exc:
+    logger.warning("[embedding] %s: Gemini embedding call failed: %s", post_id, exc)
+```
+
+This is the same mechanism as the 2026-09-07 Instagram token leak, in a file
+that sweep did not touch. `requests` builds `HTTPError`'s message from the full
+request URL, query string included, so any non-200 printed the key. Three
+aggravating details:
+
+- The branch logs at **WARNING**, so it is visible at any `LOG_LEVEL` - not a
+  `LOG_LEVEL=DEBUG`-only exposure.
+- `GEMINI_API_KEY` is not an embeddings-scoped credential. It is the key
+  litellm resolves for every `gemini/*` call in Stages 1-4, i.e. the pipeline's
+  primary model credential.
+- The failure is demonstrated, not hypothetical: this key has already been
+  quota-exhausted mid-run (432 errors, 2026-09-08, same page).
+
+`redact_tokens()` would not have helped either - it only matched
+`access_token=` and `Bearer `, with no pattern for `key=`.
+
+**Fixed.** The call now uses an `x-goog-api-key` header via a new
+`settings.py::gemini_auth_headers()` (mirroring `ig_auth_headers()`), and the
+except branch logs `redact_tokens(exc)`. `redact_tokens()` gained patterns for
+`key=` / `api_key=` (with a leading word boundary, so `monkey=` is not a match)
+and for an `x-goog-api-key` header echoed into an error string.
+
+### 2. `score_stage3()` had no per-post error handling (medium)
+
+`score_stage2()` and `score_stage4()` both wrap their per-post call in
+`try/except` precisely so one bad post cannot end a run. `score_stage3()` did
+not, around either `extract_fn(post)` or the `predicted[0]["price"]` unpacking.
+This only looked safe because `extract_product()` swallows everything into
+`_regex_fallback` - an accident of the one real implementation, not something
+the harness enforced. Any alternate Stage 3 module, or a future narrowing of
+that internal `except Exception`, would take down the whole run.
+
+**Fixed.** Same pattern as its siblings. Two deliberate choices:
+
+- The `predicted[0]["price"]` unpacking is inside the same `try`: a stage
+  returning a product with no `price` key is the same class of failure as one
+  that raises.
+- An errored post counts in the missing-price denominator but never as a hit.
+  It produced no evidence the pipeline declined to invent a price, so it must
+  not prop up the brief-section-11 recall number. A run where every call failed
+  now reports 0% recall and an explicit error count, not a silent 100%.
+
+### 3. Stage 5 emitted one flag per offending product, not per reason (medium)
+
+`route_post()` never deduplicated `flags`, so a post with N priceless products
+appended `MISSING_PRICE_FLAG` N times. Bucket assignment was unaffected (only
+emptiness is checked), but two outputs were wrong: `run_stage5.py`'s
+`flag_counts` frequency table - whose `[Nx] reason` lines are quoted verbatim
+into this file - and the per-post needs-attention line shown to a reviewer,
+which repeated the same sentence N times.
+
+Real case: post `17966735571148449` (vendor_gadgets_01) has 3 products, all
+`price.source == "none"`.
+
+**Fixed** (`flags = list(dict.fromkeys(flags))`). Measured on cached
+predictions, buckets identical, counts corrected:
+
+| vendor_gadgets_01, Gemini Cascade | before | after |
+|---|---|---|
+| auto_import / needs_attention / auto_exclude | 25 / 9 / 7 | 25 / 9 / 7 (unchanged) |
+| `[Nx]` Missing price | **8x** | **6x** |
+| all other flag counts | unchanged | unchanged |
+
+vendor_autos_01 is byte-identical before and after - it happens to have no
+multi-product post with a repeated flag, which is why this survived that
+vendor's runs. **Any "Missing price" count quoted from a vendor_gadgets_01
+Stage 5 run before today is inflated**; the routing distributions are fine.
+
+### 4. `.env` is in git history, and `.env.example` never existed (housekeeping)
+
+`.env` was committed in `03e5554` and deleted in `17f9812`. Both are ancestors
+of `origin/main`, so `git show 03e5554:.env` still retrieves it from any clone.
+The value that time was a 3-character placeholder (verified by length only, not
+printed), so nothing needs rotating - but `.gitignore` demonstrably did not
+prevent the staging, and deleting a file does not remove it from history.
+
+Separately, seven experiment YAMLs pointed readers at a `.env.example` that was
+neither tracked nor on disk.
+
+**Fixed.** Added `.env.example` (key names, empty values) and
+`scripts/scan_secrets.py`, installed as a pre-commit hook by
+`make install-hooks` (`.pre-commit-config.yaml` is there too for anyone who
+already uses that framework; it is not a dependency). The scan refuses:
+
+- `.env` and `.dvc/config.local` by path, whatever their contents;
+- anything under `eval/golden/`, `runs/`, `data/snapshots/`, `report/` except
+  `.dvc` pointers and `.gitignore` files - real vendor and commenter data must
+  reach R2, never a git object;
+- credential shapes by content (Google `AIza...`, `IGQ`/`EAA`, `sk-or-v1-`,
+  `sk-`, `gsk_`, `AKIA`, plus a generic `<credential-name> = <long literal>`).
+
+It never prints the matched value, and a false positive is waived with a
+`pragma: allowlist secret` comment on the line - visible in the diff, so a
+waiver is reviewable. `make check-secrets` scans every tracked file; the repo
+is currently clean across all 65.
+
+### 5. Still open: does Graph echo `access_token` into `paging.next`?
+
+Both pagination loops follow Graph's `paging.next` URL verbatim with
+`params = {}`, on the assumption that the URL carries no credential of its own.
+If Meta does echo an `access_token` param into it, the follow-up request puts
+the token back in the query string despite the header auth fix. Local logging
+is already defended (`redact_tokens()` on the error paths, urllib3 raised to
+INFO), so this would be a wire-level issue only.
+
+**Cannot be answered offline**: raw dumps persist only the merged media list,
+not the paging envelope - confirmed by grepping every `dump_*.json` in `runs/`
+for `paging`, `next`, and `access_token=` (zero hits in all five).
+
+**Mitigated rather than left pending.** `settings.py::strip_url_credentials()`
+now strips credential params from the next-page URL before it is followed, in
+both `ingest.py::_next_page_url()` and `run_stage6.py::_fetch_all_media()`.
+This is free and correct either way - the Authorization header still
+authenticates the follow-up - and it logs a WARNING naming the fact, never the
+value, when a credential was actually present. **The next authorized `make
+ingest` or `make sync` answers the question**: a `[paging]` warning in the run
+output means Graph does echo the token, and that result belongs in this file.
+
+### Tests added (`tests/`, 47 passing)
+
+There is still no broad test suite by design - `eval/harness.py` remains the
+verification mechanism for model quality. `tests/` covers only what the harness
+structurally cannot, and every test is offline (no network, no `.env`, no
+golden-set reads):
+
+- `test_credentials.py` - the embedding call sends the key in a header and
+  never in the URL; a simulated 429 whose message carries a key is logged
+  redacted; `redact_tokens()` covers every credential shape and leaves CDN
+  cache params alone.
+- `test_harness.py` - one failing post no longer aborts a Stage 3 run; an
+  errored post never counts toward missing-price recall; the hallucinated-price
+  check still fires. Plus a guard on `load_stage_fn()`'s reserved-parameter
+  tripwire, which was previously only exercised on the day someone
+  reintroduced the 2026-09-07 shadowing bug.
+- `test_stage5_reconcile.py` - flag deduplication, and that dedup does not drop
+  distinct reasons.
+- `test_scan_secrets.py` - the scanner catches this project's credential
+  shapes, honours the allowlist pragma, never echoes a matched value, and stays
+  quiet on `.env.example` and its own fixtures.
+
+Run with `make test`. `pytest` was added to the uv dev dependencies.
+
+## KNOWN INACCURACIES — read before quoting any number from this file (2026-09-08)
+
+Audit of this document's own reliability, written so nothing above gets lifted
+into a stakeholder report without its caveat. Ordered by how much damage a
+misquote would do.
+
+### 1. Structural — the one caveat that must survive into any external report
+
+**Every per-stage accuracy figure in this file assumes perfect upstream
+routing.** `eval/harness.py` scores each stage against **gold labels**, not
+against the previous stage's predictions, and there is no chained end-to-end
+runner anywhere in the codebase. A reader who sees "Stage 2 93%, Stage 3 90%,
+Stage 4 100%" will reasonably infer a system that works end-to-end at roughly
+that level. **That has never been measured.** A real chained run would compound
+Stage 2's errors into Stage 3 and Stage 5 and would be lower. Do not present
+these as system accuracy.
+
+### 2. Values that no longer reproduce
+
+- **Vendor 1 Stage 5 routing.** Recorded throughout as 17/30 auto_import,
+  10/30 needs_attention, 3/30 auto_exclude (**33% attention rate**). Re-run
+  2026-09-08 produces **18/9/3 = 30%**. Working-tree changes since the original
+  measurement shifted it. This propagates: the vendor-2 Stage 5 table cites 33%
+  as its reference row, and the cost analysis derives human-review cost from
+  attention rates.
+- **`make stage5` is currently broken** (`Makefile:90: *** missing separator`),
+  so the documented verification command does not run. Use
+  `uv run scripts/run_stage5.py` directly until fixed.
+
+### 3. Stale — measured before a later fix changed the mechanism
+
+- **The 2026-09-07 Stage 4 re-run** (Gemini 78% / Llama 40% / Qwen 10% /
+  GPT-4o Mini 68%) was measured **before** `PREFILTER_RE` was fixed the same
+  day. That fix changed vendor 1's short-circuit rate from 17.6% to 6% and
+  unblocked two gold-signal posts that previously could not reach the model at
+  all. The recall half of those numbers is stale. The *ranking* is probably
+  unaffected (all models share one prefilter) but has not been re-verified.
+
+### 4. Valid but not reproducible
+
+- **GPT-4o Mini, vendor 2: Stage 4 = 100% and Stage 5 = 41%.** Both come from a
+  genuine verified run (`stage4_gpt4o_mini_20260908T070314Z`, 8 calls in
+  `token_log.csv`, 41 clean entries). A queued batch later overwrote the
+  artifacts with a failed run, and OpenRouter credit is now exhausted, so they
+  cannot currently be regenerated. The numbers are real; the evidence on disk is
+  not. See the artifact caveat above.
+
+### 5. Already marked invalid above — do not quote at all
+
+- The **2026-09-02 Stage 4 Signals comparison** (all three columns ran the same
+  model).
+- The **GPT-4o Mini Stage 4 column in the 2026-09-05 section** (same cause).
+- That section's **`stock_count_known` root-cause conclusion** ("identical
+  across all three models, therefore a prompt/labelling mismatch") — an artifact
+  of the same bug.
+
+### 6. Assumptions presented alongside measurements
+
+- **45 seconds of reviewer time per flagged item** is invented, not measured.
+  Every human-cost figure in the cost analysis scales linearly off it. It is the
+  single most load-bearing number in the financial case and the easiest for a
+  stakeholder to challenge.
+- **Paid per-token pricing is applied to runs actually made on Gemini's free
+  tier.** The comparison is arithmetically sound but no money was spent on the
+  Gemini runs; do not present the cost table as observed spend.
+
+### 7. Data-quality issues affecting the numbers
+
+- **Suspected gold-labelling error, vendor 1 `18079164065330268`**: caption says
+  "Financing available through our partner bank" while gold `expected_signals`
+  is `[]`. If that is a mislabel, every model that correctly detects it is
+  scored a false positive, depressing `finance_available` precision in every
+  comparison that includes vendor 1. Never investigated.
+- **Noise floor is large relative to the differences being reported.** Re-running
+  the *same* model on the *same* golden set moved per-signal F1 by 20-35 points
+  (`stock_count_known` 44% to 73%, `sold` 100% to 67%), because most signals have
+  only 1-3 gold instances. Only large macro-level gaps are safe to quote; single
+  per-signal cells are not.
+- **Vendor 2 has zero gold instances for `urgent`, `swap_deal` and
+  `stock_count_known`** (3 of 7 signals). No model can be scored on them there,
+  and any prediction against them is counted a false positive by construction.
+- **Vendor 2's Stage 2 table is clean**, but later runs in the same file show
+  38-41 errored posts at Stage 2 from Gemini quota exhaustion. Those errors do
+  not affect the Stage 2 column (which predates them) or Stage 4 (scored
+  independently), but the raw logs will look alarming without this note.
+
+### 8. What is safe to quote as-is
+
+- **Token economics**: 2,734 tokens/post, Stage 3 at 74% of spend, Stage 4
+  cheapest despite the longest prompt. Measured from `token_log.csv`, unaffected
+  by everything above.
+- **Cost per post at paid rates** — arithmetic over real token counts and live
+  pricing (subject to the free-tier caveat in section 6).
+- **Vendor 2 Stage 2 and Stage 3 comparison tables** — clean runs, verified
+  against the token log.
+- **The qualitative findings**, which are the strongest material here anyway:
+  inference cost is 10-217x smaller than the human review it triggers; the
+  cheapest-per-token model produced the most expensive system; and single-vendor
+  model rankings did not survive contact with a second vendor.
+
+### 9. Regenerating anything — current constraints
+
+OpenRouter credit is exhausted and cannot be topped up before the demo, so
+**nothing involving GPT-4o Mini, Llama 3.1 8B or Qwen 2.5 7B can be re-run**
+until it is. Everything in `default.yaml` is Gemini end to end (Stages 1-4) and
+remains runnable on the free tier, subject to a 15 req/min and a daily quota
+that this project has already exhausted once in a day.
+
+Zero-LLM paths are unaffected by both constraints and can be re-run freely:
+`scripts/run_stage5.py`, `scripts/run_build_snapshot.py` (embeddings aside),
+`scripts/simulate_stage6.py`, and `make test`.
+
+## Chained pipeline vs. independent per-stage scoring (2026-09-09)
+
+First measurement of what this file's own headline caveat is actually worth.
+Every per-stage number above comes from `eval/harness.py`, which scores each
+stage **independently against gold**: `score_stage3` runs on posts whose *gold*
+`post_type == "product_listing"`, regardless of what Stage 2 predicted. So every
+figure assumes perfect upstream routing, and nothing had ever measured the cost
+of that assumption.
+
+Two new pieces close the loop:
+
+- **`scripts/run_pipeline.py`** — runs Stages 1-5 *chained* on live predictions
+  and emits `runs/<account>/catalog.json`. It reads **no golden set at all**, so
+  it works on any account the moment a raw dump exists. Stage 3/4 run only on
+  posts Stage 2 *predicted* as listings; the Stage 1 profile is threaded into
+  Stages 2/3/4, which the harness never does (the gap flagged 2026-09-02, so the
+  `[VENDOR]`/`[BUYER]` comment labeling had never actually fired in a scored
+  run). Stages resolve through `harness.load_stage_fn()`, so the YAML stays the
+  single source of truth and the reserved-parameter tripwire still applies.
+- **`scripts/score_catalog.py`** — scores that catalog against gold on the
+  harness's own denominators, so the two sit side by side. Kept separate from the
+  runner on purpose: "reads no golden set" is the runner's design claim and is
+  covered by tests.
+
+The load-bearing choice: **a gold `product_listing` that Stage 2 mis-routed is
+scored as a miss, not excluded from the denominator.** Excluding it would
+reproduce the harness's own numbers and measure nothing. `tests/test_score_catalog.py`
+opens with a test named for exactly that failure.
+
+### Result — `vendor_gadgets_01`, `default` config, 41 posts
+
+| Metric | Harness (independent) | Chained | 
+|---|---|---|
+| Stage 2 accuracy | 38/41 = 93% | 38/41 = 93% |
+| Stage 3 price accuracy | 28/31 = 90% | 29/31 = 94% |
+| Name similarity | 74% | 73% |
+| Missing-price recall | 3/3 = 100% | 3/3 = 100% |
+| Attention rate | 22% | 17% |
+| **Routing penalty** | — | **1 post** |
+
+**The routing penalty is one post, and it is not a misclassification.** The single
+gold listing that never reached extraction (`18351809149247806`) is the post whose
+Stage 2 call died on a transient Gemini 503; per-post error isolation routed it to
+`unknown` → `auto_exclude`. Stage 2 is accurate enough at the `product_listing`
+boundary that chaining costs essentially nothing on this data.
+
+**Do not read the other deltas as chaining effects.** Chained Stage 3 price
+accuracy came out *higher* than independent (94% vs 90%), which routing cannot
+cause — it is run-to-run nondeterminism, the same effect recorded in the
+2026-09-07 noise-floor section. Two chained runs of this identical config on the
+same day produced routing splits of 25/9/7 and 27/7/7 (attention 22% and 17%).
+**Quote a 17-22% band, never a single figure**, and treat the chained-vs-
+independent gap as "within noise, penalty ≈ 1 post" rather than as a measured
+delta per metric.
+
+### Fixed: Stage 3's regex fallback was invisible to the token log
+
+Found by running the new chained path. When `extract_product()`'s LLM call fails
+it falls back to `_regex_fallback()` — and logged **nothing**, so a run that
+quietly degraded several posts to heuristic extraction was indistinguishable in
+`report/token_log.csv` from a clean one. The `fallback_used` column has existed
+since the log was created and **no caller had ever set it**.
+
+Now writes a zero-token `stage3_extract_fallback` row with `fallback_used=True`,
+and `run_pipeline.py` surfaces the count in its summary. Same species as the
+Stage 4 binding bug: a measurement that silently reports success. In the first
+41-post run 3 posts degraded this way (Gemini rate limits exhausting 3 retries);
+all 3 carried the fallback's `extraction_confidence: 0.4` signature and were
+routed to `needs_attention`, so a human would have seen them — the system
+degraded correctly, it just could not say so.
+
+### Family configs added — three of four UNRUN
+
+Every existing `stage2_*`/`stage3_*`/`stage4_*` config swaps one stage and leaves
+the others on Gemini (deliberately, so a stage-N comparison isn't polluted). None
+of them is a same-family end-to-end run. Added
+`pipeline/config/experiments/family_{gemini,llama,qwen,gpt4o_mini}.yaml`, each
+holding one family across Stages 2/3/4. `family_llama.yaml` supplies the repo's
+**first Llama Stage 3 entry**, closing the gap noted 2026-09-08 ("no `stage3_llama*`
+config exists, so there is no same-family Stage 3 prediction to route from").
+
+**Only `family_gemini` has run.** OpenRouter is at **credits 0 / usage $0.197**
+(confirmed live, HTTP 200), so Llama, Qwen and GPT-4o Mini cannot make a single
+call. The three unrun configs each carry a `note:` saying so, and **no number may
+be published from them until each passes a 2-post smoke test with its own model
+strings visible in `report/token_log.csv` for that run_id**. The repo already
+carries two dead configs (`stage1_llama3_8b`, `stage1_qwen2_7b`) that no code path
+reads; three more unverified ones would repeat the pattern that produced the
+invalidated Stage 4 tables.
+
+**Stage 1 is deliberately excluded from every `family_*.yaml`.**
+`get_or_create_profile()` caches to `runs/<account>/profile.json`, so all four
+families would silently share whichever profile was generated first — a per-family
+Stage 1 number would be fiction.
+
+### Not done: `vendor_autos_01` has no chained score
+
+Attempted 2026-09-08. The run reached 32 of 40 posts and was killed at a 900s
+timeout while in sustained Gemini free-tier 429 backoff (49 retry warnings), after
+the day's two full 41-post gadgets runs had drained the quota. **No catalog was
+written** — `run_pipeline.py` writes only at the end, so there is no partial
+artifact to mistake for a result. Re-run on a fresh quota day. Until then the
+chained-vs-independent finding above is single-vendor, which is exactly the
+weakness the second vendor exists to catch — so it should not be generalised yet.
+
+Practical note for anyone repeating this: **two full-account chained runs is
+roughly the daily free-tier budget.** Schedule the autos run first and separately.
+
+---
+
+## This record continues in FINDINGS_BASELINE_2026-09.md (2026-09-09)
+
+Re-baselining work from 2026-09-09 onward is recorded in
+**`FINDINGS_BASELINE_2026-09.md`**, not here. Nothing above has been edited or
+removed; this file stays the durable record through 2026-09-08.
+
+**Before quoting any number above, read the first entry in that file.** The harness
+never passed the Stage 1 profile into Stages 2/3/4 until 2026-09-09, while
+`scripts/run_pipeline.py` always did. Every figure in this file was therefore
+measured on different inputs than the production path uses — most acutely Stage 4,
+whose `[VENDOR]`/`[BUYER]` comment labelling never fired in any scored run recorded
+here. The numbers were honestly measured; they are simply not comparable to
+anything in the new file, and the two must not be mixed in one table.
+
+The new file also carries the rule that every number it records comes from a run
+that passed `scripts/verify_run.py`, with its `run_id` named.
