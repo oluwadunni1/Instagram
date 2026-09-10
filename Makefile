@@ -17,12 +17,14 @@ GOLDEN    ?= eval/golden/$(ACCOUNT).json
 CONFIG    ?= pipeline/config/experiments/default.yaml
 CHANGES   ?= report/changes.json
 LABEL     ?= Gemini Cascade
-STAGE2    ?= report/stage2_Gemini_Cascade_Google_AI_Studio_predictions.json
-STAGE3    ?= report/stage3_gemini-3.5-flash-lite_Google_AI_Studio_predictions.json
-STAGE4    ?= report/stage4_gemini_gemini-3.5-flash-lite_predictions.json
+# eval/harness.py writes predictions to report/<golden file stem>/, so these
+# follow ACCOUNT automatically; only the model half needs overriding per run.
+STAGE2    ?= report/$(ACCOUNT)/stage2_Gemini_Cascade_Google_AI_Studio_predictions.json
+STAGE3    ?= report/$(ACCOUNT)/stage3_gemini-3.5-flash-lite_Google_AI_Studio_predictions.json
+STAGE4    ?= report/$(ACCOUNT)/stage4_gemini_gemini-3.5-flash-lite_predictions.json
 
 .DEFAULT_GOAL := help
-.PHONY: help ingest golden update-golden harness stage5 snapshot sync simulate-sync dvc-setup data-push data-pull data-status
+.PHONY: help ingest golden update-golden harness pipeline stage5 verify snapshot sync simulate-sync dvc-setup data-push data-pull data-status test check-secrets install-hooks
 
 help:
 	@echo "Targets (each wraps an existing uv run script - see README for the full workflow):"
@@ -30,10 +32,17 @@ help:
 	@echo "  golden          uv run eval/make_golden_skeleton.py \$$(ACCOUNT)"
 	@echo "  update-golden   uv run eval/update_golden_skeleton.py \$$(ACCOUNT)"
 	@echo "  harness         uv run eval/harness.py --golden \$$(GOLDEN) --config \$$(CONFIG)"
+	@echo "  pipeline        uv run scripts/run_pipeline.py --account \$$(ACCOUNT) --config \$$(CONFIG)  [LIMIT=N caps posts; INGEST=1 pulls a fresh dump first]"
 	@echo "  stage5          uv run scripts/run_stage5.py --golden \$$(GOLDEN) --stage2 \$$(STAGE2) --stage3 \$$(STAGE3) --stage4 \$$(STAGE4) --label \"\$$(LABEL)\"  [APPEND=1 adds --append-findings]"
+	@echo "  verify          uv run scripts/verify_run.py --run-id \$$(RUN_ID) [--expect-model \$$(EXPECT)] [--posts \$$(POSTS)] [--predictions \$$(PREDS)]   (RUN_ID= alone lists the log's run_ids)"
 	@echo "  snapshot        uv run scripts/run_build_snapshot.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN)"
 	@echo "  sync            uv run scripts/run_stage6.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN) --changes \$$(CHANGES) --token-env \$$(TOKEN_ENV)"
 	@echo "  simulate-sync   uv run scripts/simulate_stage6.py"
+	@echo ""
+	@echo "Checks (offline - these do NOT replace the harness, see CLAUDE.md):"
+	@echo "  test            uv run pytest        (credential handling, harness error isolation, stage 5 routing)"
+	@echo "  check-secrets   uv run scripts/scan_secrets.py --all"
+	@echo "  install-hooks   install the secret scan as .git/hooks/pre-commit"
 	@echo ""
 	@echo "Data (DVC -> Cloudflare R2; tracks eval/golden, runs, data/snapshots, report):"
 	@echo "  dvc-setup       one-time: read R2_* from .env, configure the remote"
@@ -41,7 +50,7 @@ help:
 	@echo "  data-pull       download data from R2 (use on a fresh clone)"
 	@echo "  data-status     show what differs between local, cache, and R2"
 	@echo ""
-	@echo "Variables (override with VAR=value): ACCOUNT TOKEN_ENV VENDOR GOLDEN CONFIG CHANGES LABEL STAGE2 STAGE3 STAGE4 APPEND"
+	@echo "Variables (override with VAR=value): ACCOUNT TOKEN_ENV VENDOR GOLDEN CONFIG CHANGES LABEL STAGE2 STAGE3 STAGE4 APPEND LIMIT INGEST RUN_ID EXPECT POSTS PREDS"
 	@echo "Current defaults: ACCOUNT=$(ACCOUNT) TOKEN_ENV=$(TOKEN_ENV) VENDOR=$(VENDOR) GOLDEN=$(GOLDEN) CONFIG=$(CONFIG)"
 
 ingest:
@@ -56,8 +65,24 @@ update-golden:
 harness:
 	uv run eval/harness.py --golden $(GOLDEN) --config $(CONFIG)
 
+# Chained Stages 1-5 on live predictions, no golden set - emits
+# runs/<ACCOUNT>/catalog.json. Reuses the newest existing raw dump unless
+# INGEST=1, so a bare run makes no Instagram API calls.
+pipeline:
+	uv run scripts/run_pipeline.py --account $(ACCOUNT) --config $(CONFIG) $(if $(LIMIT),--limit $(LIMIT),) $(if $(INGEST),--ingest --token-env $(TOKEN_ENV),)
+
 stage5:
 	uv run scripts/run_stage5.py --golden $(GOLDEN) --stage2 $(STAGE2) --stage3 $(STAGE3) --stage4 $(STAGE4) --label "$(LABEL)" $(if $(APPEND),--append-findings,)
+
+# Gate a run's validity before publishing its numbers: rows logged at all,
+# zero regex fallbacks, only the configured models called, call count in a
+# plausible band, and - from PREDS, not the log - zero errored posts. That
+# last one cannot come from the log: an errored post never reached litellm, so
+# it writes no row (FINDINGS.md 2026-09-09). Pass all three stage prediction
+# files. Exits non-zero, so `make harness ... && make verify RUN_ID=...` fails
+# the pair. With no RUN_ID, lists the run_ids present in the log.
+verify:
+	uv run scripts/verify_run.py $(if $(RUN_ID),--run-id $(RUN_ID),--list) $(foreach m,$(EXPECT),--expect-model $(m)) $(if $(POSTS),--posts $(POSTS),) $(foreach p,$(PREDS),--predictions $(p))
 
 snapshot:
 	uv run scripts/run_build_snapshot.py --vendor-handle $(VENDOR) --golden $(GOLDEN)
@@ -67,6 +92,21 @@ sync:
 
 simulate-sync:
 	uv run scripts/simulate_stage6.py
+
+# --- Offline checks -------------------------------------------------------
+# eval/harness.py remains the verification mechanism for model quality; these
+# cover only what it structurally cannot (see tests/conftest.py).
+
+test:
+	uv run pytest
+
+check-secrets:
+	uv run scripts/scan_secrets.py --all
+
+install-hooks:
+	@printf '#!/bin/sh\nexec uv run scripts/scan_secrets.py\n' > .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "Installed .git/hooks/pre-commit -> scripts/scan_secrets.py"
 
 # --- Data versioning (DVC -> Cloudflare R2) -------------------------------
 # The four data paths are DVC-tracked, not in git (see .gitignore). Each has

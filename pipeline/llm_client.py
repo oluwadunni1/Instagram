@@ -28,6 +28,7 @@ import json
 import logging
 import re
 import time
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Type, TypeVar
@@ -95,6 +96,30 @@ _TRANSIENT_EXCEPTIONS = (
     httpx.RemoteProtocolError,               # server sent bad HTTP
 )
 
+# Provider errors that arrive INSIDE a _TRANSIENT_EXCEPTIONS type but are
+# permanent, so retrying only wastes wall-clock time. litellm raises
+# OpenRouter's 402 as a generic APIError, which the tuple above classifies as
+# transient - so an exhausted balance burned 6 retries with exponential
+# backoff (2+4+8+16+32+64 = ~2 minutes) PER POST before failing. On a 41-post
+# run that is over an hour to learn what one balance check answers instantly.
+# Hit three times on 2026-09-09; see FINDINGS_BASELINE_2026-09.md.
+#
+# Matched on message text because the provider's HTTP status is not reliably
+# surfaced on the exception - deliberately narrow, and it only ever converts a
+# slow failure into a fast one with the same outcome.
+_PERMANENT_ERROR_MARKERS = (
+    "insufficient credits",
+    "requires more credits",
+    "never purchased credits",
+    "402",
+)
+
+
+def _is_permanent_provider_error(exc: Exception) -> bool:
+    """True for a provider error that no amount of waiting will fix."""
+    text = str(exc).lower()
+    return any(marker in text for marker in _PERMANENT_ERROR_MARKERS)
+
 
 TOKEN_LOG_PATH = Path("report") / "token_log.csv"
 TOKEN_LOG_FIELDNAMES = [
@@ -154,6 +179,56 @@ def log_token_usage(
         if write_header:
             writer.writeheader()
         writer.writerow(row)
+
+
+def read_run_usage(run_id: str) -> dict:
+    """Per-stage call counts and token totals for one run, read back from
+    report/token_log.csv.
+
+    Deliberately not accumulated in memory as we go: the log is what actually
+    reached litellm, so a stage that silently fell back to a different model,
+    or never called one at all, shows up here and cannot be papered over by
+    the runner's own bookkeeping.
+
+    Lives next to log_token_usage() (its writer) and TOKEN_LOG_PATH so the
+    reader and writer of the log share one definition of its shape. Both
+    scripts/run_pipeline.py and scripts/verify_run.py read through this.
+    """
+    empty = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0,
+             "fallbacks": 0, "by_stage": {}, "models": []}
+    if not TOKEN_LOG_PATH.exists():
+        return empty
+
+    by_stage: dict[str, dict] = {}
+    models: Counter = Counter()
+    totals = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0,
+              "fallbacks": 0}
+
+    with TOKEN_LOG_PATH.open(encoding="utf-8", newline="") as f:
+        for row in csv.DictReader(f):
+            if row.get("run_id") != run_id:
+                continue
+
+            def _int(key: str) -> int:
+                try:
+                    return int(row.get(key) or 0)
+                except ValueError:
+                    return 0
+
+            stage = row.get("stage") or "unknown"
+            entry = by_stage.setdefault(
+                stage, {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+            )
+            for key in ("prompt_tokens", "completion_tokens", "total_tokens"):
+                entry[key] += _int(key)
+                totals[key] += _int(key)
+            entry["calls"] += 1
+            totals["calls"] += 1
+            if (row.get("fallback_used") or "").strip().lower() == "true":
+                totals["fallbacks"] += 1
+            models[row.get("model") or "unknown"] += 1
+
+    return {**totals, "by_stage": by_stage, "models": sorted(models)}
 
 
 def complete_structured(
@@ -238,6 +313,14 @@ def complete_structured(
                 )
                 break  # success - exit transient retry loop
             except _TRANSIENT_EXCEPTIONS as exc:
+                # Fail fast on a permanent error wearing a transient error's
+                # type - an exhausted balance is not a blip, and backing off
+                # from it just hides the cause behind minutes of waiting.
+                if _is_permanent_provider_error(exc):
+                    raise RuntimeError(
+                        f"[{stage_name}] Permanent provider error on {model} - not retrying. "
+                        f"Check the account balance for the key in use. Last: {exc}"
+                    ) from exc
                 transient_attempts += 1
                 if transient_attempts > max_transient_retries:
                     raise RuntimeError(
