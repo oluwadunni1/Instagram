@@ -37,13 +37,13 @@ than what the config claimed. It fails on: zero rows logged (the run never reach
 any `fallback_used=True` row (part of the output is regex heuristic, not model output), a
 model string outside `--expect-model`, or a call count outside a band derived from `--posts`.
 Exits non-zero, so `make harness … && make verify RUN_ID=…` fails the pair. Bare
-`make verify` lists the log's run_ids. **No number goes into `FINDINGS.md` or a stakeholder
+`make verify` lists the log's run_ids. **No number goes into `README.md` or a stakeholder
 artifact from a run that has not passed this gate.**
 
 **`eval/harness.py` is the verification mechanism for anything model-related**: it scores each
 stage against the hand-labeled golden set and writes per-post predictions. To verify a change
 did not regress anything, re-run the harness (or `make stage5`, which is zero-LLM and runs off
-cached predictions) and compare against the numbers recorded in `FINDINGS.md`. `make stage5`
+cached predictions) and compare against the numbers recorded in `README.md`. `make stage5`
 with no overrides currently prints 18/30 auto_import, 9/30 needs_attention, 3/30 auto_exclude
 for `vendor_autos_01` — this file previously recorded 17/10/3, which no longer reproduces and
 predates the current working tree; treat the recorded figure as the thing to re-derive, not as
@@ -113,12 +113,12 @@ binding. `model:` in a YAML is a *display label* (`"Gemini Cascade (Google AI St
 litellm string at all. Real model strings go in `text_model` / `vision_model` /
 `signals_model` / `profile_model`. A parameter named `model` silently never receives its
 configured value and falls back to the function's own default; that is exactly how every
-Stage 4 model comparison ran on one model while reporting four (`FINDINGS.md` 2026-09-07).
+Stage 4 model comparison ran on one model while reporting four (`README.md`).
 `load_stage_fn()` now raises on this rather than binding silently.
 
 ### The harness scores stages independently, not as a chain
 
-This is the most important thing to understand before interpreting any number in `FINDINGS.md`.
+This is the most important thing to understand before interpreting any number in `README.md`.
 `main()` calls `score_stage2`, `score_stage3`, `score_stage4` in sequence, but nothing is piped
 between them. Each filters and scores against **gold labels**: `score_stage3` runs on posts
 whose *gold* `post_type == "product_listing"`, not on whatever Stage 2 predicted. So reported
@@ -137,7 +137,7 @@ never fired in a scored run. `eval/harness.py::resolve_profile()` now loads it o
 The failure mode was silent, because every stage's `profile` parameter is optional and
 defaults to `None`, so it is guarded by
 `tests/test_harness.py::test_profile_reaches_every_scored_stage`. **Figures recorded before
-2026-09-09 are not comparable to ones recorded after it** (`FINDINGS.md` 2026-09-09).
+2026-09-09 are not comparable to ones recorded after it** (`README.md`).
 
 ### Two different identifiers, easily confused
 
@@ -182,7 +182,7 @@ say whether they mean "sold" or "how much?". Do not read a `comment_delta` as ev
 Stage 4 acted on real comment content.
 Golden-set comments are therefore **hand-authored** (their IDs are a giveaway: a tidy
 `1785889326900001x` sequence), and `simulate_stage6.py` injects synthetic ones. This is the
-sanctioned workaround, not something to re-investigate — see `FINDINGS.md` 2026-09-04.
+sanctioned workaround, not something to re-investigate — see `README.md`.
 
 **`media_url` is a video file for Reels.** A Reel is `media_type=VIDEO` with
 `media_product_type=REELS`; its `media_url` ends in `.mp4`. Never hand it to a vision model or
@@ -218,7 +218,7 @@ params that change on every fetch, which would make every post falsely "changed"
   `get_ig_access_token(var_name)` — multiple accounts keep separate `.env` entries (e.g.
   `IG_ACCESS_TOKEN_GADGETS`) selected with `--token-env`, rather than overwriting one variable.
 - **A credential never goes in a URL.** Both leaks this project has had were a credential in a
-  query string that `requests` then embedded in an exception someone logged (`FINDINGS.md`
+  query string that `requests` then embedded in an exception someone logged (`README.md`
   2026-09-07, 2026-09-08). Authenticate with `ig_auth_headers()` / `gemini_auth_headers()`,
   and log `redact_tokens(exc)`, never a bare `exc`, on any path that touches an API. A URL you
   did not construct yourself — a `paging.next` from Graph — goes through
@@ -226,8 +226,12 @@ params that change on every fetch, which would make every post falsely "changed"
 - Scripts in `scripts/` and `eval/` use `argparse` with defaults that reproduce the original
   `vendor_autos_01` run, so a bare invocation stays reproducible. Follow that pattern rather
   than hardcoding a vendor.
-- `FINDINGS.md` is the durable experiment record: append dated sections, never rewrite history.
-  `report/` is regenerated on every run and is not the record.
+- `README.md` is the experiment record. It was consolidated from an append-only dated findings
+  log; the durable conclusions and every caveat on them now live in its "What went wrong" and
+  "Caveats on the numbers" sections, and code comments citing a finding point there. When a new
+  result changes a conclusion, edit the relevant section rather than appending — but never drop
+  a caveat just because it is inconvenient. `report/` is regenerated on every run and is not the
+  record; `report/token_log.csv` is the primary evidence behind every figure.
 - **The data is split between git and DVC, and which is which is deliberate.**
   `eval/golden/` and `runs/` are **committed to git** so the experiment can be re-run from a
   clone. They carry no third-party data: Meta withholds comment text, so every raw dump's

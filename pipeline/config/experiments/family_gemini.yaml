@@ -44,4 +44,4 @@ stage4_signals:
     "model" is stripped by load_stage_fn() and would silently never bind.
 
   # VERIFIED: this is the only family config that has actually run end-to-end.
-  # Free tier, so no credit required. See FINDINGS.md 2026-09-09.
+  # Free tier, so no credit required. See README.md.

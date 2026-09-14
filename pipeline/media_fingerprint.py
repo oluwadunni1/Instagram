@@ -89,7 +89,7 @@ def compute_caption_embedding(caption: str | None, post_id: str = "") -> tuple[l
         # The key goes in an x-goog-api-key header, never `?key=` - requests
         # embeds the full request URL in HTTPError, and this call's failure
         # path logs at WARNING (visible at any LOG_LEVEL), so a quota 429
-        # here used to print the live Gemini key. See FINDINGS.md 2026-09-08.
+        # here used to print the live Gemini key. See README.md.
         resp = requests.post(
             GEMINI_EMBED_URL,
             headers=gemini_auth_headers(GEMINI_API_KEY),

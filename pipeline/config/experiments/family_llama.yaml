@@ -4,7 +4,7 @@ description: >-
   Stage 2-5 comparison via scripts/run_pipeline.py. Stage 1 is deliberately absent
   from every family_*.yaml - see family_gemini.yaml for why.
 
-  NOTE: this file supplies the FIRST Llama Stage 3 entry in the repo. FINDINGS.md
+  NOTE: this file supplies the FIRST Llama Stage 3 entry in the repo. README.md
   (2026-09-08) records "Llama has no Stage 5 row: no stage3_llama* config exists, so
   there is no same-family Stage 3 prediction to route from" - this closes that gap.
   The Stage 3 pairing mirrors the Stage 2 one from stage2_llama_cascade.yaml

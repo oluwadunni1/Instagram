@@ -74,7 +74,7 @@ def test_read_run_usage_returns_zero_for_an_unlogged_run(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Zero rows is the documented tell that a run lost its network or its
-    credit rather than genuinely producing nothing (FINDINGS.md 2026-09-08).
+    credit rather than genuinely producing nothing (README.md).
     It must read as zero, never crash, so the summary can say so out loud."""
     _log(tmp_path, monkeypatch, "")
 

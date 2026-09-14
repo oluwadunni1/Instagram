@@ -229,7 +229,7 @@ def main() -> None:
                               "golden set. Raw dumps are what scripts/run_pipeline.py reads, and "
                               "their CDN URLs expire the same way - refreshing only the golden set "
                               "leaves the chained path failing vision on 403s the harness never "
-                              "sees (FINDINGS_BASELINE_2026-09.md 2026-09-10).")
+                              "sees (README.md).")
     parser.add_argument("--token-env", default="IG_ACCESS_TOKEN",
                          help="Env var holding the token for the account that owns these posts "
                               "(default: IG_ACCESS_TOKEN)")

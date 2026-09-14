@@ -227,7 +227,7 @@ def test_a_missing_raw_dump_degrades_instead_of_crashing(monkeypatch, caplog) ->
 
 @pytest.mark.parametrize("function", ["shadowed_model_stage", "shadowed_note_stage"])
 def test_reserved_parameter_names_raise_instead_of_binding_silently(function: str) -> None:
-    """Regression guard for FINDINGS.md 2026-09-07.
+    """Regression guard for README.md.
 
     A stage declaring a reserved name can never receive it: load_stage_fn()
     strips those keys, so the run completes, reports the config's label, and

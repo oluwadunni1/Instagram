@@ -89,7 +89,7 @@ def route_post(
     # three times. That never changed the bucket (only emptiness is checked),
     # but flags feeds two things it did corrupt: run_stage5.py's
     # `flag_counts.update(r["flags"])` frequency table, whose "[Nx] reason"
-    # lines get quoted verbatim into FINDINGS.md, and the per-post
+    # lines get quoted verbatim into README.md, and the per-post
     # needs-attention line, which repeated the same sentence to the reviewer.
     # Flags are post-level reasons, so one entry per distinct reason.
     flags = list(dict.fromkeys(flags))

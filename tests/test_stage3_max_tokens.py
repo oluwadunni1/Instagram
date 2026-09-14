@@ -8,7 +8,7 @@ The run then reported a clean score over partly-heuristic output.
 
 It hid for a week because vendor_autos_01 tops out at 3 products/post. It shows
 on vendor_gadgets_01 (up to 15), model-independently: the same three posts fell
-back on Gemini twice and on GPT-4o Mini (FINDINGS_BASELINE_2026-09.md).
+back on Gemini twice and on GPT-4o Mini (README.md).
 
 Offline: no network, no .env, no golden set.
 """

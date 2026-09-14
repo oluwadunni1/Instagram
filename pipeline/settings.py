@@ -46,7 +46,7 @@ def ig_auth_headers(token: str) -> dict[str, str]:
     connection errors do the same - so an expired token, a rate limit, a
     network blip, or simply LOG_LEVEL=DEBUG is enough to print a live
     credential to the console. Confirmed working against graph.instagram.com
-    (2026-09-07). See FINDINGS.md 2026-09-07.
+    (2026-09-07). See README.md.
     """
     return {"Authorization": f"Bearer {token}"}
 
@@ -62,7 +62,7 @@ def gemini_auth_headers(api_key: str | None) -> dict[str, str]:
     completion in Stages 1-4, i.e. the pipeline's primary credential.
     Returns {} when the key is unset so the caller gets the API's own
     "missing key" error rather than a header with a None value.
-    See FINDINGS.md 2026-09-08.
+    See README.md.
     """
     return {"x-goog-api-key": api_key} if api_key else {}
 
@@ -103,7 +103,7 @@ def strip_url_credentials(url: str) -> tuple[str, bool]:
     with a header. Stripping it is free and correct either way - the
     Authorization header still authenticates the follow-up - and the returned
     bool lets the caller record *whether* Graph does this without ever
-    logging the value. See FINDINGS.md 2026-09-08.
+    logging the value. See README.md.
     """
     parsed = urlsplit(url)
     if not parsed.query:

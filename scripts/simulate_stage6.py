@@ -86,7 +86,7 @@ def build_synthetic_raw_posts(snapshot: list[dict]) -> list[dict]:
 
     # 3. Comment delta: bump the count and supply the new comments directly
     #    (sidesteps the real comments-edge unreliability documented in
-    #    FINDINGS.md - this exercises the cursor/delta-listing logic itself).
+    #    README.md - this exercises the cursor/delta-listing logic itself).
     delta_id = ids[2]
     by_id[delta_id]["comments_count"] = 2
     by_id[delta_id]["comments"] = {

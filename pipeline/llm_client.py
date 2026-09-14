@@ -169,7 +169,7 @@ _TRANSIENT_EXCEPTIONS = (
 # transient - so an exhausted balance burned 6 retries with exponential
 # backoff (2+4+8+16+32+64 = ~2 minutes) PER POST before failing. On a 41-post
 # run that is over an hour to learn what one balance check answers instantly.
-# Hit three times on 2026-09-09; see FINDINGS_BASELINE_2026-09.md.
+# Hit three times on 2026-09-09; see README.md.
 #
 # Matched on message text because the provider's HTTP status is not reliably
 # surfaced on the exception - deliberately narrow, and it only ever converts a

@@ -52,9 +52,9 @@ def main() -> None:
     parser.add_argument("--stage4", type=Path, default=DEFAULT_STAGE4_PATH,
                          help="Stage 4 report/<vendor>/stage4_*_predictions.json to route")
     parser.add_argument("--label", default=DEFAULT_LABEL,
-                         help="Label for the console header and FINDINGS.md section title")
+                         help="Label for the console header and the routing-log section title")
     parser.add_argument("--append-findings", action="store_true",
-                         help="Append a dated section to FINDINGS.md with this run's results "
+                         help="Append a dated section to report/stage5_routing_log.md with this run's results "
                               "(off by default so exploratory runs during demo prep don't "
                               "spam the file - pass this once you have a result worth recording)")
     args = parser.parse_args()
@@ -107,7 +107,13 @@ def main() -> None:
     print(output)
 
     if args.append_findings:
-        findings_path = Path("FINDINGS.md")
+        # report/, not README.md. This used to append to the append-only findings
+        # log, which no longer exists - its conclusions were consolidated into the
+        # README. A machine-generated dated section does not belong in a hand-written
+        # document, so runs accumulate here instead, under the path that is already
+        # understood to be regenerated output rather than the record.
+        findings_path = Path("report") / "stage5_routing_log.md"
+        findings_path.parent.mkdir(parents=True, exist_ok=True)
         with findings_path.open("a", encoding="utf-8") as f:
             f.write(f"\n## Stage 5 Routing Distribution — {args.label} ({date.today().isoformat()})\n\n")
             f.write(f"Golden set: `{args.golden}` ({total} posts). Cached inputs: "

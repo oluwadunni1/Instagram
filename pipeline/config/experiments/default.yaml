@@ -17,7 +17,7 @@ stage1_profile:
     default. gemini-3.5-flash-lite is free-tier, is what Stage 2/3/4 already use, and
     won the 2026-09-07 Stage 4 comparison at 78% macro F1. Verified on
     vendor_gadgets_01: 4 of 5 profile fields correct against independently-known
-    ground truth (see FINDINGS.md 2026-09-07). NOTE: Stage 1 still has no scored
+    ground truth (see README.md). NOTE: Stage 1 still has no scored
     evaluation - the harness does not score it - so this is a reasoned default, not
     a measured winner.
 

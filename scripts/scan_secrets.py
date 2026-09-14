@@ -9,7 +9,7 @@ catches for free:
     cloned the repo can still `git show 03e5554:.env`. The value that time
     was a placeholder, but .gitignore alone demonstrably did not prevent the
     staging.
-  - Two live credentials have reached console logs (FINDINGS.md 2026-09-07,
+  - Two live credentials have reached console logs (README.md,
     2026-09-08). Log leaks are transient; a committed one is permanent.
 
 It also refuses to let the two DVC-tracked data paths into git:

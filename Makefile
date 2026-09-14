@@ -53,7 +53,7 @@ help:
 	@echo "  check-secrets   uv run scripts/scan_secrets.py --all"
 	@echo "  install-hooks   install the secret scan as .git/hooks/pre-commit"
 	@echo ""
-	@echo "Data (DVC -> Cloudflare R2; tracks eval/golden, runs, data/snapshots, report):"
+	@echo "Data (DVC -> Cloudflare R2; tracks data/snapshots and report - golden sets and runs are in git):"
 	@echo "  dvc-setup       one-time: read R2_* from .env, configure the remote"
 	@echo "  data-push       upload local data to R2"
 	@echo "  data-pull       download data from R2 (use on a fresh clone)"
@@ -103,7 +103,7 @@ stage5:
 # zero regex fallbacks, only the configured models called, call count in a
 # plausible band, and - from PREDS, not the log - zero errored posts. That
 # last one cannot come from the log: an errored post never reached litellm, so
-# it writes no row (FINDINGS.md 2026-09-09). Pass all three stage prediction
+# it writes no row (README.md). Pass all three stage prediction
 # files. Exits non-zero, so `make harness ... && make verify RUN_ID=...` fails
 # the pair. With no RUN_ID, lists the run_ids present in the log.
 verify:
@@ -134,9 +134,11 @@ install-hooks:
 	@echo "Installed .git/hooks/pre-commit -> scripts/scan_secrets.py"
 
 # --- Data versioning (DVC -> Cloudflare R2) -------------------------------
-# The four data paths are DVC-tracked, not in git (see .gitignore). Each has
-# a committed *.dvc pointer, so `git checkout <commit> && make data-pull`
-# restores the exact data that commit was produced against.
+# data/snapshots and report are DVC-tracked, not in git (see .gitignore); the
+# golden sets and raw dumps are committed to git instead, so a clone can score
+# without R2 access. Each DVC path has a committed *.dvc pointer, so
+# `git checkout <commit> && make data-pull` restores the exact data that commit
+# was produced against.
 #
 # dvc-setup is one-time (or after credentials rotate); it reads R2_ACCOUNT_ID,
 # R2_BUCKET, R2_ACCESS_KEY_ID, and R2_SECRET_ACCESS_KEY from .env. After it

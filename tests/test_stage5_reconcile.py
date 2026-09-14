@@ -33,7 +33,7 @@ def test_flags_are_deduplicated_across_products() -> None:
     Before this fix a 3-product post with no prices emitted
     MISSING_PRICE_FLAG three times, which inflated run_stage5.py's "Top flag
     reasons: [Nx] ..." frequency table - the table whose lines get quoted
-    verbatim into FINDINGS.md - and repeated the same sentence three times on
+    verbatim into README.md - and repeated the same sentence three times on
     the reviewer's needs-attention line. Real occurrence: post
     17966735571148449 in vendor_gadgets_01 has 3 products, all price.source
     == "none".

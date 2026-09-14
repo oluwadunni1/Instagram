@@ -4,7 +4,7 @@ Scores a chained catalog against a golden set - the measurement nothing else mak
 
 `eval/harness.py` scores each stage **independently against gold**: `score_stage3`
 runs on posts whose *gold* `post_type == "product_listing"`, regardless of what
-Stage 2 predicted. So every per-stage number in `FINDINGS.md` assumes perfect
+Stage 2 predicted. So every per-stage number in `README.md` assumes perfect
 upstream routing, and CLAUDE.md says so outright.
 
 `scripts/run_pipeline.py` runs the stages *chained* on live predictions - Stage 3

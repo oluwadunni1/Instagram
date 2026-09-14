@@ -26,7 +26,7 @@ Repository-specific context:
 
 ## Read these first
 
-Before reporting anything, read `CLAUDE.md` and `FINDINGS.md`. `FINDINGS.md` is the durable
+Before reporting anything, read `CLAUDE.md` and `README.md`. `README.md` is the durable
 record of what has already been investigated and consciously accepted. Treat "is this already
 documented as a known, accepted trade-off?" as part of triage — do not report known behavior
 cold as if it were newly discovered.

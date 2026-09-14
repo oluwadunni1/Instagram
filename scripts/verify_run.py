@@ -147,7 +147,7 @@ def verify(
         check(False, "rows logged", (
             f"ZERO rows in {llm_client.TOKEN_LOG_PATH} for run_id {run_id!r}. No model was called. "
             "A clean-looking run with no token rows is infrastructure failure, not a model "
-            "that answered nothing (FINDINGS.md 2026-09-08). Nothing else can be checked."
+            "that answered nothing (README.md). Nothing else can be checked."
         ))
         return False, lines
     check(True, "rows logged", f"{usage['calls']} call(s), {usage['total_tokens']:,} tokens")

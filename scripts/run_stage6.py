@@ -149,14 +149,14 @@ def _fetch_all_media(token: str) -> list[dict]:
         # it - pagination reuses that URL verbatim, so an echoed
         # `access_token=` would put the token back in the query string even
         # though this call authenticated with a header. Mirrors
-        # ingest.py::_next_page_url(); see FINDINGS.md 2026-09-08.
+        # ingest.py::_next_page_url(); see README.md.
         next_url = (data.get("paging") or {}).get("next")
         if next_url:
             next_url, had_credential = strip_url_credentials(next_url)
             if had_credential:
                 logger.warning(
                     "[paging] Graph echoed a credential query param into paging.next; "
-                    "stripped it before following. Record this in FINDINGS.md."
+                    "stripped it before following. Record this in README.md."
                 )
         url = next_url
         params = {}  # next_url already carries all query params

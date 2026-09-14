@@ -6,9 +6,9 @@ failures it exists to catch. Each test below is one of those failures, all of
 which have actually happened on this project:
 
   - a run that never reached a model but printed clean scores anyway
-    (FINDINGS.md 2026-09-08)
+    (README.md)
   - a throttled run whose output is partly regex heuristic
-  - a "four model comparison" that ran one model (FINDINGS.md 2026-09-07)
+  - a "four model comparison" that ran one model (README.md)
 
 Offline: no network, no .env, no golden set.
 """
@@ -92,7 +92,7 @@ def test_a_single_fallback_row_fails_the_run(
 def test_an_unexpected_model_fails_the_run(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Regression guard for FINDINGS.md 2026-09-07: four stage4_*.yaml
+    """Regression guard for README.md: four stage4_*.yaml
     comparisons reported four models while running one. The config's `model:`
     key is a display label and cannot detect this - only the log can."""
     _log(tmp_path, monkeypatch, _rows("mine", 30, model="gemini/lite"))
@@ -170,7 +170,7 @@ def test_list_run_ids_survives_a_missing_log(
 # Not log-derived: a post whose stage call raised never reached litellm, so it
 # writes no token-log row and every other check here is blind to it. This is
 # the gap the first gated run walked through - two 403'd posts, PASS on all
-# four log-derived checks (FINDINGS.md 2026-09-09).
+# four log-derived checks (README.md).
 
 def _preds(tmp_path: Path, name: str, entries: list[dict]) -> Path:
     path = tmp_path / name

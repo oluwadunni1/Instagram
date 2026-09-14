@@ -55,7 +55,7 @@ USD_RE = re.compile(r"\$\s?([\d,]+)")
 # wasted vision escalation in extract_product() - if the vendor is on record
 # saying "DM for price" in the post's own caption/comments, the price isn't
 # sitting on the photo either; escalating just re-asks the same unanswerable
-# question at 2x cost (see FINDINGS.md's Stage 3 root-cause analysis).
+# question at 2x cost (see README.md's Stage 3 root-cause analysis).
 #
 # price(s|ing): the plural matters in practice - a multi-variant listing
 # ("iPhone 12 64GB / 128GB / 256GB ... send us a DM for prices!") naturally

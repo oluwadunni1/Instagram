@@ -91,7 +91,7 @@ def load_stage_fn(
     # names can never receive it, and fails SILENTLY - the run completes,
     # reports the config's label, and quietly uses the function's own default.
     # That is exactly how every stage4_*.yaml model comparison ran on the same
-    # hardcoded model while reporting four different ones (FINDINGS.md
+    # hardcoded model while reporting four different ones (README.md
     # 2026-09-07). Fail loudly instead of producing plausible wrong numbers.
     shadowed = reserved.intersection(inspect.signature(fn).parameters)
     if shadowed:

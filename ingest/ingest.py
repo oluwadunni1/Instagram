@@ -172,7 +172,7 @@ def _next_page_url(data: dict, context: str) -> str | None:
         logger.warning(
             "[paging] %s: Graph echoed a credential query param into paging.next; "
             "stripped it before following. Header auth still applies. "
-            "Record this in FINDINGS.md - it resolves the 2026-09-08 open question.",
+            "Record this in README.md - it resolves the 2026-09-08 open question.",
             context,
         )
     return clean_url

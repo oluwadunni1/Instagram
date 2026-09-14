@@ -1,8 +1,8 @@
 """Credential-handling tests.
 
 Two live-token leaks have now reached the console in this project (the IG
-token in a Graph URL, FINDINGS.md 2026-09-07; the Gemini key in an embedding
-URL, FINDINGS.md 2026-09-08), both by the same mechanism: a credential in a
+token in a Graph URL, README.md; the Gemini key in an embedding
+URL, README.md), both by the same mechanism: a credential in a
 query string that requests then embedded in an exception it logged. These
 tests pin the fixes so a third call site can't reintroduce it quietly.
 
@@ -110,7 +110,7 @@ def test_embedding_call_sends_key_in_header_never_in_url(
 def test_embedding_failure_does_not_log_the_key(
     monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, no_sleep: None
 ) -> None:
-    """The regression test for FINDINGS.md 2026-09-08.
+    """The regression test for README.md.
 
     A quota 429 is a demonstrated event on this project's Gemini key, and
     requests builds HTTPError's message from the full request URL. Even with

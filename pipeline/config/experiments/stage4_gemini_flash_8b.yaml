@@ -38,4 +38,4 @@ stage4_signals:
     display label only. (The older claim that detect_signals() "can't take a model
     kwarg" was wrong even when written; the parameter existed but was named
     `model`, which load_stage_fn() reserves and strips, so it silently never
-    bound - see FINDINGS.md 2026-09-07.)
+    bound - see README.md.)

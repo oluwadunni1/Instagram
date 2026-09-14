@@ -40,7 +40,7 @@ MODEL = "gemini/gemini-3.5-flash-lite"
 # can never match "financing", \bnegotiat\b can never match "negotiable", \bbank\b
 # misses "banks", \bslash\b misses "slashed". Those were dead alternatives that
 # could not fire on any real word, and the signals they gate reached the LLM only by
-# accident, via unrelated tokens like "still available" (FINDINGS.md 2026-09-07).
+# accident, via unrelated tokens like "still available" (README.md).
 # The fix keeps both boundaries and adds \w* to the stems that need inflection -
 # \bfinanc\w*\b matches "financing" because \w* consumes the suffix before the
 # trailing boundary applies.
@@ -198,7 +198,7 @@ def detect_signals(
             (Google AI Studio)") and is stripped by
             eval/harness.py::load_stage_fn() before kwargs are bound. A
             parameter called `model` therefore silently never receives its
-            configured value - see FINDINGS.md 2026-09-07.
+            configured value - see README.md.
         run_id: Groups this call's report/token_log.csv row with the rest of
             one eval/harness.py run - token usage is only logged when this
             is set (see log_token_usage() in pipeline/llm_client.py).

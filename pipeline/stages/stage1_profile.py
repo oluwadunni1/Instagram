@@ -163,7 +163,7 @@ def get_or_create_profile(
     eval/harness.py::load_stage_fn(): `model` is a reserved YAML key holding a
     display label, and a stage parameter of that name can never be bound from
     config. Stage 1 resolves its own model from config so it was never
-    actually broken by this, unlike Stage 4 was - see FINDINGS.md 2026-09-07 -
+    actually broken by this, unlike Stage 4 was - see README.md -
     but the naming is now uniform across every stage.
 
     Raises:

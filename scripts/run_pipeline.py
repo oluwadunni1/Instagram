@@ -23,7 +23,7 @@ Three things differ from a harness run, all deliberate:
 3. **The Stage 1 profile is threaded into Stages 2/3/4.** This path always did;
    the harness did not until 2026-09-09, which is why every figure recorded
    before that date was measured on inputs this path never uses (see
-   FINDINGS_BASELINE_2026-09.md). Both now pass it, so the two are comparable.
+   README.md). Both now pass it, so the two are comparable.
 
 Every stage is resolved through `harness.load_stage_fn()`, so the experiment
 YAML is the single source of truth for models exactly as it is for a scored
@@ -32,7 +32,7 @@ run, and the reserved-parameter tripwire applies identically.
 Cost and escalation figures in the summary are read back from
 `report/token_log.csv` filtered to this run's `run_id` - the log records the
 model string passed to litellm at call time, so the summary cannot be fooled
-by a config's display label (FINDINGS.md 2026-09-07).
+by a config's display label (README.md).
 
 Stages run batched - Stage 2 over every post, then Stage 3 over only the posts
 Stage 2 called listings, and so on - rather than one post through all five. The
@@ -151,7 +151,7 @@ def _product_brief(products: list[dict]) -> str:
 def _stage_calls(run_id: str, stage: str) -> int:
     """Calls logged for one stage of this run, read back from
     report/token_log.csv rather than counted in-process - the same reason
-    print_summary() reads usage from the log (FINDINGS.md 2026-09-07)."""
+    print_summary() reads usage from the log (README.md)."""
     return read_run_usage(run_id)["by_stage"].get(stage, {}).get("calls", 0)
 
 
@@ -586,7 +586,7 @@ def print_summary(catalog: dict) -> None:
     else:
         lines.append("    *** ZERO rows logged for this run_id - no model was actually called. ***")
         lines.append("    A clean-looking run with no token rows means infrastructure failure,")
-        lines.append("    not a model that answered nothing (FINDINGS.md 2026-09-08).")
+        lines.append("    not a model that answered nothing (README.md).")
 
     if s["flag_counts"]:
         lines.append("")
