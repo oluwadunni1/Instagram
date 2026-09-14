@@ -39,3 +39,7 @@ scratch_*.json
 
 # --- written by `dvc add` ---
 /report
+
+# Sponsor's internal brief - local reference only, never committed.
+# The README's "What the brief asked for" section is the public stand-in.
+poc/
