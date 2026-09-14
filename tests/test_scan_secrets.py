@@ -89,16 +89,30 @@ def test_env_file_is_rejected_outright() -> None:
 
 
 @pytest.mark.parametrize("path", [
-    "eval/golden/vendor_autos_01.json",
-    "runs/vendor_autos_01/raw/dump_x.json",
     "data/snapshots/ayodele.akinbohun/posts.json",
     "report/token_log.csv",
 ])
 def test_dvc_tracked_data_is_rejected(path: str) -> None:
-    """Real vendor and commenter data belongs in R2 behind a .dvc pointer."""
+    """The two paths still in DVC belong in R2 behind a .dvc pointer."""
     assert scan_secrets.check_path_rules(path)
 
 
-@pytest.mark.parametrize("path", ["runs.dvc", "report.dvc", "eval/.gitignore", "pipeline/settings.py"])
+@pytest.mark.parametrize("path", [
+    "eval/golden/vendor_autos_01.json",
+    "runs/vendor_autos_01/raw/dump_x.json",
+])
+def test_reproduction_data_is_allowed(path: str) -> None:
+    """Golden sets and raw dumps are committed on purpose so the experiment
+    can be re-run from a clone. The dumps carry no third-party data (Meta
+    withholds comment text, so every comments array is empty) and the golden
+    sets' comments are hand-authored with invented usernames.
+
+    The mirror of test_dvc_tracked_data_is_rejected: it fails if either path
+    is quietly put back on the blocklist, which would leave a clone unable to
+    score anything."""
+    assert scan_secrets.check_path_rules(path) == []
+
+
+@pytest.mark.parametrize("path", ["report.dvc", "data/snapshots.dvc", "data/.gitignore", "pipeline/settings.py"])
 def test_pointers_and_source_are_allowed(path: str) -> None:
     assert scan_secrets.check_path_rules(path) == []

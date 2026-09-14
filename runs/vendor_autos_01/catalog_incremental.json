@@ -1,0 +1,291 @@
+{
+  "account_label": "vendor_autos_01",
+  "vendor_username": "ayodele.akinbohun",
+  "generated_at": "2026-09-10T16:11:39.773228+00:00",
+  "run_id": "pipeline_vendor_autos_01_20260910T160422Z",
+  "source_dump": "runs/vendor_autos_01/raw/dump_2026-09-05T14-53-30.785614+00-00.json",
+  "config": {
+    "name": "family_gemini",
+    "path": "pipeline/config/experiments/family_gemini.yaml",
+    "stage2": "Gemini Family (Google AI Studio)",
+    "stage3": "Gemini Family (Google AI Studio)",
+    "stage4": "Gemini Family (Google AI Studio)"
+  },
+  "profile": {
+    "business_category": "automotive",
+    "seller_style": "catalog_poster",
+    "language_mix": "english",
+    "pricing_behavior": "captions",
+    "vendor_username": "ayodele.akinbohun"
+  },
+  "summary": {
+    "posts": 6,
+    "auto_import": 6,
+    "needs_attention": 0,
+    "auto_exclude": 0,
+    "attention_rate": 0.0,
+    "products_extracted": 6,
+    "posts_reaching_stage2": 6,
+    "posts_reaching_stage3": 6,
+    "posts_reaching_stage4": 6,
+    "stage2_escalations": 0,
+    "flag_counts": {},
+    "errors": 0
+  },
+  "usage": {
+    "calls": 13,
+    "prompt_tokens": 12822,
+    "completion_tokens": 1466,
+    "total_tokens": 14288,
+    "fallbacks": 0,
+    "by_stage": {
+      "stage2_triage_pass_a": {
+        "calls": 6,
+        "prompt_tokens": 2097,
+        "completion_tokens": 150,
+        "total_tokens": 2247
+      },
+      "stage3_extract_pass_a": {
+        "calls": 6,
+        "prompt_tokens": 9657,
+        "completion_tokens": 1210,
+        "total_tokens": 10867
+      },
+      "stage4_signals": {
+        "calls": 1,
+        "prompt_tokens": 1068,
+        "completion_tokens": 106,
+        "total_tokens": 1174
+      }
+    },
+    "models": [
+      "gemini/gemini-3.5-flash-lite"
+    ]
+  },
+  "errors": [],
+  "items": [
+    {
+      "post_id": "18083572661694306",
+      "permalink": "https://www.instagram.com/p/Dc1tDblEWOI/",
+      "timestamp": "2026-09-03T20:47:10+0000",
+      "media_type": "CAROUSEL_ALBUM",
+      "media_product_type": null,
+      "thumbnail_url": "https://instagram.fiba2-2.fna.fbcdn.net/v/t51.82787-15/792493196_18094493927242374_3796239394131174657_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=ImDDP7NaRPMQ7kNvwEFnB_8&_nc_oc=AdquErdEEP2Ti7CrTHrMd5RoWwVxsUJjpR4HkqEn8f838WdHcBOYRUKr3OJ23GTnQ0A&_nc_zt=23&_nc_ht=instagram.fiba2-2.fna&edm=ANQ71j8EAAAA&_nc_gid=rMVjr8bZcnHdv1oI4-omeg&_nc_tpa=Q5bMBQKMSckDQbjLJ3HaV3QaKeXY1UCCvLBzt-ftiA4bnWE9hBf7vJQiRGiExjOKOu2FQEmMUHd7Yz7UKQ&oh=00_AQLu0wvM5Gk2yUq4g-FDHIv6Vv6Xi1K6Oh84Yy-Lf51H_g&oe=6AA892F0",
+      "post_type": "product_listing",
+      "triage_confidence": 0.98,
+      "triage_escalated": false,
+      "bucket": "auto_import",
+      "flags": [],
+      "products": [
+        {
+          "name": "2016 Toyota Corolla",
+          "description": "Brand: Toyota\nModel: Corolla\nYear; 2016\nPrice;11,500,000\nCondition:Registered\nTransmission: Automatic",
+          "images": [],
+          "variants": [],
+          "price": {
+            "value": 11500000,
+            "currency": "NGN",
+            "source": "caption",
+            "confidence": 1.0
+          },
+          "quantity_signal": {
+            "kind": "none",
+            "evidence": null
+          },
+          "negotiation_signal": "unknown",
+          "extraction_confidence": 1.0
+        }
+      ],
+      "signals": []
+    },
+    {
+      "post_id": "17995344692823582",
+      "permalink": "https://www.instagram.com/p/Dc1rZtukTgz/",
+      "timestamp": "2026-09-03T20:32:44+0000",
+      "media_type": "IMAGE",
+      "media_product_type": null,
+      "thumbnail_url": "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/794903325_18094490819242374_5438254603804419585_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=pzoyclpOTn0Q7kNvwFTTMJ5&_nc_oc=AdpZdCHyiNX_V39fXZzD-czGVLpgJ8RSQoYFB7CDCBBumYEa_4YSTExefOjuAN7KSCg&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANQ71j8EAAAA&_nc_gid=6CFE3nBBnmNxfF-pDXqViA&_nc_tpa=Q5bMBQIUmVvnzzCc5GW4vxr07E7g8wmsaOkSVLsiyYDfMY-MmUhxOgaHUrg_6HF3sI0ACOiuEXNZzMARJA&oh=00_AQLKTsUMMsTbQotowGkpWnOhNOibcspopFjfzZqnS4Aytg&oe=6AA863C2",
+      "post_type": "product_listing",
+      "triage_confidence": 0.98,
+      "triage_escalated": false,
+      "bucket": "auto_import",
+      "flags": [],
+      "products": [
+        {
+          "name": "2007 Lexus IS250",
+          "description": "Brand: Lexus, Model: IS250, Year: 2007, Condition: Foreign used, Transmission: Automatic",
+          "images": [],
+          "variants": [],
+          "price": {
+            "value": 11000000,
+            "currency": "NGN",
+            "source": "caption",
+            "confidence": 1.0
+          },
+          "quantity_signal": {
+            "kind": "none",
+            "evidence": null
+          },
+          "negotiation_signal": "unknown",
+          "extraction_confidence": 1.0
+        }
+      ],
+      "signals": []
+    },
+    {
+      "post_id": "17874654051567137",
+      "permalink": "https://www.instagram.com/p/Dc1qKI7EfZV/",
+      "timestamp": "2026-09-03T20:21:52+0000",
+      "media_type": "IMAGE",
+      "media_product_type": null,
+      "thumbnail_url": "https://instagram.fiba2-2.fna.fbcdn.net/v/t51.82787-15/792324025_18094488266242374_2666098252246038715_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=bG28rzM0XSMQ7kNvwGK13DD&_nc_oc=AdrW6j08f97Mhb2jgr_8DI74NJlrhMvuB2LzhDvnKePbUiNm6Rl6DaRdg28xUuaSe5c&_nc_zt=23&_nc_ht=instagram.fiba2-2.fna&edm=ANQ71j8EAAAA&_nc_gid=3oV-TE1SU-tqFZwyMRPiZg&_nc_tpa=Q5bMBQLWexb6bLK4l77YH5IDL5S_dFUr4EOs57pdtUeNzHyrlLczpq6erX3l7EBNPjPtohfFixQ24IW3iQ&oh=00_AQKl26rtYQXYUAsNNEKg5ScjtzzJQJ6jcQGYYOMWWsXeGg&oe=6AA86360",
+      "post_type": "product_listing",
+      "triage_confidence": 0.98,
+      "triage_escalated": false,
+      "bucket": "auto_import",
+      "flags": [],
+      "products": [
+        {
+          "name": "2019 Toyota Highlander",
+          "description": "2019 Toyota Highlander, Foreign used ( AUGUST 2026 ENTRY), Automatic transmission",
+          "images": [],
+          "variants": [],
+          "price": {
+            "value": 39999999,
+            "currency": null,
+            "source": "caption",
+            "confidence": 1.0
+          },
+          "quantity_signal": {
+            "kind": "none",
+            "evidence": null
+          },
+          "negotiation_signal": "unknown",
+          "extraction_confidence": 1.0
+        }
+      ],
+      "signals": []
+    },
+    {
+      "post_id": "18125290171804479",
+      "permalink": "https://www.instagram.com/p/Dc1gLlikU_K/",
+      "timestamp": "2026-09-03T18:54:41+0000",
+      "media_type": "CAROUSEL_ALBUM",
+      "media_product_type": null,
+      "thumbnail_url": "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/792705245_18094463897242374_1933179934103358586_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=4IUcAQeRSrwQ7kNvwEdH2CH&_nc_oc=AdrvgDUQNImosnUFzYbMQJcelKUoGp7ABQEPAe3wXuWeEi8azwr3X7ltTNj761eGcwA&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANQ71j8EAAAA&_nc_gid=jQcejnytVs-IyDOm0xLOPQ&_nc_tpa=Q5bMBQLBIty6DAcp1Bo9TTnHIUZyq0G3BA18-OyXvRXzfDSMSytVvFDDumANxHksjMHEsJaIKxB_s69lKQ&oh=00_AQLbf6_nGvwBV5aXcdEJjW0DqfsZKliRXqKvv6wpk5zeZw&oe=6AA87635",
+      "post_type": "product_listing",
+      "triage_confidence": 0.99,
+      "triage_escalated": false,
+      "bucket": "auto_import",
+      "flags": [],
+      "products": [
+        {
+          "name": "2021 Mercedes-Benz GLE53",
+          "description": "Brand: Mercedes-Benz, Model: GLE53, Year: 2021, Condition: Foreign Used ( 2026 Entry ), Transmission: Automatic, 360Camera, Park Assist, Apple CarPlay",
+          "images": [],
+          "variants": [],
+          "price": {
+            "value": 120000000,
+            "currency": "NGN",
+            "source": "caption",
+            "confidence": 1.0
+          },
+          "quantity_signal": {
+            "kind": "none",
+            "evidence": null
+          },
+          "negotiation_signal": "unknown",
+          "extraction_confidence": 0.99
+        }
+      ],
+      "signals": []
+    },
+    {
+      "post_id": "18129555988734304",
+      "permalink": "https://www.instagram.com/p/DcV7wpCCF1Q/",
+      "timestamp": "2026-08-22T12:39:58+0000",
+      "media_type": "IMAGE",
+      "media_product_type": null,
+      "thumbnail_url": "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/783573222_18090469877242374_8572554071037242389_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=d1JOr9be7LwQ7kNvwHCPsh5&_nc_oc=AdrVSGb0LJFa2FnOQoEiO6X2xsTBubxNTKkvt93_DFLBrnTQ3ZaGkNKVyeb7mLZTvSk&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANQ71j8EAAAA&_nc_gid=N1cO4Pp51jx3xA03tSGPWQ&_nc_tpa=Q5bMBQLU22AACi-AQkUYHnP7DQbhR3aNhtu2ePlkusO4LQ-ZXNoa_ulc3Pzn9EzhvQFgigzIJa6n3su_zQ&oh=00_AQLYucDUV9G_ESGicsz0BZHb_9v5Jlv6rvfvNboc9QNDAA&oe=6AA89946",
+      "post_type": "product_listing",
+      "triage_confidence": 0.98,
+      "triage_escalated": false,
+      "bucket": "auto_import",
+      "flags": [],
+      "products": [
+        {
+          "name": "2022 Mercedes-Benz GLE 53 AMG Coupe",
+          "description": "2022 Mercedes-Benz GLE 53 AMG Coupe, Color: White Exterior on Black Interior, AMG Night Package & Black Rims, 3.0L Inline-6 Turbo with EQ Boost, 100% Tokunbo / Customs Duty Paid in Full",
+          "images": [],
+          "variants": [
+            {
+              "type": "color",
+              "values": [
+                "White Exterior",
+                "Black Interior"
+              ]
+            }
+          ],
+          "price": {
+            "value": 105000,
+            "currency": "USD",
+            "source": "caption",
+            "confidence": 1.0
+          },
+          "quantity_signal": {
+            "kind": "explicit_count",
+            "evidence": "Only 2 units available in stock!"
+          },
+          "negotiation_signal": "fixed",
+          "extraction_confidence": 1.0
+        }
+      ],
+      "signals": [
+        {
+          "signal": "urgent",
+          "confidence": 1.0,
+          "evidence": "⚠️ STOCK ALERT: Only 2 units available in stock! First come, first served."
+        },
+        {
+          "signal": "stock_count_known",
+          "confidence": 1.0,
+          "evidence": "⚠️ STOCK ALERT: Only 2 units available in stock!"
+        }
+      ]
+    },
+    {
+      "post_id": "18128205745669337",
+      "permalink": "https://www.instagram.com/p/DcPCAeBEX5o/",
+      "timestamp": "2026-08-19T20:19:53+0000",
+      "media_type": "CAROUSEL_ALBUM",
+      "media_product_type": null,
+      "thumbnail_url": "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/775799322_18089678465242374_750503814486932463_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=dn5bd91humEQ7kNvwHUME4r&_nc_oc=AdrClq34Dg-kuODnIUkED2T-qyZPgDgwuCRqt320JHI8sIAS8-vI9WZLw6QjGRbV6Fk&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANQ71j8EAAAA&_nc_gid=A07BTVTOuZrTbAt0XuTP4A&_nc_tpa=Q5bMBQLOMEWBN5ddgvjH-grjsbzO4ilz9kT2aUejJaPxhW6d1STBj8hWkg3uAAdZAUNUwBS88Aqu5Ie8sQ&oh=00_AQLbGD25xkSgPW_7ZzrJAuZ4ybsK10--9Y3u6NGuIVNEyA&oe=6AA87C46",
+      "post_type": "product_listing",
+      "triage_confidence": 0.99,
+      "triage_escalated": false,
+      "bucket": "auto_import",
+      "flags": [],
+      "products": [
+        {
+          "name": "2018 Toyota Camry SE",
+          "description": "2018 Toyota Camry SE | Foreign Used | Just Cleared 🇳🇬 [FLASH SALE]\n• 2.5L 4-cyl, automatic\n• 68,500 km\n• Pearl white / black leather\n• Reverse camera, dual-zone climate, Apple CarPlay\n• Custom duty fully paid, papers complete",
+          "images": [],
+          "variants": [],
+          "price": {
+            "value": 14300000,
+            "currency": "NGN",
+            "source": "caption",
+            "confidence": 1.0
+          },
+          "quantity_signal": {
+            "kind": "none",
+            "evidence": null
+          },
+          "negotiation_signal": "fixed",
+          "extraction_confidence": 1.0
+        }
+      ],
+      "signals": []
+    }
+  ]
+}

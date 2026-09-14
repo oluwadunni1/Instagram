@@ -60,10 +60,12 @@ pre-commit secret scanner (`test_scan_secrets.py`). No test may make a network c
 Adding a test that needs a model response is a sign it belongs in the harness instead.
 
 **`make install-hooks`** installs `scripts/scan_secrets.py` as a git pre-commit hook: it blocks
-committing `.env`, `.dvc/config.local`, or anything under the four DVC-tracked data paths, and
-scans staged content for credential shapes. `.env` reached a commit once already (`03e5554`,
-deleted in `17f9812`, still retrievable from history) — `.gitignore` alone did not stop it.
-Waive a false positive with a `pragma: allowlist secret` comment on the line.
+committing `.env`, `.dvc/config.local`, or anything under the two DVC-tracked data paths
+(`data/snapshots/`, `report/`), and scans staged content for credential shapes. `.env` reached a
+commit once already (`03e5554`) — `.gitignore` alone did not stop it. The value that time was an
+empty placeholder, and the blob was purged from history before the repo was published, but the
+staging is what the hook exists to prevent. Waive a false positive with a
+`pragma: allowlist secret` comment on the line.
 
 To score a single stage in isolation, point `--config` at an experiment YAML that swaps only
 that stage; `--golden` restricts scoring to one vendor.
@@ -148,17 +150,17 @@ defaults to `None`, so it is guarded by
 
 ### Where output goes (and what collides)
 
-| Artifact | Path | Keyed by |
-|---|---|---|
-| Raw dump | `runs/<account_label>/raw/dump_<ts>.json` | account_label |
-| Stage 1 profile cache | `runs/<account_label>/profile.json` | account_label |
-| Golden set | `eval/golden/<account_label>.json` | account_label |
-| Chained catalog | `runs/<account_label>/catalog.json` | account_label |
-| Stage 5 bucket split | `runs/<account_label>/buckets/{auto_import,needs_attention,auto_exclude}.json` | account_label |
-| Harness predictions | `report/<vendor_id>/stage{2,3,4}_<model>_predictions.json` | vendor_id + model |
-| Token log | `report/token_log.csv` | append-only, has `vendor_id` column |
-| Stage 6 snapshot | `data/snapshots/<vendor_handle>/` | vendor_handle |
-| Stage 6 changes | `report/changes.json` | fixed default — pass `--changes` per vendor |
+| Artifact | Path | Keyed by | Stored in |
+|---|---|---|---|
+| Raw dump | `runs/<account_label>/raw/dump_<ts>.json` | account_label | git |
+| Stage 1 profile cache | `runs/<account_label>/profile.json` | account_label | git |
+| Golden set | `eval/golden/<account_label>.json` | account_label | git |
+| Chained catalog | `runs/<account_label>/catalog.json` | account_label | git |
+| Stage 5 bucket split | `runs/<account_label>/buckets/{auto_import,needs_attention,auto_exclude}.json` | account_label | git |
+| Harness predictions | `report/<vendor_id>/stage{2,3,4}_<model>_predictions.json` | vendor_id + model | DVC |
+| Token log | `report/token_log.csv` | append-only, has `vendor_id` column | DVC |
+| Stage 6 snapshot | `data/snapshots/<vendor_handle>/` | vendor_handle | DVC |
+| Stage 6 changes | `report/changes.json` | fixed default — pass `--changes` per vendor | DVC |
 
 `eval/harness.py` with **no** `--golden` globs every `eval/golden/*.json` and merges all
 vendors into one accuracy number (tagging the token log `all_vendors`). Always pass
@@ -226,7 +228,14 @@ params that change on every fetch, which would make every post falsely "changed"
   than hardcoding a vendor.
 - `FINDINGS.md` is the durable experiment record: append dated sections, never rewrite history.
   `report/` is regenerated on every run and is not the record.
-- Raw dumps and golden sets contain real vendor and commenter data. All four data paths
-  (`eval/golden/`, `runs/`, `data/snapshots/`, `report/`) are DVC-tracked to Cloudflare R2 and
-  gitignored, each with a committed `.dvc` pointer so a commit pins the data it was produced
-  against. **`eval/golden/` is irreplaceable** — the hand labels cannot be regenerated.
+- **The data is split between git and DVC, and which is which is deliberate.**
+  `eval/golden/` and `runs/` are **committed to git** so the experiment can be re-run from a
+  clone. They carry no third-party data: Meta withholds comment text, so every raw dump's
+  `comments` array is empty, and the golden sets' comments are hand-authored with invented
+  usernames (the real handles in them are the vendor's own and the repo owner's).
+  **`eval/golden/` is irreplaceable** — the hand labels cannot be regenerated.
+  `data/snapshots/` and `report/` stay **DVC-tracked to Cloudflare R2** and gitignored, each
+  with a committed `.dvc` pointer so a commit pins the data it was produced against — `report/`
+  because it is regenerated every run and is the bulk of the size, `data/snapshots/` because it
+  is binary embeddings. `scripts/scan_secrets.py` enforces exactly this split and
+  `tests/test_scan_secrets.py` pins it in both directions.

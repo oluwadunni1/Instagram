@@ -38,5 +38,4 @@ scratch_*.json
 *.bak
 
 # --- written by `dvc add` ---
-/runs
 /report

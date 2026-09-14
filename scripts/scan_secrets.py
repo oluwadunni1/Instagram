@@ -12,9 +12,17 @@ catches for free:
   - Two live credentials have reached console logs (FINDINGS.md 2026-09-07,
     2026-09-08). Log leaks are transient; a committed one is permanent.
 
-It also refuses to let the DVC-tracked data paths into git: eval/golden/,
-runs/, data/snapshots/ and report/ hold real vendor and commenter data and
-belong in R2 behind a .dvc pointer, never in a git object.
+It also refuses to let the two DVC-tracked data paths into git:
+data/snapshots/ and report/ belong in R2 behind a .dvc pointer, never in a
+git object - report/ because it is regenerated on every run and is the
+largest thing here, snapshots/ because it is binary embeddings.
+
+eval/golden/ and runs/ used to be on that list and no longer are: they are
+committed on purpose so the experiment can be re-run from a clone. That is
+safe because the raw dumps carry no third-party data - Meta withholds
+comment text, so every dump's comments array is empty - and the golden
+sets' comments are hand-authored with invented usernames. The content scan
+below still runs over both.
 
 Usage:
     uv run scripts/scan_secrets.py            # staged changes (hook mode)
@@ -42,10 +50,11 @@ ALLOWLIST_PRAGMA = "pragma: allowlist secret"
 # Paths that must never be committed at all, regardless of content.
 FORBIDDEN_PATHS = (".env", ".dvc/config.local")
 
-# DVC-tracked data: real vendor/commenter data, stored in Cloudflare R2 with
-# a committed *.dvc pointer. The *.dvc and .gitignore files inside them are
-# the parts that DO belong in git.
-DATA_PREFIXES = ("eval/golden/", "runs/", "data/snapshots/", "report/")
+# DVC-tracked data: stored in Cloudflare R2 with a committed *.dvc pointer.
+# The *.dvc and .gitignore files inside them are the parts that DO belong in
+# git. eval/golden/ and runs/ are deliberately absent from this tuple - see
+# the module docstring.
+DATA_PREFIXES = ("data/snapshots/", "report/")
 DATA_ALLOWED_SUFFIXES = (".dvc", ".gitignore")
 
 # Only text-ish files are worth scanning line by line.
@@ -99,7 +108,7 @@ def check_path_rules(path: str) -> list[str]:
     for prefix in DATA_PREFIXES:
         if normalized.startswith(prefix) and not normalized.endswith(DATA_ALLOWED_SUFFIXES):
             problems.append(
-                f"{path}: DVC-tracked data (real vendor/commenter data). "
+                f"{path}: DVC-tracked data. "
                 f"Commit the .dvc pointer and `make data-push` instead."
             )
     return problems

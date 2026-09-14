@@ -1,0 +1,1904 @@
+[
+  {
+    "post_id": "18042748280816067",
+    "media_type": "IMAGE",
+    "caption": "WHY BREAK THE BANK FOR THE LEOPARD 8? 🛑🙅‍♂️\n\nMeet the ultimate lineup. Pre-order yours today:\n\n🚙 LEOPARD 3 (Compact & Agile)\n▪️ Perfect for city cruising and light off-roading.\n💰 Estimated Landed Price: ₦40,000,000 - ₦45,000,000\n\n🚙 LEOPARD 5 (The Sweet Spot)\n▪️ Super Hybrid Off-Roader (680 HP)\n▪️ Premium leather, massive screens, and Diff locks.\n💰 Estimated Landed Price: ₦50,000,000 - ₦65,000,000\n\n🚙 LEOPARD 7 (Executive Space)\n▪️ Extended wheelbase for maximum family comfort.\n💰 Estimated Landed Price: ₦65,000,000 - ₦75,000,000\n\n(Note: Final prices depend on the chosen trim level and daily FX rates at the time of clearing).\n\nSend a DM today to lock in your pre-order!\n\n📍 Showroom: Lekki Phase 1, Lagos\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#BYDLeopard #Leopard5 #Leopard3 #Leopard7 #PreOrderNigeria #LagosCars #HybridSUV #ApexMotors",
+    "permalink": "https://www.instagram.com/p/DcV-s_giIht/",
+    "timestamp": "2026-08-22T13:05:41+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Pre-order price range post with 3 vehicles. Leopard 8 is a negative distractor entity and must not be extracted.",
+    "products": [
+      {
+        "name": "BYD Leopard 3",
+        "description": "Compact & agile hybrid SUV suited for city cruising and light off-roading.",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/782252608_18090475901242374_7647694655834925362_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=qw4GXKFx_ZgQ7kNvwFFnFaY&_nc_oc=AdqyJ8dscwAmBI_FVmTtR4OxdnrZdXqpC-YHSnuDaCjYIG2w_D37fMMGNMNG1PFJUU4&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=U1UcZX8ct4PAet4wMt1pIg&_nc_tpa=Q5bMBQLdwnNe8-HNLr1k5Q1iK5rNawBKYjHJwruOIWk6GtwnDP1w-geOeLgcNCeun3TmPjiwBCrH2GybuQ&oh=00_AQLMFYQYfrVDuwKST0AbNsbuWJaAvO-fgb-sCq6UI06cPw&oe=6AA6FD82"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "Compact & Agile"
+            ]
+          }
+        ],
+        "price": {
+          "value": 40000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 40000000,
+          "max": 40000000
+        },
+        "quantity_signal": {
+          "kind": "restock",
+          "evidence": "Pre-order yours today! Send a DM today to lock in your pre-order!",
+          "source": "caption"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": null,
+          "attributes": {},
+          "accepts_swap": null
+        }
+      },
+      {
+        "name": "BYD Leopard 5",
+        "description": "Super Hybrid Off-Roader delivering 680 HP with premium leather, massive infotainment screens, and differential locks.",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/782252608_18090475901242374_7647694655834925362_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=qw4GXKFx_ZgQ7kNvwFFnFaY&_nc_oc=AdqyJ8dscwAmBI_FVmTtR4OxdnrZdXqpC-YHSnuDaCjYIG2w_D37fMMGNMNG1PFJUU4&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=U1UcZX8ct4PAet4wMt1pIg&_nc_tpa=Q5bMBQLdwnNe8-HNLr1k5Q1iK5rNawBKYjHJwruOIWk6GtwnDP1w-geOeLgcNCeun3TmPjiwBCrH2GybuQ&oh=00_AQLMFYQYfrVDuwKST0AbNsbuWJaAvO-fgb-sCq6UI06cPw&oe=6AA6FD82"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "Super Hybrid Off-Roader (680 HP)"
+            ]
+          }
+        ],
+        "price": {
+          "value": 50000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 50000000,
+          "max": 50000000
+        },
+        "quantity_signal": {
+          "kind": "restock",
+          "evidence": "Pre-order yours today! Send a DM today to lock in your pre-order!",
+          "source": "caption"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": null,
+          "attributes": {},
+          "accepts_swap": null
+        }
+      },
+      {
+        "name": "BYD Leopard 7",
+        "description": "Executive SUV with an extended wheelbase built for family space and long-distance comfort.",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/782252608_18090475901242374_7647694655834925362_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=qw4GXKFx_ZgQ7kNvwFFnFaY&_nc_oc=AdqyJ8dscwAmBI_FVmTtR4OxdnrZdXqpC-YHSnuDaCjYIG2w_D37fMMGNMNG1PFJUU4&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=U1UcZX8ct4PAet4wMt1pIg&_nc_tpa=Q5bMBQLdwnNe8-HNLr1k5Q1iK5rNawBKYjHJwruOIWk6GtwnDP1w-geOeLgcNCeun3TmPjiwBCrH2GybuQ&oh=00_AQLMFYQYfrVDuwKST0AbNsbuWJaAvO-fgb-sCq6UI06cPw&oe=6AA6FD82"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "Executive Space (Extended Wheelbase)"
+            ]
+          }
+        ],
+        "price": {
+          "value": 65000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 65000000,
+          "max": 65000000
+        },
+        "quantity_signal": {
+          "kind": "restock",
+          "evidence": "Pre-order yours today! Send a DM today to lock in your pre-order!",
+          "source": "caption"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": null,
+          "attributes": {},
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/782252608_18090475901242374_7647694655834925362_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=qw4GXKFx_ZgQ7kNvwFFnFaY&_nc_oc=AdqyJ8dscwAmBI_FVmTtR4OxdnrZdXqpC-YHSnuDaCjYIG2w_D37fMMGNMNG1PFJUU4&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=U1UcZX8ct4PAet4wMt1pIg&_nc_tpa=Q5bMBQLdwnNe8-HNLr1k5Q1iK5rNawBKYjHJwruOIWk6GtwnDP1w-geOeLgcNCeun3TmPjiwBCrH2GybuQ&oh=00_AQLMFYQYfrVDuwKST0AbNsbuWJaAvO-fgb-sCq6UI06cPw&oe=6AA6FD82"
+  },
+  {
+    "post_id": "18120996466885495",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "THIS OR THAT? 🤔 BATTLE OF THE PREMIUM FAMILY SUVs!\n\nIf you have a budget of 35m and under, which of these two reliable, foreign-used, AWD machines are you driving home today? Both are fully cleared and ready to go!\n\n🔥 OPTION A: 2016 Lexus RX350 AWD\nThe definition of luxury and reliability.\n▪️ Mileage: 72,600 Actual Miles (Pristine inside and out)\n▪️ Specs: 3.5L V6, Power Moonroof, Blind Spot Monitor, Lane Keep Assist, Cooling/Heating Seats.\n💰 OUTRIGHT SALE: ₦34,900,000\n💳 FINANCE DEAL: ₦10.5m Minimum Deposit (Spread balance up to 36 months)\n\n🔥 OPTION B: 2016 Toyota Highlander XLE AWD\n(Tastefully Facelifted to 2018/2019 Specifications)\n▪️ Mileage: 87,000 Actual Miles\n▪️ Specs: 3.5L V6, 2nd Row Captain Seats, 3rd Row Seating, Power Liftgate, Rear Ventilation Ducts.\n💰 OUTRIGHT SALE: ₦26,500,000\n💳 FINANCE DEAL: ₦8.5m Upfront Deposit\n\nWHICH ARE YOU PICKING? A or B? Let us know in the comments! 👇\n\nAvailable for Outright Sale, Swap, or Financing.\n\n📍 Showroom: Lekki Phase 1, Lagos\n\n📞 Call/WhatsApp: 0803 555 0142 for inspection.\n\n#ThisOrThat #LexusRX350 #ToyotaHighlander #LagosCars #CarFinancingNigeria #TokunboCars #ApexMotors #FamilySUV",
+    "permalink": "https://www.instagram.com/p/DcV9b-8iKWw/",
+    "timestamp": "2026-08-22T12:54:38+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "multi_product",
+    "expected_flag": null,
+    "notes": "Carousel comparison post (Option A vs Option B). Outright sale prices must be extracted; financing deposit amounts (10.5m, 8.5m) must be ignored.",
+    "products": [
+      {
+        "name": "2016 Lexus RX350 AWD",
+        "description": "Foreign-used luxury SUV with 72,600 actual miles, 3.5L V6 engine, power moonroof, blind spot monitor, lane keep assist, and cooling/heating seats.",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784075401_18090472712242374_3899005527741783458_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=oW7fcYywgoIQ7kNvwF9iLWa&_nc_oc=AdrEPCy87CZ4NfpKbKIPVkwoJrbNd9EJ3BnCBJTsWbLaSeGW21yi0IiRJWv_0_nvdNU&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=1MbeP2kvt-gkAxhOHNKyzQ&_nc_tpa=Q5bMBQJ_CVMMa1dLdyanngoGNeewkotMLhfTmJ1c9D3E07yuEDRok55gqgJ2dC8QArxLHO-HsfnD-z9cZQ&oh=00_AQKJQ7cR14uowPHYEl7k-1BmTde4FLFIQUG7kNln31_4jw&oe=6AA70407"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "AWD",
+              "Foreign Used",
+              "72,600 Miles"
+            ]
+          }
+        ],
+        "price": {
+          "value": 34900000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": null,
+          "attributes": {},
+          "accepts_swap": null
+        }
+      },
+      {
+        "name": "2016 Toyota Highlander XLE AWD",
+        "description": "Foreign-used family SUV with 87,000 actual miles, facelifted to 2018/2019 specifications. Features 2nd row captain seats, 3rd row seating, 3.5L V6 engine, power liftgate, and power moonroof.",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784075401_18090472712242374_3899005527741783458_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=oW7fcYywgoIQ7kNvwF9iLWa&_nc_oc=AdrEPCy87CZ4NfpKbKIPVkwoJrbNd9EJ3BnCBJTsWbLaSeGW21yi0IiRJWv_0_nvdNU&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=1MbeP2kvt-gkAxhOHNKyzQ&_nc_tpa=Q5bMBQJ_CVMMa1dLdyanngoGNeewkotMLhfTmJ1c9D3E07yuEDRok55gqgJ2dC8QArxLHO-HsfnD-z9cZQ&oh=00_AQKJQ7cR14uowPHYEl7k-1BmTde4FLFIQUG7kNln31_4jw&oe=6AA70407"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "AWD",
+              "Foreign Used",
+              "87,000 Miles",
+              "Facelifted to 2018/2019 Specs"
+            ]
+          }
+        ],
+        "price": {
+          "value": 26500000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": null,
+          "attributes": {},
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784075401_18090472712242374_3899005527741783458_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=oW7fcYywgoIQ7kNvwF9iLWa&_nc_oc=AdrEPCy87CZ4NfpKbKIPVkwoJrbNd9EJ3BnCBJTsWbLaSeGW21yi0IiRJWv_0_nvdNU&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=1MbeP2kvt-gkAxhOHNKyzQ&_nc_tpa=Q5bMBQJh37oYQSamtsYJBtBJZTvbYggEUng5TuVFywdECxpSKC1AtFPgL8UV313gK2j1IxS6Vspl8fUN4A&oh=00_AQIxFxwaT3LUnrrXMiY67e-HUpVuPuKgFBt38AyPyvKBjQ&oe=6AA70407"
+  },
+  {
+    "post_id": "17897690802571800",
+    "media_type": "IMAGE",
+    "caption": "Happy new month to all our clients worldwide",
+    "permalink": "https://www.instagram.com/p/DcV82oliKa1/",
+    "timestamp": "2026-08-22T12:49:32+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "announcement",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Negative test case. This is a lifestyle/greeting post. The pipeline's Stage 2 Triage should identify this as non-transactional, resulting in an empty products array.",
+    "expected_signals": [],
+    "products": [],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783616880_18090471770242374_6888491625489489352_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=yWBBG3uEA4sQ7kNvwGhCr5W&_nc_oc=Adq3vqS9kILvcSG-CxbH59SYEW4JvFCUQjjgN5DWQ5QrQSrT0hc4eKuzkrivYt68P_4&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=tS6lFB3zX2KIYeAqqp0FHw&_nc_tpa=Q5bMBQJeBVoXqfw49xSo7Wd7qgeALNUMoPI6JViJDguxPGkrI_8EKD-F7wdhmnj75NM385WMOEgdlacV9w&oh=00_AQL3ZEIkpixDJziQjXh6C41Q2IxmFhcwW8h4k67zGuS98Q&oe=6AA6F79C"
+  },
+  {
+    "post_id": "18075852833375244",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "2024 Toyota Hilux Adventure (4x4 Double Cabin)\n▪️ Condition: Brand New / Zero Mileage\n▪️ 4.0L V6 Engine\n▪️ Leather interior, 360 Camera, Push-to-start\n▪️ White shipping wrap still intact!\n\n⚠️ STOCK ALERT: We have exactly 4 units left in this spec.\n\n💰 SINGLE UNIT PRICE: ₦65,000,000 (Fixed)\n🤝 FLEET DISCOUNT (Buy all 4): ₦245,000,000 total for the bundle.\n\nNo single-unit negotiations. Company transfers accepted.\n\n📍 Showroom: Ikeja GRA, Lagos\n📞 Call/WhatsApp: 0803 555 0142 for invoice requests.\n\n#ToyotaHilux #HiluxNigeria #FleetVehicles #CompanyCars #LagosCars #BrandNewCarsNigeria #ApexMotors",
+    "permalink": "https://www.instagram.com/p/DcV8HlxCIeu/",
+    "timestamp": "2026-08-22T12:43:06+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000012",
+        "username": "blessing_o",
+        "text": "Can we negotiate the single unit price a little?",
+        "timestamp": "2026-08-22T15:00:00+0000"
+      },
+      {
+        "id": "17858893269000013",
+        "username": "ayodele.akinbohun",
+        "text": "No negotiation on single units, price is fixed as posted. Only fleet buyers get the discount.",
+        "timestamp": "2026-08-22T15:20:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Edge case for fixed pricing with a bundle/fleet discount distractor and an explicit inventory count (4 units). Vendor comment explicitly refuses to negotiate - negative test case for price_negotiable. Caption's 'STOCK ALERT: We have exactly 4 units left' is genuine urgent (scarcity) language, positive test case alongside the price_negotiable negative.",
+    "expected_signals": [
+      {
+        "signal": "urgent",
+        "confidence": null
+      },
+      {
+        "signal": "stock_count_known",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2024 Toyota Hilux Adventure",
+        "description": "Brand New 4x4 Double Cabin with 4.0L V6 Engine, leather interior, 360 Camera, and Push-to-start.",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/784781784_18090470429242374_4953550752459575628_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=-UIEVdjKJyYQ7kNvwEyUZtM&_nc_oc=AdpkTAHArMrTxoTB4w2HzScJtg3FDFlItiso2kU4g3vvIJgoG8p-2FXsjr0_eCp4w7c&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=GfpgpRPOey82UxNxI4LJFg&_nc_tpa=Q5bMBQK_xboWD09tA8uUatU-oq-Vku4HXxt9hHoAiuvFFez7Dsgw2dfnNya1ugok8cY1l1f7LXMJ9vWSgg&oh=00_AQKz9LMEPHRROfp1x8mW-JYg51Z1-AlFVU7X7MwhQ-XIyA&oe=6AA71030",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/782208288_18090470420242374_7853494826917723424_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=aeXybrY6ciMQ7kNvwHxpb_8&_nc_oc=AdoTcuBq2WW-yZwj-0qXt89iDe6DVCb4zEB3SPMcRrDvsnMcDYZFYAARC6259Swnce8&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=GfpgpRPOey82UxNxI4LJFg&_nc_tpa=Q5bMBQJPGm8C_xu-FEvP0bF58ebKw9X4uhqAS2Tovjtylsipls5aiynt1vPMg6_tvLH5rM-e_x0U_UTOow&oh=00_AQLiAsW5RDJit4G5HoLCZM90lJmBwy-U0YJ0_k8vQ8DFFQ&oe=6AA72256",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/782208288_18090470420242374_7853494826917723424_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=L2gYYH32_y8Q7kNvwFWucxZ&_nc_oc=AdqAr3dN4NEt4IbUCEv8hfkOygPWzmxqKp8Sba1jC5ph6JVvtOjpkYwrevdUP7AHZ3w&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQKLpgrEGYnpwAUjAE8SveNg1BqBjD1q8x0iF31QGl35oTG56Z7hZyOB_eT78SZSN072mn6r4KGRnw&oh=00_AQHcbR96PY9tJlckCSKhM6uogQ3soltKTYyKWQNtfkKZ2A&oe=6A90F116"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "4x4 Double Cabin",
+              "4.0L V6"
+            ]
+          }
+        ],
+        "price": {
+          "value": 65000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 65000000,
+          "max": 65000000
+        },
+        "quantity_signal": {
+          "kind": "explicit_count",
+          "evidence": "We have exactly 4 units left in this spec.",
+          "source": "caption"
+        },
+        "negotiation_signal": "fixed",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Brand New / Zero Mileage",
+            "make": "Toyota",
+            "model": "Hilux Adventure",
+            "year": "2024"
+          },
+          "accepts_swap": false
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/784781784_18090470429242374_4953550752459575628_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=-UIEVdjKJyYQ7kNvwEyUZtM&_nc_oc=AdpkTAHArMrTxoTB4w2HzScJtg3FDFlItiso2kU4g3vvIJgoG8p-2FXsjr0_eCp4w7c&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=GfpgpRPOey82UxNxI4LJFg&_nc_tpa=Q5bMBQJTHZjohJB5IYaGfE77rWK5uCJDa2lEIFHVL4yiyAoGqed6y3ka4F002hJe_8hKinY3lyL_nFaU9w&oh=00_AQJptx5pCaHmWy0xiyl0JxRQ0H-6QHcHYJxOWgQyhACecw&oe=6AA71030"
+  },
+  {
+    "post_id": "18129555988734304",
+    "media_type": "IMAGE",
+    "caption": "AVAILABLE IN LAGOS 📍🇳🇬 — THE ULTIMATE DAILY DRIVER\n\nFreshly cleared, fully detailed, and sitting pretty. Buy and drive with zero issues!\n\n2022 Mercedes-Benz GLE 53 AMG Coupe\n▪️ Color: ⚪ Exterior on ⚫ Interior\n▪️ AMG Night Package & Black Rims\n▪️ 3.0L Inline-6 Turbo with EQ Boost\n▪️ 100% Tokunbo / Customs Duty Paid in Full\n\n⚠️ STOCK ALERT: Only 3 units available in stock! First come, first served.\n\n💰 PRICE: $110,000 USD (Net).\n(Naira payment accepted at the prevailing parallel market rate on the day of transfer, currently estimated at around 175m, subject to daily FX changes).\n\n⚠️ No swaps on this unit. Outright cash/transfer only.\n\n📍 Location: Lekki Phase 1\n📞 Call/WhatsApp: 0803 555 0142\n\n#MercedesGLE53 #GLECoupe #AMG #TokunboCars #LagosCars #CarSalesLagos #MercedesNigeria",
+    "permalink": "https://www.instagram.com/p/DcV7wpCCF1Q/",
+    "timestamp": "2026-08-22T12:39:58+0000",
+    "has_carousel_children": false,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000010",
+        "username": "amaka.eze",
+        "text": "Can I swap my current car for this one plus balance?",
+        "timestamp": "2026-08-22T14:00:00+0000"
+      },
+      {
+        "id": "17858893269000011",
+        "username": "ayodele.akinbohun",
+        "text": "No swaps on this particular unit, sorry — cash or bank transfer only.",
+        "timestamp": "2026-08-22T14:30:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Edge case for USD pricing anchoring with a dynamic NGN parallel market mention, explicit limited stock (3 units), and a strict no-swap policy. Vendor comment explicitly declines a swap request - negative test case for swap_deal. Caption's 'STOCK ALERT: Only 3 units available in stock! First come, first served' is genuine urgent (scarcity) language, positive test case alongside the swap_deal negative.",
+    "expected_signals": [
+      {
+        "signal": "urgent",
+        "confidence": null
+      },
+      {
+        "signal": "stock_count_known",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2022 Mercedes-Benz GLE 53 AMG Coupe",
+        "description": "Tokunbo 3.0L Inline-6 Turbo with EQ Boost, featuring AMG Night Package and Black Rims.",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783573222_18090469877242374_8572554071037242389_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=eqfu8AHDwP8Q7kNvwH07Wum&_nc_oc=Adp3lDpR_daaP2iPyHNwuYM433x-flHVOYTKmatb6WEUCIV6oGqi5xZPAZYiuqZhkq0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=l5WYBBPPjZVbEyOlmCPatg&_nc_tpa=Q5bMBQLaFKlnPvTtYbvudynQtu8cuPj_g3lvefWWyXrR5S6GkywxP4sTrFORZs4eEu1Awn5WYCWeQb1_QQ&oh=00_AQKO6Kbu6QV6_blVFC3jTKibew8XMNIz9yHEzHjNHxjnyg&oe=6AA70F86"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "White Exterior",
+              "Black Interior"
+            ]
+          }
+        ],
+        "price": {
+          "value": 110000,
+          "currency": "USD",
+          "source": "caption",
+          "confidence": null,
+          "min": 110000,
+          "max": 110000
+        },
+        "quantity_signal": {
+          "kind": "explicit_count",
+          "evidence": "Only 3 units available in stock! First come, first served.",
+          "source": "caption"
+        },
+        "negotiation_signal": "fixed",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "100% Tokunbo",
+            "make": "Mercedes-Benz",
+            "model": "GLE 53 AMG Coupe",
+            "year": "2022"
+          },
+          "accepts_swap": false
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783573222_18090469877242374_8572554071037242389_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=eqfu8AHDwP8Q7kNvwH07Wum&_nc_oc=Adp3lDpR_daaP2iPyHNwuYM433x-flHVOYTKmatb6WEUCIV6oGqi5xZPAZYiuqZhkq0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=l5WYBBPPjZVbEyOlmCPatg&_nc_tpa=Q5bMBQLaFKlnPvTtYbvudynQtu8cuPj_g3lvefWWyXrR5S6GkywxP4sTrFORZs4eEu1Awn5WYCWeQb1_QQ&oh=00_AQKO6Kbu6QV6_blVFC3jTKibew8XMNIz9yHEzHjNHxjnyg&oe=6AA70F86"
+  },
+  {
+    "post_id": "17997025208807776",
+    "media_type": "IMAGE",
+    "caption": "🚨 PREMIUM SWAP DEAL OR OUTRIGHT PURCHASE 🚨\nFresh out of the port: 2021 Mercedes-Benz GLC 43 AMG Coupe\n▪️ Selenite Grey Metallic Exterior\n▪️ V6 BiTurbo Engine (Extremely fast)\n▪️ AMG Night Package & Burmester Audio\n▪️ 100% Tokunbo / Custom Duty Fully Paid\n\n🔁 SWAP DEAL: Bring your clean 2017 Lexus RX 350 plus a ₦50,000,000 cash balance and drive this Benz away today! (Subject to physical inspection of your car).\n\n💰 OUTRIGHT SALE PRICE: One hundred and fifteen m (115m). Non-negotiable.\n\n📍 Showroom: Lekki Phase 1, Lagos\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#MercedesGLC #GLCCoupe #CarSwapLagos #LagosCars #TokunboCars #AMG #CarVendorLagos",
+    "permalink": "https://www.instagram.com/p/DcV5BwpDlYa/",
+    "timestamp": "2026-08-22T12:16:06+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Complex swap deal structure with explicit swap requirements and a spelled-out outright sale price (115m).",
+    "expected_signals": [
+      {
+        "signal": "swap_deal",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2021 Mercedes-Benz GLC 43 AMG Coupe",
+        "description": "100% Tokunbo V6 BiTurbo Engine with AMG Night Package & Burmester Audio.",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783144012_18090463748242374_2768006915899155745_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=eGTsNbesHlIQ7kNvwHv5-fs&_nc_oc=AdqzAlBvhe1eScb1I1Xikq0cmNv2DeMhqjnUsc0UKQNrOg4odiFJtAlXuzKVFqFV-HY&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=-_43bAiEKkvH6E5tb36XPg&_nc_tpa=Q5bMBQI5CklaXk39SDFkGMLbP30a9pDUkdfNd-mHaNZVkFhMB--F_UUvJAmstrLuRKwLLRYFfqsyVXeVdw&oh=00_AQLxd-9svKAvFt9nnVOXOCsbo_U0QquiPmFZmlmYjQXGbQ&oe=6AA6F977"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Selenite Grey Metallic"
+            ]
+          }
+        ],
+        "price": {
+          "value": 115000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 115000000,
+          "max": 115000000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "fixed",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "100% Tokunbo / Custom Duty Fully Paid",
+            "make": "Mercedes-Benz",
+            "model": "GLC 43 AMG Coupe",
+            "year": "2021"
+          },
+          "accepts_swap": true
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783144012_18090463748242374_2768006915899155745_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=eGTsNbesHlIQ7kNvwHv5-fs&_nc_oc=AdqzAlBvhe1eScb1I1Xikq0cmNv2DeMhqjnUsc0UKQNrOg4odiFJtAlXuzKVFqFV-HY&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=-_43bAiEKkvH6E5tb36XPg&_nc_tpa=Q5bMBQI5CklaXk39SDFkGMLbP30a9pDUkdfNd-mHaNZVkFhMB--F_UUvJAmstrLuRKwLLRYFfqsyVXeVdw&oh=00_AQLxd-9svKAvFt9nnVOXOCsbo_U0QquiPmFZmlmYjQXGbQ&oe=6AA6F977"
+  },
+  {
+    "post_id": "18156202255497621",
+    "media_type": "IMAGE",
+    "caption": "LUXURY DOESN'T HAVE TO MAKE NOISE 🤫✨\n\nWhy go and spend ₦95,000,000 on a basic Toyota Prado when you can pull up like a true executive in this machine for a fraction of the cost?\n\nFresh out of the port: 2018 Lexus RX 350\n▪️ Atomic Silver Exterior\n▪️ V6 Engine (Smooth and incredibly reliable)\n▪️ Floating Touchscreen & Premium Audio\n▪️ 100% Tokunbo / Foreign Used (Customs cleared)\n\nThis is the definition of \"Buy and Drive\" with zero headaches.\n\n💰 PRICE: 📲 Send a DM / WhatsApp for the price! (Only serious buyers, please).\n\n📍 Showroom: Lekki Phase 1, Lagos\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#LexusRX350 #LexusNigeria #TokunboCars #LagosCars #CarVendorLagos #LuxurySUV",
+    "permalink": "https://www.instagram.com/p/DcV4gmrDhDn/",
+    "timestamp": "2026-08-22T12:11:34+0000",
+    "has_carousel_children": false,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000014",
+        "username": "kelechi_drives",
+        "text": "Do you offer financing for this?",
+        "timestamp": "2026-08-22T14:30:00+0000"
+      },
+      {
+        "id": "17858893269000015",
+        "username": "ayodele.akinbohun",
+        "text": "Yes, we work with two partner banks for financing — DM us for the breakdown.",
+        "timestamp": "2026-08-22T15:00:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "DM for price edge case with a negative distractor entity (Toyota Prado 95m). Vendor comment confirms bank financing is available.",
+    "expected_signals": [
+      {
+        "signal": "finance_available",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2018 Lexus RX 350",
+        "description": "100% Tokunbo / Foreign Used with V6 Engine, Floating Touchscreen & Premium Audio.",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/784426950_18090463028242374_3594810157598963955_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=_74KZpgMlaIQ7kNvwF1WCGu&_nc_oc=AdqqDK8iDSDVEWEb0KdnSqmoXr3BtzwmzWQGC-A_36RiT2EODUwplqIsKA0sZ8tg-PE&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=YKaVd0n_NSpngfODcKDiew&_nc_tpa=Q5bMBQJsgynx5mkVew__VJJJKccyZJ6PQpFdM69B6zCIxsT4VDcM2D4kSA-_U-StKpXMNx1oRC6PDpPTzg&oh=00_AQIHZUSfu0KIlomwuw9yULfHXlmuaWmiDsvz0I3xl2_5qw&oe=6AA7000A"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Atomic Silver"
+            ]
+          }
+        ],
+        "price": {
+          "value": null,
+          "currency": null,
+          "source": "none",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "100% Tokunbo / Foreign Used",
+            "make": "Lexus",
+            "model": "RX 350",
+            "year": "2018"
+          },
+          "accepts_swap": false
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/784426950_18090463028242374_3594810157598963955_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=_74KZpgMlaIQ7kNvwF1WCGu&_nc_oc=AdqqDK8iDSDVEWEb0KdnSqmoXr3BtzwmzWQGC-A_36RiT2EODUwplqIsKA0sZ8tg-PE&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=YKaVd0n_NSpngfODcKDiew&_nc_tpa=Q5bMBQJsgynx5mkVew__VJJJKccyZJ6PQpFdM69B6zCIxsT4VDcM2D4kSA-_U-StKpXMNx1oRC6PDpPTzg&oh=00_AQIHZUSfu0KIlomwuw9yULfHXlmuaWmiDsvz0I3xl2_5qw&oe=6AA7000A"
+  },
+  {
+    "post_id": "17942404707299492",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "AVAILABLE FOR SALE IN LAGOS 📍🇳🇬 — EXECUTIVE COMFORT\n\nSuper clean, executive-grade 2013 Toyota Avalon XLE just landed in our showroom! Smooth, reliable, and built for luxury without the headache of high maintenance.\n\n▪️ 3.5L V6 Engine (Fuel efficient & bulletproof reliability)\n\n▪️ Premium Leather Interior with Wood Accents\n\n▪️ Keyless Entry & Push-to-Start Button\n\n▪️ Reverse Camera & Large Touchscreen Display\n\n▪️ Condition: Foreign Used / Tokunbo (Customs Duty 100% Paid)\n💰 PRICE: 📲 Send a DM / WhatsApp for price! (Serious buyers only).\n\n📍 Location: Lekki Phase 1, Lagos\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#ToyotaAvalon #AvalonNigeria #LagosCars #TokunboCars #CarSalesLagos #ExecutiveSedan",
+    "permalink": "https://www.instagram.com/p/DcV3_qPDgw8/",
+    "timestamp": "2026-08-22T12:07:04+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000006",
+        "username": "chidi_autos247",
+        "text": "Still available? Any room to negotiate on the price?",
+        "timestamp": "2026-08-22T15:20:00+0000"
+      },
+      {
+        "id": "17858893269000007",
+        "username": "ayodele.akinbohun",
+        "text": "Yes still available. There's a bit of room to negotiate for serious buyers only.",
+        "timestamp": "2026-08-22T16:05:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "DM for price edge case with carousel images. Vendor comment hints at negotiation room for serious buyers.",
+    "expected_signals": [
+      {
+        "signal": "price_negotiable",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2013 Toyota Avalon XLE",
+        "description": "Foreign Used executive-grade sedan with 3.5L V6, premium leather, and keyless entry.",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/784506821_18090461777242374_9044794702563069128_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=PFShkRHBzRIQ7kNvwH5Sg1g&_nc_oc=Adp3pOeBRlGqyXM7uoFAxBKRGujjdGMFzDTVbudxnKalspEzFRbv8A_XR5Vs3CmPSuY&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=pZBZKP-q1IfZyn4MzOGjhA&_nc_tpa=Q5bMBQIVO8dEeRiySGCqTXQRZbpmcL4Q2fwHMlb89JNbxzdukIBxwYKxbLyxyxn5RT0qbmHoY15lQJvVPw&oh=00_AQKL1BozL-HLfUhhYhCDxqsGRYS6wuBaIC0ZgzxBbphxHQ&oe=6AA723EF",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/783985337_18090461765242374_6214135500411141859_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=RsIzHckAzhgQ7kNvwGx-7li&_nc_oc=AdpimJAAIlk8-1LonI9lFhbI7hFV6-DUGMRfnWYQPgC6KtnCCKQB57mmYPq2I_UhUWE&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=pZBZKP-q1IfZyn4MzOGjhA&_nc_tpa=Q5bMBQJLdvVwKGQ598eFWXjp75GKNxncNUgV-RMYkJ3K921cQ_OecVTfrZempaCChygWs6RzGOo2qp0YqA&oh=00_AQLPVQu8bxH-kKPyiSbL3edPK3wt5KmAkdrQyemWZXu4lA&oe=6AA70C54",
+          "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/783985337_18090461765242374_6214135500411141859_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=EV8Gx_XX1dQQ7kNvwHVFXyk&_nc_oc=AdqYyt96HeIvwmVUOAyXrO-W4eT5ikluL0WIeuhdXcGFQAH0kS6U2PelhXVRTTnKDb0&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQLDO8RyWPsEH8H3pQUQLbExKZ4R4OMoyrAQXRQ-xF9KX6jyaUQBhptX_y3wcWkMAxHb9sYz3zIg_Q&oh=00_AQFYXeaGh-NhyhmCTvvcynvwB9eNlLYxZwQ5cYHjAqCY-Q&oe=6A911354"
+        ],
+        "variants": [
+          {
+            "type": "style",
+            "values": [
+              "Premium Leather with Wood Accents"
+            ]
+          }
+        ],
+        "price": {
+          "value": null,
+          "currency": null,
+          "source": "none",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "negotiable",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Foreign Used / Tokunbo (Customs Duty 100% Paid)",
+            "make": "Toyota",
+            "model": "Avalon XLE",
+            "year": "2013"
+          },
+          "accepts_swap": false
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/784506821_18090461777242374_9044794702563069128_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=PFShkRHBzRIQ7kNvwH5Sg1g&_nc_oc=Adp3pOeBRlGqyXM7uoFAxBKRGujjdGMFzDTVbudxnKalspEzFRbv8A_XR5Vs3CmPSuY&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=pZBZKP-q1IfZyn4MzOGjhA&_nc_tpa=Q5bMBQLsPrmCz3_YgPtU1tmm4j3BReGDYSLieN63if2FW35EGD79NJAB-AEfx4fZqle-ZuvjScNgMElkUw&oh=00_AQJsAD1Msv6lldIOxpJppErY85vrITTe0xw0kShkDss2FA&oe=6AA723EF"
+  },
+  {
+    "post_id": "18114987011511783",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "🎉 KEYS HANDED OVER! ANOTHER CLEAN MACHINE DELIVERED! 🎉\n\nCongratulations to our esteemed client on taking delivery of this pristine 2016 Mercedes-Benz GLE 350.\n\nFrom sourcing to full customs clearance and final detailing, we handled everything. Thank you for trusting us to upgrade your garage! 🤝\n\nVehicle Specs Delivered:\n▪️ 3.5L V6 Engine\n▪️ Black Leather Interior & Wood Trims\n▪️ Premium Infotainment & Navigation\n\n(Vehicle was sourced and delivered on pre-order).\n\nDo you want us to source your dream car from the US or Canada with zero stress? Send us a DM with your exact specifications and budget. We deliver exactly what we promise!\n\n📍 Office: Lekki Phase 1, Lagos\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#SoldAndDelivered #MercedesGLE #HappyCustomer #CarDeliveryLagos #ApexMotors #Testimonial #LagosCarDealer",
+    "permalink": "https://www.instagram.com/p/DcV3FimDtzj/",
+    "timestamp": "2026-08-22T11:59:08+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "testimonial_repost",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Delivery/Testimonial post, no active product listed.",
+    "products": [],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783985343_18090459809242374_3453319530875834685_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=ME44ysfmqKAQ7kNvwE1VrXE&_nc_oc=Adpv8InNYmMv8V-8eADxtOYSUf0ezcfh-5gaMuSZ7lWvofelsxaJJYF7msqdpgC83M4&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=1n20zzPfVuoHXksZgNZduQ&_nc_tpa=Q5bMBQJThwXGtR5RiSWjJaRvTllCZ-E7UilRYSU2pprPRx1UladfIh654oBzpWfmltcwit4lWSx5B0AoWg&oh=00_AQI02f9cs-CZVrLGOlcVwphIF-voiCj1VxLC7XIqBa-npA&oe=6AA70989"
+  },
+  {
+    "post_id": "18173859304438540",
+    "media_type": "IMAGE",
+    "caption": "ANOTHER KEY HANDED OVER! 🔑🍾 CONGRATULATIONS TO OUR CLIENT!\n\nHuge congratulations to Dr. Tobi on picking up his super clean 2014 Mercedes-Benz GLK 350 4MATIC!\n\nFrom Lagos Island inspection to full vehicle registration and key handover in less than 48 hours. Thank you for trusting Apex Motors with your garage upgrade!\n\n▪️ 3.5L V6 Engine\n▪️ Obsidian Black Metallic on Black Leather\n▪️ Panoramic Sunroof & Premium Audio\n\n(Sold & Delivered for ₦18,500,000)\n\nNeed a clean machine delivered with zero stress? Send us a DM today with your budget and we'll source your dream ride.\n\n📍 Showroom: Plot 14, Admiralty Way, Lekki Phase 1\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#Sold #CarDelivery #MercedesGLK #HappyClient #LagosCarVendor #ApexMotorsLagos #SoldOut",
+    "permalink": "https://www.instagram.com/p/DcV14uLDhje/",
+    "timestamp": "2026-08-22T11:48:39+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "testimonial_repost",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Delivery/Sold out post, no active product listed.",
+    "products": [],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/782184654_18090458159242374_1718131243514700497_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=4dgfUqbUiwIQ7kNvwG44Fm_&_nc_oc=AdpfVPmJeVnMhe2DNaj39B48KBO2LxZJFlBZ2AxpVJBWFMqxwP9_k4dnWSbai4yNDB8&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=LNqYe0O_6q1qEFvJMArSYw&_nc_tpa=Q5bMBQIXpYWRYO2jek1RzHxTk4DQAUL0jx6opmE4O5wlplbn38vOfIzzbt8Ne-OHHq6vhnvubO9IxAh1vQ&oh=00_AQKGDmVISlVD7Oz1MV5wX7gU8KWWWa1GjSd2EVd6vjpOUQ&oe=6AA6F572"
+  },
+  {
+    "post_id": "18114579454953892",
+    "media_type": "IMAGE",
+    "caption": "Bring in your 2012–2015 Toyota Land Cruiser and let us give it the complete 2022 facelift makeover.\n\nFull Conversion Kit Includes:\n▪️ 2022 Front & Rear Bumpers\n▪️ Sequential LED Headlights & Taillights\n▪️ Brand New 2022 Front Grille\n▪️ Interior Steering Wheel Upgrade\n\n💰 Total Package Price: ₦3,800,000 (Covers parts, professional installation, and oven-baked painting).\n\nDrop your SUV at our Ikeja workshop on Monday, pick it up on Friday looking like a brand-new Tokunbo machine.\n\nSend a DM or call 0803 555 0142 to book your slot for next week!\n\n#ToyotaLandCruiser #LandCruiserUpgrade #LagosMechanic #CarFaceliftNigeria #AutoWorkshopLagos",
+    "permalink": "https://www.instagram.com/p/DcV1GwCjgTx/",
+    "timestamp": "2026-08-22T11:41:49+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Service/Modification offering, not a vehicle sale.",
+    "products": [
+      {
+        "name": "2022 Facelift Makeover for 2012-2015 Toyota Land Cruiser",
+        "description": "Full Conversion Kit Includes: 2022 Front & Rear Bumpers, Sequential LED Headlights & Taillights, Brand New 2022 Front Grille, Interior Steering Wheel Upgrade",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/782615531_18090455936242374_3900893222798895922_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=h4EbqmUkPMQQ7kNvwFK9p3s&_nc_oc=AdrRqcM7by6fOfVihxSfF1XydTBfwVhXaMEmq5WN-avS3dVNKkeKVmWfrX9-JuRyIi8&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QzZdgoz1Qs-gCFvaoN2wSQ&_nc_tpa=Q5bMBQJOufMUVsmuQ2wg7TvF-FbrqnDSza0YKJ_0td5btVtYrF1MwReA5XciBiyJ8-E-BvHFDuU09d9p-A&oh=00_AQJf5v5fqE835CSAZ7pImrYDge1dXR6m9x8MpPSo8G9vkA&oe=6AA71181"
+        ],
+        "variants": [],
+        "price": {
+          "value": 3800000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 3800000,
+          "max": 3800000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive_service",
+          "attributes": {},
+          "accepts_swap": false
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/782615531_18090455936242374_3900893222798895922_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=h4EbqmUkPMQQ7kNvwFK9p3s&_nc_oc=AdrRqcM7by6fOfVihxSfF1XydTBfwVhXaMEmq5WN-avS3dVNKkeKVmWfrX9-JuRyIi8&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QzZdgoz1Qs-gCFvaoN2wSQ&_nc_tpa=Q5bMBQJOufMUVsmuQ2wg7TvF-FbrqnDSza0YKJ_0td5btVtYrF1MwReA5XciBiyJ8-E-BvHFDuU09d9p-A&oh=00_AQJf5v5fqE835CSAZ7pImrYDge1dXR6m9x8MpPSo8G9vkA&oe=6AA71181"
+  },
+  {
+    "post_id": "18017164724876313",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "MASSIVE PRICE DROP 📉🚨 — MUST GO THIS WEEK!\nFirst person to pay takes it.\n\n2013 Hyundai Sonata\n▪️ Condition: Registered (Super clean Nigerian Used, Buy and Drive)\n▪️ Transmission: Automatic\n▪️ AC chilling engine and gear 100%.\n\n❌ Was: ₦10,500,000\n✅ NOW SELLING FOR: 8.5m LAST.\n\nNo long talk, no lowballers. This 8.5m is fixed",
+    "permalink": "https://www.instagram.com/p/DcVzzvnjvBu/",
+    "timestamp": "2026-08-22T11:30:29+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000018",
+        "username": "samuel_lekki",
+        "text": "Is this still available?",
+        "timestamp": "2026-08-22T13:00:00+0000"
+      },
+      {
+        "id": "17858893269000019",
+        "username": "ayodele.akinbohun",
+        "text": "Sold this morning, sorry! Follow us for the next unit.",
+        "timestamp": "2026-08-22T13:20:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Price drop post with old and new price. New price is fixed. Vendor comment confirms the unit sold shortly after posting.",
+    "expected_signals": [
+      {
+        "signal": "urgent",
+        "confidence": null
+      },
+      {
+        "signal": "sold",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2013 Hyundai Sonata",
+        "description": "Registered (Super clean Nigerian Used, Buy and Drive), Automatic, AC chilling engine and gear 100%.",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/782888656_18090452336242374_8140990662438172640_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=pC00toyI7-sQ7kNvwGn2FYJ&_nc_oc=Adq_ASaKDw-VT5mDUXhnLIVEDP6X0itr1CQKDV3NyOdDHcceO-Tl0xnkXqW9aV6IH8k&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=m_BX_Tn0C8kk0Lo_Tj6uAw&_nc_tpa=Q5bMBQL39G6wYRrGieYxeaHoYP3Cf9DzNOkUJF-UBD2MUSNRptohH5zqtlojEUE-4QLkZVpN0KDu9fo6Bw&oh=00_AQK_aFYmcohS0kDKH-3vcwxnv5Y2k0nUKRJUGoRJ9XzCKw&oe=6AA70732",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783485840_18090452339242374_5063221842724930624_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=qAz8uYxSvpkQ7kNvwHF11he&_nc_oc=AdpCYLry91J3SjhU9BMxmfRK-C047Bcq1PK-O6JcQoceRmzzvy5ZPOM2ILFAf04r0eI&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=m_BX_Tn0C8kk0Lo_Tj6uAw&_nc_tpa=Q5bMBQKWp9Chm6x1wtBJHI2ofTgr0dx7ocdk4MaC6YrFD2PWJpsjbwrFMHLxl5Wu2sWbBwpFCtwAKDImaw&oh=00_AQJucwpjht-gbSI57xzPhHsBi1dnv9PsG7mUo_Yyc84lqA&oe=6AA6F8FD",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/783424083_18090452321242374_5091316624846673843_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=tyKjF_K3EJMQ7kNvwFHKJxZ&_nc_oc=AdrOJOvRuWlB6MKEQEqquJ933QqPEOpwQfXt4-KMTudfAPpMhDhvu8LTHkdzx1iwV_I&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=m_BX_Tn0C8kk0Lo_Tj6uAw&_nc_tpa=Q5bMBQK1IlYcvQCQBnl4Md11q9QhB9sUxForwGvx-bT0vJN95ImBOx53mC65OWfIvRG5wropd_DsqA0RKg&oh=00_AQI3Y7D9iqvwGLxWi5olklq64-puC2SgFH4hVdF9iVlInA&oe=6AA70D28",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/783424083_18090452321242374_5091316624846673843_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=Z5OQb8ztiHIQ7kNvwEN4T2a&_nc_oc=AdpCeEk5cKpPUiI9--AaztKJoN2puEl1hQGax9tyyxzWOwK4R3DfLFFVuMNueUOefgI&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQL-vulEsGeDc69eD9EtAw6RlynP5GIQiHaC84NoSmPYxqU9KToGt-lu3vOXwKOVRGodc1_dU8W5Sw&oh=00_AQEiiXp_EuurEtku5GRER8IqQ0PbfkqlQGRCCYENi_VUNg&oe=6A911428"
+        ],
+        "variants": [],
+        "price": {
+          "value": 8500000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 8500000,
+          "max": 8500000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "fixed",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Nigerian Used",
+            "make": "Hyundai",
+            "model": "Sonata",
+            "year": "2013"
+          },
+          "accepts_swap": false
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/782888656_18090452336242374_8140990662438172640_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=pC00toyI7-sQ7kNvwGn2FYJ&_nc_oc=Adq_ASaKDw-VT5mDUXhnLIVEDP6X0itr1CQKDV3NyOdDHcceO-Tl0xnkXqW9aV6IH8k&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=m_BX_Tn0C8kk0Lo_Tj6uAw&_nc_tpa=Q5bMBQImWEm7Y-OzX0T-bMS14ynhrcMglcwV85-bMyiaP4DDuxZ5s8KIQmhbG_W6PLNXZ_rHNEiXPewOgg&oh=00_AQIqOQQl9zuhI8Uf0WIOOSTrGMosHzFpVic5wm215BcoiQ&oe=6AA70732"
+  },
+  {
+    "post_id": "18106957489885276",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "FRESH ARRIVALS IN STOCK 📍🇳🇬 — SWIPE LEFT 📲\n\nClean machines just landed. Foreign-used & unregistered units ready for immediate inspection and drive-away. We buy, sell, and swap!\n\n1️⃣ 2017 Dodge Challenger\n▪️ Condition: Foreign Used (Recent Entry)\n▪️ Transmission: Automatic\n💰 PRICE: #28.5m\n💳 Affordable car loan available: Pay 40% (11.5m) upfront!\n\n2️⃣ 2017 Lexus RX 350\n▪️ Condition: Unregistered (Clean Title)\n▪️ Transmission: Automatic\n▪️ V6 Engine / Panoramic View\n💰 PRICE: ₦33,000,000 (Slightly negotiable)\n💳 Car finance available: Pay as low as 40% (13.2m) down payment.\n\n3️⃣ 2021 Mercedes-Benz GLE 53 AMG\n▪️ Condition: Foreign Used (Custom Duty fully paid)\n▪️ Features: 360 Camera, Park Assist, Apple CarPlay\n⚠️ STOCK ALERT: Only 1 unit in stock!\n💰 PRICE: 120m LAST. (No lowballers).\n💳 Car loan: Pay 48m upfront.\n\n📍 Showroom Locations:\n• 2a, Tijani Bello Street, Ojodu Berger, Lagos\n• Banex Mall, opposite Maroko Police Station, Lekki Phase 1\n\n📞 DM or WhatsApp: 0803 555 0142 for serious enquiries.\n\n#LagosCars #CarSalesNigeria #DodgeChallenger #LexusRX350 #MercedesGLE53 #CarFinancingLagos #AutosInNigeria",
+    "permalink": "https://www.instagram.com/p/DcVxCWADq3C/",
+    "timestamp": "2026-08-22T11:06:16+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "multi_product",
+    "expected_flag": null,
+    "notes": "Multi-product listing with 3 separate vehicles, each with specific prices, some fixed and some negotiable.",
+    "expected_signals": [
+      {
+        "signal": "finance_available",
+        "confidence": null
+      },
+      {
+        "signal": "price_negotiable",
+        "confidence": null
+      },
+      {
+        "signal": "urgent",
+        "confidence": null
+      },
+      {
+        "signal": "swap_deal",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2017 Dodge Challenger",
+        "description": "Foreign Used (Recent Entry), Automatic",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784426919_18090447950242374_1466636674302079513_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=aYRwj20swogQ7kNvwEEoxgN&_nc_oc=AdrgCQSAtuR8u_SAo7N9tP3U-VT-me83g6rX1iFWt3Cpkuasr_VJ9tOzMdn0vdXLDuo&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKxLTBo1oMW5_VwA3L_FkM3KgiG7NfhxF6MT3DoGn0LXwdwJAp7WrQ92h3U-U3Bb5JSLw1-m2Gr7A&oh=00_AQJsfZQdkR9tEnV1244HGvZwPMwTAJCpNmA4z94fIgoJbg&oe=6AA70B46",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783468147_18090447944242374_1969055946422089447_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=kLfCTFa0XmYQ7kNvwGtizAB&_nc_oc=AdrYiA3lkceXGtRVkLh_fSA57Covy9QfRv4G8iZ550GRZEdhg6F_RixHpk9MlYJDUPE&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKjZMMxfQAFZrRmFi6yg-PBCm9JBgy6nZeMaM4GynOCrXXS8UbxCGpG__osZ25B9QcvqOXNn3AyNg&oh=00_AQI7miwQrXc49264Sc3MEqNDkwRijJ5S6oLm-HI_LQR5kA&oe=6AA7266D",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783985337_18090447947242374_1611255490483973910_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=kKZQU42Eg9MQ7kNvwGLEZXn&_nc_oc=Adp1E57NpaLs4dmpY1MlpMTmE65F86NzU_jCdzXvIxSSoqOQuqZuIEAm6MUkhzGrp7c&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKWcG63XiYFG2wVb_GR8NKKSWfEAWCUI-38qFEX64Gloc_kWPUyNL9nmo4RnfbCQtTVqRzn2uUr2A&oh=00_AQLiLgfFoVWONkEAcuHMusq7EhqrvULeEQCxeM6EBpLNCQ&oe=6AA70233",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/783985337_18090447947242374_1611255490483973910_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=NuL4swetqvYQ7kNvwGqMyVz&_nc_oc=AdprjdGl5OYlkMiWVvuDay6TzE1Yp4MGGzMpmxh9-JAp-r5lwlpJB7nNWBrXlEKMho8&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQIT8UELqcugxJecR5WW_qJYsbtdCRwTsBcyPiXGO-A2CoqE39ZPO01F8rgqfz48DZ4jpi8N4Sn93Q&oh=00_AQGFiIX1gspUSNAxWg_LZ-PCIH3EmCM1jE9TfK-XIO48kA&oe=6A910933"
+        ],
+        "variants": [],
+        "price": {
+          "value": 28500000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 28500000,
+          "max": 28500000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Foreign Used",
+            "make": "Dodge",
+            "model": "Challenger",
+            "year": "2017"
+          },
+          "accepts_swap": true
+        }
+      },
+      {
+        "name": "2017 Lexus RX 350",
+        "description": "Unregistered (Clean Title), Automatic, V6 Engine / Panoramic View",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784426919_18090447950242374_1466636674302079513_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=aYRwj20swogQ7kNvwEEoxgN&_nc_oc=AdrgCQSAtuR8u_SAo7N9tP3U-VT-me83g6rX1iFWt3Cpkuasr_VJ9tOzMdn0vdXLDuo&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKxLTBo1oMW5_VwA3L_FkM3KgiG7NfhxF6MT3DoGn0LXwdwJAp7WrQ92h3U-U3Bb5JSLw1-m2Gr7A&oh=00_AQJsfZQdkR9tEnV1244HGvZwPMwTAJCpNmA4z94fIgoJbg&oe=6AA70B46",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783468147_18090447944242374_1969055946422089447_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=kLfCTFa0XmYQ7kNvwGtizAB&_nc_oc=AdrYiA3lkceXGtRVkLh_fSA57Covy9QfRv4G8iZ550GRZEdhg6F_RixHpk9MlYJDUPE&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKjZMMxfQAFZrRmFi6yg-PBCm9JBgy6nZeMaM4GynOCrXXS8UbxCGpG__osZ25B9QcvqOXNn3AyNg&oh=00_AQI7miwQrXc49264Sc3MEqNDkwRijJ5S6oLm-HI_LQR5kA&oe=6AA7266D",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783985337_18090447947242374_1611255490483973910_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=kKZQU42Eg9MQ7kNvwGLEZXn&_nc_oc=Adp1E57NpaLs4dmpY1MlpMTmE65F86NzU_jCdzXvIxSSoqOQuqZuIEAm6MUkhzGrp7c&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKWcG63XiYFG2wVb_GR8NKKSWfEAWCUI-38qFEX64Gloc_kWPUyNL9nmo4RnfbCQtTVqRzn2uUr2A&oh=00_AQLiLgfFoVWONkEAcuHMusq7EhqrvULeEQCxeM6EBpLNCQ&oe=6AA70233",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/783985337_18090447947242374_1611255490483973910_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=NuL4swetqvYQ7kNvwGqMyVz&_nc_oc=AdprjdGl5OYlkMiWVvuDay6TzE1Yp4MGGzMpmxh9-JAp-r5lwlpJB7nNWBrXlEKMho8&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQIT8UELqcugxJecR5WW_qJYsbtdCRwTsBcyPiXGO-A2CoqE39ZPO01F8rgqfz48DZ4jpi8N4Sn93Q&oh=00_AQGFiIX1gspUSNAxWg_LZ-PCIH3EmCM1jE9TfK-XIO48kA&oe=6A910933"
+        ],
+        "variants": [],
+        "price": {
+          "value": 33000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 33000000,
+          "max": 33000000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "negotiable",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Unregistered",
+            "make": "Lexus",
+            "model": "RX 350",
+            "year": "2017"
+          },
+          "accepts_swap": true
+        }
+      },
+      {
+        "name": "2021 Mercedes-Benz GLE 53 AMG",
+        "description": "Foreign Used (Custom Duty fully paid), Features: 360 Camera, Park Assist, Apple CarPlay",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784426919_18090447950242374_1466636674302079513_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=aYRwj20swogQ7kNvwEEoxgN&_nc_oc=AdrgCQSAtuR8u_SAo7N9tP3U-VT-me83g6rX1iFWt3Cpkuasr_VJ9tOzMdn0vdXLDuo&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKxLTBo1oMW5_VwA3L_FkM3KgiG7NfhxF6MT3DoGn0LXwdwJAp7WrQ92h3U-U3Bb5JSLw1-m2Gr7A&oh=00_AQJsfZQdkR9tEnV1244HGvZwPMwTAJCpNmA4z94fIgoJbg&oe=6AA70B46",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783468147_18090447944242374_1969055946422089447_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=kLfCTFa0XmYQ7kNvwGtizAB&_nc_oc=AdrYiA3lkceXGtRVkLh_fSA57Covy9QfRv4G8iZ550GRZEdhg6F_RixHpk9MlYJDUPE&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKjZMMxfQAFZrRmFi6yg-PBCm9JBgy6nZeMaM4GynOCrXXS8UbxCGpG__osZ25B9QcvqOXNn3AyNg&oh=00_AQI7miwQrXc49264Sc3MEqNDkwRijJ5S6oLm-HI_LQR5kA&oe=6AA7266D",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783985337_18090447947242374_1611255490483973910_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=kKZQU42Eg9MQ7kNvwGLEZXn&_nc_oc=Adp1E57NpaLs4dmpY1MlpMTmE65F86NzU_jCdzXvIxSSoqOQuqZuIEAm6MUkhzGrp7c&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQKWcG63XiYFG2wVb_GR8NKKSWfEAWCUI-38qFEX64Gloc_kWPUyNL9nmo4RnfbCQtTVqRzn2uUr2A&oh=00_AQLiLgfFoVWONkEAcuHMusq7EhqrvULeEQCxeM6EBpLNCQ&oe=6AA70233",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/783985337_18090447947242374_1611255490483973910_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=NuL4swetqvYQ7kNvwGqMyVz&_nc_oc=AdprjdGl5OYlkMiWVvuDay6TzE1Yp4MGGzMpmxh9-JAp-r5lwlpJB7nNWBrXlEKMho8&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQIT8UELqcugxJecR5WW_qJYsbtdCRwTsBcyPiXGO-A2CoqE39ZPO01F8rgqfz48DZ4jpi8N4Sn93Q&oh=00_AQGFiIX1gspUSNAxWg_LZ-PCIH3EmCM1jE9TfK-XIO48kA&oe=6A910933"
+        ],
+        "variants": [],
+        "price": {
+          "value": 120000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 120000000,
+          "max": 120000000
+        },
+        "quantity_signal": {
+          "kind": "explicit_count",
+          "evidence": "Only 1 unit in stock!",
+          "source": "caption"
+        },
+        "negotiation_signal": "fixed",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Foreign Used",
+            "make": "Mercedes-Benz",
+            "model": "GLE 53 AMG",
+            "year": "2021"
+          },
+          "accepts_swap": true
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/784426919_18090447950242374_1466636674302079513_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=aYRwj20swogQ7kNvwEEoxgN&_nc_oc=AdrgCQSAtuR8u_SAo7N9tP3U-VT-me83g6rX1iFWt3Cpkuasr_VJ9tOzMdn0vdXLDuo&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Vr5J6eOLaQQUmFQiz9POkg&_nc_tpa=Q5bMBQLZu7sAq0SsAyc0WjNmXOykgdtPbtO86F9RcjpFBxmOHjXP9nTDAKXUENXej9fil62I29PPKNlLvg&oh=00_AQKIoAF9Y_tr-XpOnQxbqY2w5U_q5BTcbeA-ZCAP0tUY6Q&oe=6AA70B46"
+  },
+  {
+    "post_id": "17975827368107390",
+    "media_type": "IMAGE",
+    "caption": "Make una dm for more info",
+    "permalink": "https://www.instagram.com/p/DcVtwABjmzs/",
+    "timestamp": "2026-08-22T10:37:33+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Caption is vague ('Make una dm for more info'), but the photo itself has text overlaid on it reading 'For just 32.6M Naira I'll sell this 2016 C450 to you' - product name and price are only recoverable via the image, not the caption/comments.",
+    "products": [
+      {
+        "name": "2016 C450",
+        "description": "White Mercedes-Benz C450 sedan, sold via price/model text overlaid on the post photo rather than the caption.",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783830282_18090442733242374_1400706208130565027_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=m3U3BlElw2sQ7kNvwH3e98Z&_nc_oc=AdpRNtkjev6YxS8QymuEI-qAWfmxcDZt3jeIwGrumkEy-idgDWwWYI3j5PMV03WBozA&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=jZ5B2BqfMLqW5dR1dmQMsA&_nc_tpa=Q5bMBQKiReRqOPB8Zb0Ux2Q8dzLPIBZDCFVlIca0h-VJy3n0DH1awA9ytuB83E73g5za5NVXtWYDe1CwLg&oh=00_AQL2Eye75bp994KqOAuCx1WgoXfBuRHvoFc01W9lbNXBng&oe=6AA7040E"
+        ],
+        "variants": [],
+        "price": {
+          "value": 32600000,
+          "currency": "NGN",
+          "source": "image",
+          "confidence": null,
+          "min": 32600000,
+          "max": 32600000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "make": "Mercedes-Benz",
+            "model": "C450",
+            "year": "2016"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783830282_18090442733242374_1400706208130565027_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=m3U3BlElw2sQ7kNvwH3e98Z&_nc_oc=AdpRNtkjev6YxS8QymuEI-qAWfmxcDZt3jeIwGrumkEy-idgDWwWYI3j5PMV03WBozA&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=jZ5B2BqfMLqW5dR1dmQMsA&_nc_tpa=Q5bMBQKiReRqOPB8Zb0Ux2Q8dzLPIBZDCFVlIca0h-VJy3n0DH1awA9ytuB83E73g5za5NVXtWYDe1CwLg&oh=00_AQL2Eye75bp994KqOAuCx1WgoXfBuRHvoFc01W9lbNXBng&oe=6AA7040E"
+  },
+  {
+    "post_id": "18073956491710644",
+    "media_type": "IMAGE",
+    "caption": "Available in Lagos 📍",
+    "permalink": "https://www.instagram.com/p/DcVtFDWjh9u/",
+    "timestamp": "2026-08-22T10:31:41+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Caption is vague ('Available in Lagos'), but the photo itself has text overlaid on it reading '2021 Mercedes benz GLC63s coupe in black on black selling for 123m naira' - product name and price are only recoverable via the image, not the caption/comments.",
+    "products": [
+      {
+        "name": "2021 Mercedes-Benz GLC 63S Coupe",
+        "description": "Black-on-black Mercedes-Benz GLC 63S Coupe, sold via price/model text overlaid on the post photo rather than the caption.",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/780949599_18090441467242374_8900788540908775671_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMiJ9&_nc_ohc=uil5PqJEAroQ7kNvwHLhMjJ&_nc_oc=AdrcLcOfT-vRN1wdM17tzRT4QIjRr5cXajSo_PLrkqtv45V4TyYDAWCZABe7_0QeSPk&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=WYu6elEsIP1l4Zt85khj3A&_nc_tpa=Q5bMBQJ3MxVTa-LsXQMK9whARzqDAHKW1u6v_syFg7bw7jxeCwjqR9NslbnXy9QTxcYIwh8fWIhm_ll07Q&oh=00_AQLZIoTesptUd7rsAC6yr0Qk4GQiVhiOc5_j7a5lerJmdA&oe=6AA706D6"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Black on Black"
+            ]
+          }
+        ],
+        "price": {
+          "value": 123000000,
+          "currency": "NGN",
+          "source": "image",
+          "confidence": null,
+          "min": 123000000,
+          "max": 123000000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "make": "Mercedes-Benz",
+            "model": "GLC 63S Coupe",
+            "year": "2021"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/780949599_18090441467242374_8900788540908775671_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMiJ9&_nc_ohc=uil5PqJEAroQ7kNvwHLhMjJ&_nc_oc=AdrcLcOfT-vRN1wdM17tzRT4QIjRr5cXajSo_PLrkqtv45V4TyYDAWCZABe7_0QeSPk&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=WYu6elEsIP1l4Zt85khj3A&_nc_tpa=Q5bMBQJ3MxVTa-LsXQMK9whARzqDAHKW1u6v_syFg7bw7jxeCwjqR9NslbnXy9QTxcYIwh8fWIhm_ll07Q&oh=00_AQLZIoTesptUd7rsAC6yr0Qk4GQiVhiOc5_j7a5lerJmdA&oe=6AA706D6"
+  },
+  {
+    "post_id": "18029319446669897",
+    "media_type": "IMAGE",
+    "caption": "🚨 FLASH SALE ALERT 🚨\n\nLooking for your dream ride without breaking the bank? We are running a massive discount on this beauty for a limited time only!\n\n✔️ Clean title\n✔️ Buy and drive\n✔️ Zero issues\n\nDon't sleep on this deal. Send us a DM now or call us to claim this offer before it's gone!\n\n#CarPromo #CarSalesNigeria #DiscountSales #LagosCars #AutoVendor",
+    "permalink": "https://www.instagram.com/p/DcVsA7fDr5g/",
+    "timestamp": "2026-08-22T10:22:23+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Discount sale but no specific vehicle or price mentioned in caption.",
+    "expected_signals": [
+      {
+        "signal": "urgent",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "Unknown Vehicle",
+        "description": "Clean title, Buy and drive, Zero issues",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783830276_18090439526242374_2284030880349203271_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=_xaLAi6gOw4Q7kNvwG8CpqN&_nc_oc=AdpCc5Q16jIXLPGukeviALbk-b3V25rFmExoVAY_1uS89I3nTpEz0tbqzR0cHw07jZU&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Nm4s4SJpvqEqCMSugduf0g&_nc_tpa=Q5bMBQJjjlBOv3HZhEI1InUaswyGi0vdrXDuoZ_lkVu4iOCJJG2_WYe4_6riiMcFdyQSQR5E8NPQYWZb-w&oh=00_AQKLVz4DnS9QETo_mp_sfwpYw80WroLGKr7gp8nSRhSvDA&oe=6AA6FA9C"
+        ],
+        "variants": [],
+        "price": {
+          "value": null,
+          "currency": null,
+          "source": "none",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {},
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783830276_18090439526242374_2284030880349203271_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=_xaLAi6gOw4Q7kNvwG8CpqN&_nc_oc=AdpCc5Q16jIXLPGukeviALbk-b3V25rFmExoVAY_1uS89I3nTpEz0tbqzR0cHw07jZU&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=Nm4s4SJpvqEqCMSugduf0g&_nc_tpa=Q5bMBQJjjlBOv3HZhEI1InUaswyGi0vdrXDuoZ_lkVu4iOCJJG2_WYe4_6riiMcFdyQSQR5E8NPQYWZb-w&oh=00_AQKLVz4DnS9QETo_mp_sfwpYw80WroLGKr7gp8nSRhSvDA&oe=6AA6FA9C"
+  },
+  {
+    "post_id": "18018786554879091",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "THE APEX PREDATOR IS HERE 🦖🔥\n\nBrand-new Dodge RAM 1500 TRX. The most powerful street-legal half-ton pickup ever built.\n\n▪️ 6.2L Supercharged V8 Hemi (Hellcat Engine)\n▪️ 702 Horsepower / 650 lb-ft torque\n▪️ 0 - 60mph in 4.5 seconds\n▪️ Bilstein Black Hawk e2 shock absorbers\n▪️ 12-inch touchscreen with Uconnect\n\nClear road for this monster! 🚧 Not for small boys.\n\n⚠️ STOCK ALERT: Only 2 units landed. When it's gone, it's gone!\n\n💰 Price: One hundred and forty-five m (145m)\nAvailable colors: ⚫ 🔴 ⚪\n\nShoot us a DM if you're ready to tame the beast.\n\n#RAM1500TRX #RamNigeria #OffroadLagos #TRX #PickupTrucksNigeria",
+    "permalink": "https://www.instagram.com/p/DcUd0fGiNJT/",
+    "timestamp": "2026-08-21T22:59:07+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000008",
+        "username": "tundipeters",
+        "text": "How many units are left now?",
+        "timestamp": "2026-08-22T08:10:00+0000"
+      },
+      {
+        "id": "17858893269000009",
+        "username": "ayodele.akinbohun",
+        "text": "Just a few left at this point, moving fast!",
+        "timestamp": "2026-08-22T08:40:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Single product with spelled-out price and explicit stock count in caption. Vendor comment gives only a vague hint on remaining stock, not a fresh explicit count.",
+    "expected_signals": [
+      {
+        "signal": "urgent",
+        "confidence": null
+      },
+      {
+        "signal": "stock_count_known",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "Dodge RAM 1500 TRX",
+        "description": "Brand-new, 6.2L Supercharged V8 Hemi (Hellcat Engine), 702 Horsepower / 650 lb-ft torque, 0 - 60mph in 4.5 seconds, Bilstein Black Hawk e2 shock absorbers, 12-inch touchscreen with Uconnect",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/780949608_18090310979242374_8036199084010301659_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=X0b6cEdTyq0Q7kNvwHHg9rJ&_nc_oc=AdrBzo7IWiN4g1ixq2X_YTtk9FsRJF4a-HgAYEV4uDLTA2yxLviuCMCsU2xTUWuWeFA&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=ptvS9u9s7PR5H3Z94IzS_Q&_nc_tpa=Q5bMBQK5XlLjZk5pDSgvs4XXv2ZnxRAqA0cLIclReKZQ3mtjXiHPqmaryv-rbc7qPIZD60IK83WZmWmSwA&oh=00_AQLiECiM0-u12wSZGz5_Fnxqu6NvYgWYXke4I9jDAkR2rQ&oe=6AA708EA",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783573227_18090310982242374_3820546477090882403_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=DVLsj7exp0UQ7kNvwFoTknT&_nc_oc=AdqoIBacM_OTu_mI39vOlbGnS64ugy55OKEgOUDZgdtsCtJuSKOxOlLwhOWpyFzK9Zs&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=ptvS9u9s7PR5H3Z94IzS_Q&_nc_tpa=Q5bMBQLtcrye59dE5FFEzqDXUdPB9o5pd_fTf-UHjgjM5058t4lpQa5yw-KR-1YfNgS9hPwrqOwX1vbcQQ&oh=00_AQJZH73u_DEYviVD9BPuaXA0UPpKuOArdoNUV0wZrtNhnQ&oe=6AA71352",
+          "https://instagram.fiba2-2.fna.fbcdn.net/v/t51.82787-15/783573227_18090310982242374_3820546477090882403_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=EzF4STPrdcAQ7kNvwGcRW57&_nc_oc=AdrohROuUc4bOLdeUrl6Im1oyDrdFk9F2D4lJKM7yBTRnUVbMxcL02rH5gQ_xicnkMc&_nc_zt=23&_nc_ht=instagram.fiba2-2.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQLY3e85Cu1ZLVahKf-t98yYZSXzyns6UXV084xILRhGsaYDb4n5BuwjDmGzqRAgDtTNrKP7s3KJgA&oh=00_AQH0gMxX32oyskA6-iVODnzeNxFpwc2Bk64_xMYzW2dXEw&oe=6A911A52"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Black",
+              "Red",
+              "White"
+            ]
+          }
+        ],
+        "price": {
+          "value": 145000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 145000000,
+          "max": 145000000
+        },
+        "quantity_signal": {
+          "kind": "explicit_count",
+          "evidence": "Only 2 units landed. When it's gone, it's gone!",
+          "source": "caption"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Brand-new",
+            "make": "Dodge",
+            "model": "RAM 1500 TRX",
+            "year": "Unknown"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/780949608_18090310979242374_8036199084010301659_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=102&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=X0b6cEdTyq0Q7kNvwHHg9rJ&_nc_oc=AdrBzo7IWiN4g1ixq2X_YTtk9FsRJF4a-HgAYEV4uDLTA2yxLviuCMCsU2xTUWuWeFA&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=ptvS9u9s7PR5H3Z94IzS_Q&_nc_tpa=Q5bMBQLKeBOLaJ0lR8L09Wwk7WAgJlsTfbHBzX5bkvdV-XdXqu-F7cj2koCSsoTRUKCagCGFDkjaZszCOw&oh=00_AQJG0uuIcuBx6xrrjeQaFExVCpxSh0X6pS3Ti7FuU2Potw&oe=6AA708EA"
+  },
+  {
+    "post_id": "18128952712668902",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "JUST ARRIVED: Toyota Raize 🚘🇳🇬\n\nThe ultimate compact SUV for the city. Big on tech, light on fuel.\n\n▪️ 7-inch customizable digital instrument cluster\n▪️ Floating touchscreen infotainment\n▪️ Apple CarPlay & Android Auto\n▪️ Push-button start & smart keyless entry\n\nCheck the flyer for pricing and finance options! 👆🏾\n\nSend us a DM for price\n\n#ToyotaRaize #ToyotaNigeria #CompactSUV #LagosCars #CarSalesLagos",
+    "permalink": "https://www.instagram.com/p/DcUbUzWiAbl/",
+    "timestamp": "2026-08-21T22:37:19+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "DM for price edge case for a new arrival.",
+    "products": [
+      {
+        "name": "Toyota Raize",
+        "description": "Compact SUV for the city. 7-inch customizable digital instrument cluster, Floating touchscreen infotainment, Apple CarPlay & Android Auto, Push-button start & smart keyless entry",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/780949587_18090307325242374_7548038177778803175_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=v0sC4aFmjVMQ7kNvwE5yhXY&_nc_oc=Adpzk__8nOcb6Yo7zyprftyv0LuMAsqfkWFxnOgodpYPIleTEAuWvDe8vzkwki5Ycn0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=l3rMOH1V8lfk1-n5dn2ufQ&_nc_tpa=Q5bMBQKRz5hbwdGIDPplAWy2GMwgNfDiFs0PE7scESQRJQWtph0iKr5RaG07RFdZrxr6s9gyElNKqkm90g&oh=00_AQK_8nwUS7wDXoEC2nSaozqI03TJ2rM6VswHHwwFMmbg-Q&oe=6AA71B82",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783485849_18090307328242374_5870238160997113178_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=GRsmHS8bYykQ7kNvwGiwFZx&_nc_oc=Adqe3keP0s4TvfVsUkgLRvuR6Y381UeDphi9n4OjaONzeCGXPE2ffx85T2DNsIqZVBQ&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=l3rMOH1V8lfk1-n5dn2ufQ&_nc_tpa=Q5bMBQLJi4X5Fd7EJvjBWhRWXCqw3oP6PyjkJAnl7-syVjTa79nD7uGjVFsAbu7dbZTa76IJatJAfnEPzw&oh=00_AQJkzlv3XU4GqX0xQaM1EFsEUyiZgmyRXFJCWgfe0zG-OA&oe=6AA71C98",
+          "https://instagram.fiba2-2.fna.fbcdn.net/v/t51.82787-15/783485849_18090307328242374_5870238160997113178_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=DtLuq6SchU0Q7kNvwHPMxw7&_nc_oc=AdrDplfQZ3TC-ka-WlVabL6DGgKKSVrQp6QryqnHTvqO9d7-XzJUYo3rJMaygCO0Rp4&_nc_zt=23&_nc_ht=instagram.fiba2-2.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQKrlNyQXVJ4M6B-Gs87eIrltPzjZ5gKPbjNTBWt5pW1J6WjaiOGYNPHWALiAZiPdngQsULwLIpwCA&oh=00_AQF1blEe_eej6-RVLYSKrZApiVgr6v_0hIoSsK7EbLbzYA&oe=6A912398"
+        ],
+        "variants": [],
+        "price": {
+          "value": null,
+          "currency": null,
+          "source": "none",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "JUST ARRIVED",
+            "make": "Toyota",
+            "model": "Raize",
+            "year": "Unknown"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/780949587_18090307325242374_7548038177778803175_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=v0sC4aFmjVMQ7kNvwE5yhXY&_nc_oc=Adpzk__8nOcb6Yo7zyprftyv0LuMAsqfkWFxnOgodpYPIleTEAuWvDe8vzkwki5Ycn0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=l3rMOH1V8lfk1-n5dn2ufQ&_nc_tpa=Q5bMBQIqoNrM-Mk4d-ZK_37jdQD4k_ssgvUxhcqR2GhoDqjJ_CHjZ6widqCLgz-37JDBmSOaHIWU7EkUjg&oh=00_AQJOkOzqlPYePZiUVq8pGN7fblQeqAgAcx7JbaLX5zovog&oe=6AA71B82"
+  },
+  {
+    "post_id": "18457973368136711",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "NEW ARRIVAL 🚨🇳🇬\n\nThe 2025 GAC GS8 has landed. Fully-specified and ready for Lagos roads.\n\n▪️ Massive 14.6-inch infotainment touchscreen\n▪️ Tri-zone automatic climate control (independent comfort for all 3 rows)\n▪️ Premium executive interior\n▪️ Unmatched luxury in its segment\n💰 Price: Send a DM for price! Serious buyers only.",
+    "permalink": "https://www.instagram.com/p/DcUVyuhkdCM/",
+    "timestamp": "2026-08-21T21:48:58+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "DM for price edge case for a new arrival.",
+    "products": [
+      {
+        "name": "2025 GAC GS8",
+        "description": "Fully-specified, Massive 14.6-inch infotainment touchscreen, Tri-zone automatic climate control, Premium executive interior",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783948027_18090299213242374_696966242005961877_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=VoKh9aN1QQ8Q7kNvwFMFlas&_nc_oc=AdqvQzdN1miHtYIfJnUrB8T4W44XDX-XJoj7wlygwCAf4uXnlURCHqUnAApnL7D_jkQ&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=tcOoHZWWcqHzZVqbprjg9A&_nc_tpa=Q5bMBQLlc6SpxMcxageYzLpcME1K4SiiXSkf7jyvCBrbgIJ7dc4MOT9dw-cOobWFiP6QRSVn5agCVgIc5Q&oh=00_AQKfR_7mHnyL6OKUvkQIK3yl-q_mj_HsU4znHDCZshSL6w&oe=6AA703FA",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/783948029_18090299195242374_5957710420990810954_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=lPCxxsm_280Q7kNvwF3gDJ1&_nc_oc=AdrVQL_wG7TBeuR3BxwRUgaqJcaN7dNL1Zyfm42dHqBeOL65LpFk7tkS7m4wT29p2xI&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=tcOoHZWWcqHzZVqbprjg9A&_nc_tpa=Q5bMBQIVRLScEIpCd2cMD_6WO6mFKCNgBnRicKoPK1nI0fJArLiu-1Q66O6u8JvKF0ux2xxKp4whvMSfLQ&oh=00_AQLuGSIR7-0airgR2LtXLoCiv53Pu9oARZde5KxN9TW1pg&oe=6AA70F6F",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/780949590_18090299210242374_8032995828622064310_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=CaOrErSzvUQQ7kNvwGWTN0n&_nc_oc=AdoAgjkTRPOVUj15vLTy3IKu9BoMkf0V2OmqP1VmEgjhKBTgbcZa_KW9rAOOIYEwhjU&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=tcOoHZWWcqHzZVqbprjg9A&_nc_tpa=Q5bMBQKnnsLuXl0z0UDZovEzLHV85L9muBLvzQYSVRh4_zWYMFP5bomnGQHrkxVtRSlb8U7LLKpcNWqUeg&oh=00_AQIsHLvc1v7L5SzY4VDi8ktq4G13CkJwEQrvAvSaodF9Ng&oe=6AA70AF3",
+          "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/780949590_18090299210242374_8032995828622064310_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=4dDscIa_2SAQ7kNvwH7VId5&_nc_oc=AdpGIJe30JL5UhOl5dMB4Ph6JdMa_sEIC9XP7zI5NQQYY5MTRnDukWlH6v7FxgmgfvU&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQIuNg3Fs8yUN-kFHeoAGBTSEKH12GHr_oc5_Dsx0br8FPMnqiQUdFdiwjVKCc0ZhhijMs59BzkKog&oh=00_AQHfgiAAM2Narse2uuqWEHfyX6hVKNffl0RPbDYursSRbg&oe=6A9111F3"
+        ],
+        "variants": [],
+        "price": {
+          "value": null,
+          "currency": null,
+          "source": "none",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "NEW ARRIVAL",
+            "make": "GAC",
+            "model": "GS8",
+            "year": "2025"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/783948027_18090299213242374_696966242005961877_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=VoKh9aN1QQ8Q7kNvwFMFlas&_nc_oc=AdqvQzdN1miHtYIfJnUrB8T4W44XDX-XJoj7wlygwCAf4uXnlURCHqUnAApnL7D_jkQ&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=tcOoHZWWcqHzZVqbprjg9A&_nc_tpa=Q5bMBQJuAOkqzlgT1txJRgDfbUH6t9cxGdT7rhw5bjx1PSiSehx4poeo-7vfh54qBakXZV9RjJfHD451nQ&oh=00_AQIdY659h_m2LOirsq_SVsvM960e5r6jAWJIPPBciDrF7g&oe=6AA703FA"
+  },
+  {
+    "post_id": "18013200521927952",
+    "media_type": "IMAGE",
+    "caption": "NEW ARRIVAL 🚨🇳🇬\n\nBrand New Ford Territory Titanium — The ultimate daily driver.\n\n▪️ 1.5L EcoBoost Turbo Engine\n▪️ 7-Speed Automatic with Rotary Shifter\n▪️ 12-inch Center Touchscreen Display\n▪️ Panoramic Sunroof\n▪️ Premium Leather Interior & Ambient Lighting\n▪️ Blind Spot Information System (BLIS)\n\nClean, spacious, and highly fuel-efficient for Lagos traffic.\n\n💰 Price: #45m (Slightly negotiable)\n\n📞 Call/WhatsApp: 0803 555 0142\n\n#FordTerritory #FordNigeria #LekkiCars #SUVsLagos #CarsForSaleLagos",
+    "permalink": "https://www.instagram.com/p/DcUU_Kwkfx7/",
+    "timestamp": "2026-08-21T21:41:56+0000",
+    "has_carousel_children": false,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000004",
+        "username": "chinedu_motors",
+        "text": "How many units do you have in this exact spec?",
+        "timestamp": "2026-08-22T09:00:00+0000"
+      },
+      {
+        "id": "17858893269000005",
+        "username": "ayodele.akinbohun",
+        "text": "We have just 1 unit in this exact spec, other colors available on order.",
+        "timestamp": "2026-08-22T09:30:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Slightly negotiable price for a brand new vehicle. Vendor comment confirms exactly 1 unit in stock in this spec.",
+    "expected_signals": [
+      {
+        "signal": "price_negotiable",
+        "confidence": null
+      },
+      {
+        "signal": "stock_count_known",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "Ford Territory Titanium",
+        "description": "1.5L EcoBoost Turbo Engine, 7-Speed Automatic with Rotary Shifter, 12-inch Center Touchscreen Display, Panoramic Sunroof, Premium Leather Interior & Ambient Lighting, Blind Spot Information System (BLIS)",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/784351083_18090298265242374_4242858296232712403_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=xpTyAZQX5hYQ7kNvwGmUsXC&_nc_oc=AdqN1AAgchWueltpclXAQNiddQB8Lo_jTybNttJ3wYdZymemjHsj5-4spXt_bVUidxw&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=cDaVwEjjxH8g-pHSNeNqtg&_nc_tpa=Q5bMBQKg9H3hgPEON2AITF_DigJZ6NiQE3CzM75_4oqmAJixlHlVhQ0zX2pPS7zj8RdAfcPg0z9K89kORA&oh=00_AQI8g-xS52UhK9_THREZ6msFkJFGuX5H0vLdQSrLhMkB0w&oe=6AA72031"
+        ],
+        "variants": [],
+        "price": {
+          "value": 45000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 45000000,
+          "max": 45000000
+        },
+        "quantity_signal": {
+          "kind": "explicit_count",
+          "evidence": "We have just 1 unit in this exact spec, other colors available on order.",
+          "source": "vendor_comment"
+        },
+        "negotiation_signal": "negotiable",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Brand New",
+            "make": "Ford",
+            "model": "Territory Titanium",
+            "year": "Unknown"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/784351083_18090298265242374_4242858296232712403_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=xpTyAZQX5hYQ7kNvwGmUsXC&_nc_oc=AdqN1AAgchWueltpclXAQNiddQB8Lo_jTybNttJ3wYdZymemjHsj5-4spXt_bVUidxw&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=cDaVwEjjxH8g-pHSNeNqtg&_nc_tpa=Q5bMBQKg9H3hgPEON2AITF_DigJZ6NiQE3CzM75_4oqmAJixlHlVhQ0zX2pPS7zj8RdAfcPg0z9K89kORA&oh=00_AQI8g-xS52UhK9_THREZ6msFkJFGuX5H0vLdQSrLhMkB0w&oe=6AA72031"
+  },
+  {
+    "post_id": "18349537654172552",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "AVAILABLE FOR SALE IN LAGOS 📍🇳🇬 / NEW ARRIVAL‼️‼️\n\n⬛️ 2025 MERCEDES-BENZ C300 AMG LINE.\n\n▪️ 2.0L TURBOCHARGED 4-CYLINDER ENGINE\n▪️ 9G-TRONIC 9-SPEED AUTOMATIC TRANSMISSION\n▪️ AMG LINE EXTERIOR & INTERIOR PACKAGE\n▪️ PANORAMIC SUNROOF\n▪️ 11.9-INCH CENTRAL TOUCHSCREEN & 12.3-INCH DIGITAL DRIVER DISPLAY\n▪️ 64-COLOR AMBIENT LIGHTING\n▪️ BURMESTER 3D SURROUND SOUND SYSTEM\n▪️ WIRELESS APPLE CARPLAY & ANDROID AUTO\n▪️ HEATED SEATS / MEMORY PACKAGE\n\n⬛️ 255 hp mild-hybrid turbo. Seamless and intelligent gear shifts for the perfect luxury ride. The ultimate executive daily driver that perfectly blends premium comfort and aggressive styling.\n\nPRICE: $75,000 TO YOUR DOORSTEP ANYWHERE IN NIGERIA 📍🇳🇬",
+    "permalink": "https://www.instagram.com/p/DcUNVTQESw_/",
+    "timestamp": "2026-08-21T20:35:03+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "USD priced luxury vehicle.",
+    "products": [
+      {
+        "name": "2025 MERCEDES-BENZ C300 AMG LINE",
+        "description": "2.0L TURBOCHARGED 4-CYLINDER ENGINE, 9G-TRONIC 9-SPEED AUTOMATIC TRANSMISSION, AMG LINE EXTERIOR & INTERIOR PACKAGE, PANORAMIC SUNROOF, 11.9-INCH CENTRAL TOUCHSCREEN & 12.3-INCH DIGITAL DRIVER DISPLAY, 64-COLOR AMBIENT LIGHTING, BURMESTER 3D SURROUND SOUND SYSTEM, WIRELESS APPLE CARPLAY & ANDROID AUTO, HEATED SEATS / MEMORY PACKAGE",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783727523_18090288272242374_639851257819546408_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=-GwgT4grF94Q7kNvwG211e2&_nc_oc=Adrzqn4mKlgiOpLRUvfnXE0SmsVZzUGThyXnCkr_iZrFo5oHxImm8jYRO0tu945BqVs&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=ze3hPMHpW7HW6F0g5q2Fiw&_nc_tpa=Q5bMBQIWhpbNAPTHcdQ1W3uwzDDi5LQudX63NnQ3MYqt2i04x7qYp_sV9Lkt6R201TCs_82gbze_FAN8WQ&oh=00_AQI5E6lB_u6h3gNL4O5cTZVqYZwzzW9cDl0yAauOrphyhg&oe=6AA71CCF",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/781005367_18090288263242374_841503222765361382_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=Mn3IGsJCbKAQ7kNvwEXOBVA&_nc_oc=AdrijbsY03xpyzBGNIzPRXgH3MI5cEtfdSBBywv5bc4ObAEsq-_vR9Hca-U0h5AbOhU&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=ze3hPMHpW7HW6F0g5q2Fiw&_nc_tpa=Q5bMBQJTsThBmQO1Ywe5UZYPekJuxm3-D_Ln82Ks4kOjC2fTMFmA6pLkBVP6GFrfluC7YKohriC_JZPxMA&oh=00_AQJiaGuyrB_N7AV-wCR6JxQucYTtBeOhKfU7mNNariaiAg&oe=6AA71D42",
+          "https://instagram.fiba2-1.fna.fbcdn.net/v/t51.82787-15/781005367_18090288263242374_841503222765361382_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=fPvVRpQj0R8Q7kNvwFpkLPj&_nc_oc=Adrexj0LPmDCAWSu5iR1Cjo-0q0NpWLy2KNe7demHr7gDhKaGQ6vu2cGGt-eS4P5tbE&_nc_zt=23&_nc_ht=instagram.fiba2-1.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQK5DWqdvtxBvrbHIOtPCoFnnwvh8hBhbAUoBa7kmacUu7w_b-IXFKDKAdJ7cAnlCkUK_6PS8EAu6Q&oh=00_AQG_3c1gattdr-ZjPq5oxwW-OezUqRODRNmEqXsPc0RYpQ&oe=6A912442"
+        ],
+        "variants": [],
+        "price": {
+          "value": 75000,
+          "currency": "USD",
+          "source": "caption",
+          "confidence": null,
+          "min": 75000,
+          "max": 75000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "NEW ARRIVAL",
+            "make": "Mercedes-Benz",
+            "model": "C300 AMG LINE",
+            "year": "2025"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/783727523_18090288272242374_639851257819546408_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=-GwgT4grF94Q7kNvwG211e2&_nc_oc=Adrzqn4mKlgiOpLRUvfnXE0SmsVZzUGThyXnCkr_iZrFo5oHxImm8jYRO0tu945BqVs&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=ze3hPMHpW7HW6F0g5q2Fiw&_nc_tpa=Q5bMBQJUYrZ0Tb45VnPjDQ3dYi7JwK4Uj4sOyzAF4z1GvVhbS6bhYHqfjoE7tWvFaaFw8pdopR7iVbbs-A&oh=00_AQIgIt3SNY_lxWYWVkK-1-kDi4n1YIPGV4f5sKKHYN7s6Q&oe=6AA71CCF"
+  },
+  {
+    "post_id": "17916501969435418",
+    "media_type": "IMAGE",
+    "caption": "The Huawei-Stelato S9 has arrived. ⚡️\n\n• Huawei intelligent driving & infotainment systems\n• 100kWh battery with up to 816km range\n• 0-100 km/h in 3.9 seconds (AWD variant)\n• Executive luxury interior\n\nPrice: Starting at $44,000\n\nSend us a DM to pre-order yours today.\n\n#StelatoS9 #HuaweiAuto #EVLagos #LuxuryCarsNigeria #CarsForSaleLagos",
+    "permalink": "https://www.instagram.com/p/DcULAPOES4K/",
+    "timestamp": "2026-08-21T20:14:42+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "USD priced pre-order for a new EV.",
+    "products": [
+      {
+        "name": "Huawei-Stelato S9",
+        "description": "Huawei intelligent driving & infotainment systems, 100kWh battery with up to 816km range, 0-100 km/h in 3.9 seconds (AWD variant), Executive luxury interior",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/780771437_18090285182242374_5935616472790126153_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=oxRVzcxZO0wQ7kNvwHqWOai&_nc_oc=AdrtcCU63rUcj2rAq2ibswF31kWcXLXvMKB8zteRkvIj16nvXPcDq8NEdDqqnS9USnQ&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=tmu2gbF9yvNEwTNs-wRI1g&_nc_tpa=Q5bMBQL2AWFDPiRQ3LvmT0ZvzZipXEBRXjftuqlhPSlTaT5A2JogxN0tvDDFZ27sm5OzTp6WJ8lkQYuE2g&oh=00_AQLUHZtHFE2fDcQwsmIy3aGyEcgxt__hQAt9WbvQ1PDB4g&oe=6AA72558"
+        ],
+        "variants": [],
+        "price": {
+          "value": 44000,
+          "currency": "USD",
+          "source": "caption",
+          "confidence": null,
+          "min": 44000,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "restock",
+          "evidence": "Send us a DM to pre-order yours today.",
+          "source": "caption"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "pre-order",
+            "make": "Huawei-Stelato",
+            "model": "S9",
+            "year": "Unknown"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/780771437_18090285182242374_5935616472790126153_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=oxRVzcxZO0wQ7kNvwHqWOai&_nc_oc=AdrtcCU63rUcj2rAq2ibswF31kWcXLXvMKB8zteRkvIj16nvXPcDq8NEdDqqnS9USnQ&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=tmu2gbF9yvNEwTNs-wRI1g&_nc_tpa=Q5bMBQL2AWFDPiRQ3LvmT0ZvzZipXEBRXjftuqlhPSlTaT5A2JogxN0tvDDFZ27sm5OzTp6WJ8lkQYuE2g&oh=00_AQLUHZtHFE2fDcQwsmIy3aGyEcgxt__hQAt9WbvQ1PDB4g&oe=6AA72558"
+  },
+  {
+    "post_id": "18051759722796086",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "2021 Tesla Model 3 Long Range — Red Multi-Coat ⚡\n\nYes, EVs work in Lagos. We install the home charger for you.\n\n• Dual motor AWD, 0-100 in 4.2s\n• 52,000 km\n• 568 km range (rated)\n• Autopilot included, FSD not transferred\n• Battery health 94%\n\nPrice range: $34,000 – $38,000 depending on charger package\n\nLekki. We're one of the few importing EVs into Nigeria properly — ask us anything.\n\n#tesla #model3 #teslanigeria #electriccars #evlagos #lekki #carsforsale",
+    "permalink": "https://www.instagram.com/p/DcPDvpvEWmL/",
+    "timestamp": "2026-08-19T20:35:04+0000",
+    "has_carousel_children": true,
+    "comment_count": 1,
+    "comments": [
+      {
+        "id": "17858893269000001",
+        "username": "ayodele.akinbohun",
+        "text": "This unit is officially SOLD! Thanks to everyone that reached out. 🙏",
+        "timestamp": "2026-08-21T09:14:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": "sold_out",
+    "notes": "USD price range for EV. Vendor confirmed SOLD in comments — pipeline must detect staleness=sold_out from vendor comment, not caption.",
+    "expected_signals": [
+      {
+        "signal": "sold",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2021 Tesla Model 3 Long Range",
+        "description": "Dual motor AWD, 0-100 in 4.2s, 52,000 km, 568 km range (rated), Autopilot included, FSD not transferred, Battery health 94%",
+        "images": [
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/775243728_18089681783242374_1814975126544868840_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=FAAllqQNEzYQ7kNvwGZRjUC&_nc_oc=AdqxaP-JizldFqzNwc8OdHMgtnaL-fYB7QC64wnO_z0jPdIHOot5zlPXkB_KdsPfZkA&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=aze2RFtUFCkWHEmYhV1haw&_nc_tpa=Q5bMBQI_2-pyed8WCe0WiBJNWcIGAgGl4A_zEZ59cGetultNkwLaMEjcyTAiijPNk2wnHrjspILVn6qD-A&oh=00_AQL1SIOOLFJOBF5GnJm_X4_kepuz0Badh2WItfmOsWhQwQ&oe=6AA6FC54",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/779221779_18089681813242374_8095932403280386873_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=dBIhhRA6mBQQ7kNvwFHFPJe&_nc_oc=AdpVuS14iI76LNngHydAGchS1tACbLbctIr0vFS_P-Ax27-wEWxNKu0wiG5deGHAJOw&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=aze2RFtUFCkWHEmYhV1haw&_nc_tpa=Q5bMBQL3kQofsOcLQrEZUfvvqF_5-iyghpILZ0FWHBmTrMi8pRVbifDshcnCS03CTCX6YMnw3GefocB6rg&oh=00_AQJtnfSlkt178tdjftVtOKD138KYa85R0OmbN8XkfQsf_g&oe=6AA7059B",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/780606649_18089681792242374_8029177886840568605_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=13vNladvCxUQ7kNvwEtunda&_nc_oc=AdrEl7Yg9NkZegdkY5NlyaxJYq0UZieb4sEfK04AqiWKK2NJJZYp5glomelbvkwFLaU&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=aze2RFtUFCkWHEmYhV1haw&_nc_tpa=Q5bMBQIZ2U79kTsvZBw_6kD5an6o3OX3qD6MMYSuLLd6O8U8M7gZvORAaKjOLRZNQVOG7PQ_ReB0SnrOnw&oh=00_AQLsHRZGbfcAACZB9_ZSDI-3YouHtAE7UO_KcfYNXWVSoQ&oe=6AA6F858",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/780606649_18089681792242374_8029177886840568605_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=vLOcv4ej3sIQ7kNvwElc5sx&_nc_oc=Adpd-rxRIFyewxDunigMxVy8saGFJ3Zk-JXefEvRkADum2hJqRNZZD97aOEK9_V8vRw&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQIv-ixgAlu85AWBETYcIjABuE-8z9Dxm6GNhSZv_-pIj00OFEHaEnznD5KVbg3o1Z7bD-A74OHC6w&oh=00_AQHEPMx5e9zMJGmY7ZQD82x7mtQAG9-gr52fvOEFhR8zUQ&oe=6A90FF58"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Red Multi-Coat"
+            ]
+          }
+        ],
+        "price": {
+          "value": 34000,
+          "currency": "USD",
+          "source": "caption",
+          "confidence": null,
+          "min": 34000,
+          "max": 38000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Used",
+            "make": "Tesla",
+            "model": "Model 3 Long Range",
+            "year": "2021"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/775243728_18089681783242374_1814975126544868840_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=FAAllqQNEzYQ7kNvwGZRjUC&_nc_oc=AdqxaP-JizldFqzNwc8OdHMgtnaL-fYB7QC64wnO_z0jPdIHOot5zlPXkB_KdsPfZkA&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=aze2RFtUFCkWHEmYhV1haw&_nc_tpa=Q5bMBQK1lopxP8bIGyhkl9PI4BjjjCRKyT9F95BhALyWlAbPYbH-uf_WXmSIv7nMSjNNawWwYCgTiiK9Eg&oh=00_AQJJCZKZbti_Tr-VCs2X0Ql1QzazH88b5nZzeRRiyCOdaA&oe=6AA6FC54"
+  },
+  {
+    "post_id": "18331493713257979",
+    "media_type": "IMAGE",
+    "caption": "💳 DRIVE AWAY WITH 0% DOWN PAYMENT\n\nWe partnered with three banks so you don't have to save for two years.\n\n• Spread payments over 12 – 48 months\n• Approval in 48 hours\n• Salary earners AND business owners welcome\n• No hidden charges, we show you the full schedule upfront\n\nRequirements: valid ID, 6 months bank statement, proof of address.\n\nSend us a DM with \"FINANCE\" and we'll send the full breakdown.\n\n#carfinance #autoloan #0downpayment #cardealershipnigeria #financing #lagosbusiness",
+    "permalink": "https://www.instagram.com/p/DcPDnyLkb9v/",
+    "timestamp": "2026-08-19T20:33:59+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "announcement",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Finance promotional post.",
+    "expected_signals": [
+      {
+        "signal": "finance_available",
+        "confidence": null
+      }
+    ],
+    "products": [],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/774924798_18089681618242374_7957285365001635410_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=iCTvcnzi_YYQ7kNvwFHxKZY&_nc_oc=AdqA87Wltp1MfOKoYPBTDX-ANh83nw8m_tui7NeOcibP_Nv5_Y7dLJdF3t7O8B46LjQ&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=61YwKSmJixV4sWxEgtga0w&_nc_tpa=Q5bMBQJ_t_JTXBoXvsHx_Bg99AO5NXxoFpdRUXnmx4Syy_Rk7vonENdJyWrz5RXIqxjtXkOmsVWA6_ry4A&oh=00_AQJA2WaT7BYKyKB-GalLeQ6RKRllDzAxah8xq0cQUpei6w&oe=6AA6F78C"
+  },
+  {
+    "post_id": "18106477655229394",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "2022 Toyota Land Cruiser Prado TXL — Bronze\n\nThe one everybody has been asking for. Fresh off the ship.\n\n• 4.0L V6, automatic\n• 18,500 km\n• Full time 4WD, diff lock\n• 7 seats, leather, multi-terrain select\n• Original paint all round, no repaint\n\nPrice: $78,500 USD (or naira equivalent at day rate)\n\nApapa, Lagos. Duty inclusive. We handle registration for you.\n\n#prado #landcruiser #prado2022 #toyotaprado #suvnigeria #apapa #carsforsale",
+    "permalink": "https://www.instagram.com/p/DcPDb6KEUWX/",
+    "timestamp": "2026-08-19T20:32:22+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000002",
+        "username": "oluwadunni01",
+        "text": "How many units do you have available for this?",
+        "timestamp": "2026-08-20T08:30:00+0000"
+      },
+      {
+        "id": "17858893269000003",
+        "username": "ayodele.akinbohun",
+        "text": "We have exactly 4 units in stock right now. DM us to reserve yours!",
+        "timestamp": "2026-08-20T09:05:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "USD priced vehicle. Vendor confirmed 4 units in stock via comment thread — buyer oluwadunni01 asked, vendor ayodele.akinbohun replied. Pipeline must extract quantity from vendor comment.",
+    "expected_signals": [
+      {
+        "signal": "stock_count_known",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2022 Toyota Land Cruiser Prado TXL",
+        "description": "4.0L V6, automatic, 18,500 km, Full time 4WD, diff lock, 7 seats, leather, multi-terrain select, Original paint all round, no repaint",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775243725_18089681327242374_570232719361423788_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=QuKzclINQ6IQ7kNvwHcROIb&_nc_oc=AdpWH3zd0t6sXRqPALIwqczyhcVCfOkX2yhJ2YDVOtwu2IvGbSA8D0z7rxPoAvxO9PM&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QtGvgoEZEXB5Lfro9AyuAg&_nc_tpa=Q5bMBQIm8ARtwX06_tU5X1jfO21-RkzofrfLlUplHGgUUT69LbVnYruc07EiQGaQvTuSqgmEy0pyczO7_g&oh=00_AQJ4K_TKWvqslWVE2W91qBvV8wxfVEKS-r21JgA0RDo_5g&oe=6AA6F505",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775740637_18089681333242374_4250987733454638474_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=jLmpYWKTo40Q7kNvwGGQ3KB&_nc_oc=AdoACsBSv_ctbwT4IFgovFzxxw_6cUF4XVYyiiRQJPp7LjkIxZ5HvsC3fa9n3jHUfTE&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QtGvgoEZEXB5Lfro9AyuAg&_nc_tpa=Q5bMBQKQeRYfaR5j_X1U9p-QtEwUWOPRIyw2zlHVTEd6laOuC8G_W0MVjv96e0lnSn389UvIWTCvEXMHFQ&oh=00_AQJQ7YjUW1LkVlYMu6WAAFJWpjR8hUDbG7ASRe8N8NGomw&oe=6AA71A8F",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775727230_18089681330242374_3388258013075792190_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=0Nc6GJvF69IQ7kNvwGBKroY&_nc_oc=Adohu451D2fVybFyIf_UFi_ibeehQ5rz2UPZfvMuweEjtJM_LIJFxDhyQpO519P9W1M&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=QtGvgoEZEXB5Lfro9AyuAg&_nc_tpa=Q5bMBQIoWVafa6aK6kuz6xMuDJnp5BM_R1IezYwkllkTHX1-gb9BqCF9Oqo5SXuwdB5EuDKl5rdBadJ0dQ&oh=00_AQIhyjJyqCo5cvYSH45dNJWfvipq1J7AmROBi8BfVLMRdg&oe=6AA70969",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775244982_18089681306242374_2863616731988317568_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=bKNMqahNnsEQ7kNvwFc4pt6&_nc_oc=AdofB9Jmhcbmfg-LH50208-nZeZJhq8LcZqPlV23Zk-N58gfI1fFx6-AbmuAleqvx0k&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QtGvgoEZEXB5Lfro9AyuAg&_nc_tpa=Q5bMBQJ0vQPRMxEDfc2xMip7wYy6sMkEqpO3q_Fta4U5ZHpKdZ_jLPg42fSaNPoZFWG_Sf7O9iacYOwHJQ&oh=00_AQJCKKJlZgVN0aUPOg0ohixZWuVb8M0O6-Zxjx1dEe7IPQ&oe=6AA6FB00",
+          "https://instagram.fiba2-2.fna.fbcdn.net/v/t51.82787-15/775244982_18089681306242374_2863616731988317568_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=_NPxQCoxZGEQ7kNvwHRTy2y&_nc_oc=AdrKo5G48S0XpjgoAuBpp0_t8aOWeee4pzQf_6XNVga_sIwa_RpBOsljBKTxvsTI128&_nc_zt=23&_nc_ht=instagram.fiba2-2.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQJrrVvXPVbTqZUQVrFAdkYR43GSBROYCOROvOIRfNBacvJlTmtmvJ6f2vfqW3uNU5zHRga_Jo7osg&oh=00_AQFBQRZHt99C1ZLsTOEppzQDGMD7R9e7U_QQrzogdi_8qw&oe=6A910200"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Bronze"
+            ]
+          }
+        ],
+        "price": {
+          "value": 78500,
+          "currency": "USD",
+          "source": "caption",
+          "confidence": null,
+          "min": 78500,
+          "max": 78500
+        },
+        "quantity_signal": {
+          "kind": "explicit_count",
+          "evidence": "We have exactly 4 units in stock right now. DM us to reserve yours!",
+          "source": "vendor_comment"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Used",
+            "make": "Toyota",
+            "model": "Land Cruiser Prado TXL",
+            "year": "2022"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775243725_18089681327242374_570232719361423788_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=QuKzclINQ6IQ7kNvwHcROIb&_nc_oc=AdpWH3zd0t6sXRqPALIwqczyhcVCfOkX2yhJ2YDVOtwu2IvGbSA8D0z7rxPoAvxO9PM&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QtGvgoEZEXB5Lfro9AyuAg&_nc_tpa=Q5bMBQJeYKnqkvRFXDSURB3jxnIKSdwMQjgv4B7kB3YszJ3dRKJOYA1nHCyVx68CMasQT353Hkopl8pkAQ&oh=00_AQL_s57nLvEqXOs_Cw575BYNSeuVxiQ0B6CcdoB-Y8THeg&oe=6AA6F505"
+  },
+  {
+    "post_id": "18112015715068333",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "2021 BMW X5 xDrive40i — Alpine White 🤍\n\nSwipe to see the interior — cognac Vernasca leather, absolutely spotless.\n\n• 3.0L turbo inline-6, 335hp\n• 29,800 km\n• xDrive AWD\n• Panoramic sky roof, Harman Kardon, heads-up display\n• Still under warranty\n\n💬 DM for price — serious buyers only please\n\nLocated in Ikoyi. Private viewing by appointment.\n\n#bmwx5 #x5 #bmwnigeria #luxurycars #ikoyi #tokunbocars #carsforsale",
+    "permalink": "https://www.instagram.com/p/DcPDT_QEVQ4/",
+    "timestamp": "2026-08-19T20:31:17+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000016",
+        "username": "ade_wale234",
+        "text": "I heard from a friend you only have 1 unit left, is that true?",
+        "timestamp": "2026-08-20T09:00:00+0000"
+      },
+      {
+        "id": "17858893269000017",
+        "username": "ayodele.akinbohun",
+        "text": "Still available, come through for a private viewing!",
+        "timestamp": "2026-08-20T09:30:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "DM for price. Buyer speculates a stock count in their own comment, but the vendor never confirms a number - negative test case for stock_count_known (must not fire from a buyer's guess).",
+    "expected_signals": [],
+    "products": [
+      {
+        "name": "2021 BMW X5 xDrive40i",
+        "description": "3.0L turbo inline-6, 335hp, 29,800 km, xDrive AWD, Panoramic sky roof, Harman Kardon, heads-up display, Still under warranty",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775726890_18089681075242374_879183879311149155_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=ZQwifqXjMgwQ7kNvwGEbf0X&_nc_oc=AdpnOAi8YgSvvFwnCD3KADP8Yow-AeT9mSJYjnU1kpXoW6M-lJ4BF-FiYd2Kd42nhs0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=BMEIIGnljtZqjUf35JziwA&_nc_tpa=Q5bMBQKS2yk4Kv5xCz81FAptoMlJCOA4dr7rr9rTqEA_EsKq9-rnOscUuuqguwODdQtOr39Zwz0vB9FSgQ&oh=00_AQLFVoIgCSTnWg2IcKYw67WiDGkWOcwKoWwMSsXIBQscJQ&oe=6AA70E0F",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775280939_18089681066242374_6481483617279447025_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=I3eypTLAEuoQ7kNvwFo94xn&_nc_oc=Adra1gctS89thNDhUBGoXDbhHWfPVRZ_3ik4FE8mS1S737YEseCwarEKsNTJiys_wV0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=BMEIIGnljtZqjUf35JziwA&_nc_tpa=Q5bMBQKLN_z7qvR38CEGxpQsFcydEHfGGucjY-BOsgMadLcpNd9hpkfGYyiUTXjAR1JMLxGT6VVqEVn8gA&oh=00_AQKReyMe0q3Y3mo1X2dmuHHfhnOzUq0PNzYx1dZ9S67YnQ&oe=6AA6F76D",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/780087731_18089681048242374_5878589055667278499_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=4RdUWZyN--8Q7kNvwGYYYfz&_nc_oc=AdpLiXNC_6ylOsg_3l1EY1a0GjaGFSziPbGqX8iZJBzOLm7zPihrFH548AetXN7leic&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=BMEIIGnljtZqjUf35JziwA&_nc_tpa=Q5bMBQLXBVV3QP2dyYb7zbSVLcej6dZo6H6MUtvivlr6jR1mldc3DwwZ1j6uvc4YZ-pq7Vyr-lStox8qhg&oh=00_AQLZ4ftIbuKmiLbLLzmIM-wf5KvoWoDS9ZkOzZ7giA4I3g&oe=6AA71FDE",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/779842768_18089681078242374_6207083958923721044_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=E6yckHHpumwQ7kNvwEiu0ZB&_nc_oc=AdqLWEAUdKoQmX2gyxCjtZdk2hNPa1mXQLu-KLWs4A2Bfq2pheMGG6qnyxlzETdIXcY&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=BMEIIGnljtZqjUf35JziwA&_nc_tpa=Q5bMBQLvJOUzniSs9IGcEwFOgXsVlPkr6N0AkBP9pl2f91wts6X-eBuHBe2FLHCFBtsKv5PMdN0Hg9Re_A&oh=00_AQKcch64ipmORXWOZh1BBtvxtKn4RtQM2xs0BIB4hXeddg&oe=6AA7057C",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775319146_18089681057242374_5721208905085098160_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=s4LLodkN06kQ7kNvwFumi55&_nc_oc=Adq7TcEbuRn4ubj5WU8FsRGbnec0hN43jToOfAJeAfEwx60E5i06pQGHdh2TKZI7jlE&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=BMEIIGnljtZqjUf35JziwA&_nc_tpa=Q5bMBQLO--jz_kY-O4cE2-PGxQAw38R7yvDWX_ChoiGhrjva68jS2SsAt6ztnH59JkXMiv11YjiEeriUWw&oh=00_AQL0uhhk-8oAV8EWHiU5DbrUIrK9nNDZdKRYA7J7dmclBw&oe=6AA70505",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/775319146_18089681057242374_5721208905085098160_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=F7wNCybiRs8Q7kNvwE0lCyR&_nc_oc=AdptQkXKAcDYC4ahnELET6IireAC3yt1N5NvxlvrDsrC4gDaQIpgCga3ByImaeBOdBg&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQKOx1Pg03N1iSO3RnedtMMdvk3K1NkMSrdETbmBn7iiBouF16FpmHjhn9zKcdTo_MqJwkVYGf79aw&oh=00_AQHxn8iDplF5ahT9ZCLXucTfJA_cGEmVovlfIO4HX_mtrA&oe=6A910C05"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Alpine White",
+              "cognac Vernasca leather"
+            ]
+          }
+        ],
+        "price": {
+          "value": null,
+          "currency": null,
+          "source": "none",
+          "confidence": null,
+          "min": null,
+          "max": null
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Used",
+            "make": "BMW",
+            "model": "X5 xDrive40i",
+            "year": "2021"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775726890_18089681075242374_879183879311149155_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=ZQwifqXjMgwQ7kNvwGEbf0X&_nc_oc=AdpnOAi8YgSvvFwnCD3KADP8Yow-AeT9mSJYjnU1kpXoW6M-lJ4BF-FiYd2Kd42nhs0&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=BMEIIGnljtZqjUf35JziwA&_nc_tpa=Q5bMBQKiFj6OpgoYjweTzdmqNLKXQSLVvXv8btdNx8Knm4r8Sxm6GSewaxjKBabePINba98cdiKsPLBYBw&oh=00_AQKNkE0Q1_w3JDy0C_PfTeexlh9CoAmQBBk4h421Jx-YcQ&oe=6AA70E0F"
+  },
+  {
+    "post_id": "18079164065330268",
+    "media_type": "IMAGE",
+    "caption": "2019 Lexus RX 350 F-Sport — Foreign used\n\n• 3.5L V6, 295hp, 8-speed auto\n• 41,200 km\n• AWD\n• Panoramic roof, Mark Levinson sound, 360 camera\n• Full service history from the US\n\nPrice: ₦32,000,000\n\nDuty paid. Ready for immediate pickup in Victoria Island.\nFinancing available through our partner bank — ask in DM.\n\n#lexusrx350 #lexusnigeria #rx350 #luxurysuv #victoriaisland #carsforsalelagos",
+    "permalink": "https://www.instagram.com/p/DcPCnwoEYt6/",
+    "timestamp": "2026-08-19T20:25:15+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Standard product listing.",
+    "products": [
+      {
+        "name": "2019 Lexus RX 350 F-Sport",
+        "description": "3.5L V6, 295hp, 8-speed auto, 41,200 km, AWD, Panoramic roof, Mark Levinson sound, 360 camera, Full service history from the US",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/778139458_18089679593242374_3414970025513590728_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=uv5XymOuXekQ7kNvwHNTyHF&_nc_oc=AdoKLA_esKlcxD994kaMGtFXgoAQhwGRlPFdNwBTlTmWyr9x1ueGgs77OxQRQoANBOw&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=affno5FM-Hko2_KNzTKN6g&_nc_tpa=Q5bMBQLI8k5lUFywWdZZfhGnjGeAekjQtTCxuoi10V7YYCAVWJrQaYarHtVHp1Ivcz78n9_em-et4WIeuA&oh=00_AQIHW2_gtmGwIHOIQpMwal_9Sm8QrKKuhQ-QEFLiHO_5og&oe=6AA71892"
+        ],
+        "variants": [],
+        "price": {
+          "value": 32000000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 32000000,
+          "max": 32000000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Foreign used",
+            "make": "Lexus",
+            "model": "RX 350 F-Sport",
+            "year": "2019"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/778139458_18089679593242374_3414970025513590728_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=uv5XymOuXekQ7kNvwHNTyHF&_nc_oc=AdoKLA_esKlcxD994kaMGtFXgoAQhwGRlPFdNwBTlTmWyr9x1ueGgs77OxQRQoANBOw&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=affno5FM-Hko2_KNzTKN6g&_nc_tpa=Q5bMBQLI8k5lUFywWdZZfhGnjGeAekjQtTCxuoi10V7YYCAVWJrQaYarHtVHp1Ivcz78n9_em-et4WIeuA&oh=00_AQIHW2_gtmGwIHOIQpMwal_9Sm8QrKKuhQ-QEFLiHO_5og&oe=6AA71892"
+  },
+  {
+    "post_id": "17894529186657159",
+    "media_type": "IMAGE",
+    "caption": "🚨 END OF MONTH CLEARANCE — 3 DAYS ONLY 🚨\n\nEvery unit on the lot marked down. Over 40 cars available.\n\n✅ Up to ₦2,500,000 off selected SUVs\n✅ Free full detailing on every purchase\n✅ Free 1-year tracker installation\n\n📍 Plot 14, Admiralty Way, Lekki Phase 1\n🕘 Mon–Sat, 9am – 7pm\n\nWalk in. No appointment needed.\n\n#clearancesale #cardealership #lagos #lekki #carsale #promo #limitedtimeoffer",
+    "permalink": "https://www.instagram.com/p/DcPCgBjEewj/",
+    "timestamp": "2026-08-19T20:24:11+0000",
+    "has_carousel_children": false,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "announcement",
+    "carousel_classification": "not_carousel",
+    "expected_flag": null,
+    "notes": "Clearance sale promotional post.",
+    "expected_signals": [
+      {
+        "signal": "clearance",
+        "confidence": null
+      },
+      {
+        "signal": "urgent",
+        "confidence": null
+      }
+    ],
+    "products": [],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/779932049_18089679440242374_3465485516734915351_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=gBm0IFbBPL4Q7kNvwFLEvZi&_nc_oc=AdrtJFf6aA_BVO9ZIY_xO1ctX9mu5h1G0tVM6j88H0SDdQEzS3MF-ABkKDQz0VhMwr4&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=ynmX59chqpxJduUVSL3aXg&_nc_tpa=Q5bMBQJgoim2SAW3OnsXkoxMq9uwasoyaogGqTOe2KcXd3plW-8JeuQsP20kUVE_bwfk_VJWryOR7F5G_w&oh=00_AQI0Ct2_j7uJmMSUFla6ZJU3pcxhWxHEwH8nt1LOtC07YQ&oe=6AA71955"
+  },
+  {
+    "post_id": "18133507585622516",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "2016 Honda Accord EX-L — Red on black 🔥\n\nClean Nigerian used, one careful owner. Bought and serviced here.\n\n• 2.4L i-VTEC, automatic\n• 112,000 km\n• Sunroof, heated seats, push start\n• Brand new tyres (Michelin, fitted last month)\n• AC ice cold\n\nPrice range: ₦8,500,000 – ₦9,200,000 depending on payment plan\n(Outright buyers get the lower end)\n\nIkeja GRA, Lagos. Swap possible with a smaller car + cash.\n\n#hondaaccord #accord2016 #nigerianused #carsforsale #ikeja #lagosautos",
+    "permalink": "https://www.instagram.com/p/DcPCYVrEX5e/",
+    "timestamp": "2026-08-19T20:23:08+0000",
+    "has_carousel_children": true,
+    "comment_count": 2,
+    "comments": [
+      {
+        "id": "17858893269000020",
+        "username": "ifeoma.k",
+        "text": "Still up for grabs?",
+        "timestamp": "2026-08-20T09:00:00+0000"
+      },
+      {
+        "id": "17858893269000021",
+        "username": "ayodele.akinbohun",
+        "text": "Yes, but I've got two other buyers coming to view this weekend, so don't wait too long if you want it.",
+        "timestamp": "2026-08-20T09:45:00+0000"
+      }
+    ],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Price range with swap accepted. Vendor comment adds time-pressure about competing buyers.",
+    "expected_signals": [
+      {
+        "signal": "swap_deal",
+        "confidence": null
+      },
+      {
+        "signal": "urgent",
+        "confidence": null
+      }
+    ],
+    "products": [
+      {
+        "name": "2016 Honda Accord EX-L",
+        "description": "2.4L i-VTEC, automatic, 112,000 km, Sunroof, heated seats, push start, Brand new tyres, AC ice cold",
+        "images": [
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775319915_18089679083242374_2748514112496774818_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=N4_gtVapyBAQ7kNvwEjO4VN&_nc_oc=AdodFks9dpokE24jqL7m2gBHLbuW61UjOBWA0DYDSDgc_rTbrJeILOiqErkapG2sjk4&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QH8w4_x9Og-b5KbBhax76Q&_nc_tpa=Q5bMBQK-fpw12TyG3FAJ7_aKcpuf_WfIrLLRk9K65DE1wv_VMIdlsnnBtF3tEM4buWM3LSYpkyNh5lCEag&oh=00_AQJuqpOMmhAc_hqnCJN5rV1pVGTlrlyw8OKTlzH-qR55Ug&oe=6AA71952",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775567350_18089679074242374_87684728277756705_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=hq6wPXCTLuEQ7kNvwFkH5jC&_nc_oc=AdqJoGka_AM0icwfFFBrMxIOMYZEhjfiVC3IfAnmP5pRIy-yd-GAvyq7ggDOMH_Xx2c&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=QH8w4_x9Og-b5KbBhax76Q&_nc_tpa=Q5bMBQLEavqwOvA52BZn9mkrF8yklkkAZ8hIZrs1Ay5c7xxoGJm1Z1xwS6pZwaZTYE2m1fWmJnwKG9o4Iw&oh=00_AQLHKRBAi-QfNJwa1YZHdFK2CyLkTXJSQ6JIoZ7CVaWCyQ&oe=6AA705CE",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775442143_18089679056242374_5531398714508177550_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=107&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=GnGrvePUmw8Q7kNvwEqOIlQ&_nc_oc=Adqbo2hGks7iK12-JKUszdCx7L5F2xR6RXnoXFzEOZWEPjrrGqtpITpkn4wPbqDu3K0&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=QH8w4_x9Og-b5KbBhax76Q&_nc_tpa=Q5bMBQLF2enqBw2ACtBvL_68FXVfhjYNu0ecRR6XQPxQ2b4z30RJ7QD8a7AjrZogPzjPaI8TZqAU1rZpYw&oh=00_AQJ6fVXeBC9O9wprBC7iFi7OwLCFg589ryfmM7zil9jGfg&oe=6AA71EAA",
+          "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/779816674_18089679071242374_4899013291892789369_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=L5PtVfCi_9sQ7kNvwF2EeV8&_nc_oc=AdpOvklucES9FKC_l3Ne499auHoYvfKMU-0TLwhKpmfzymbWSC3hR_ugUB9OBcnuHO8&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QH8w4_x9Og-b5KbBhax76Q&_nc_tpa=Q5bMBQIuEh9vnMvEssOEnyGJyicsxtu-pq92aL5_S1WfzglnreIgNLmUvZTWx-4qOs747ickL2P6UBBnQQ&oh=00_AQJbbFAzspGg1LZE2SJIdAPeE6HcvMb97unV4KlqpFmHhQ&oe=6AA70CD4",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/780075362_18089679086242374_8016270148686091229_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=rnyKY-HUxKIQ7kNvwH5JU2z&_nc_oc=Adq4YcOYwg-hFFuo8zTw_nKC8MspgE-TmOstZ6yYIKlVjMXiIHU-6It5EjxG0h3sTps&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=QH8w4_x9Og-b5KbBhax76Q&_nc_tpa=Q5bMBQKGsFdu-48dhl-BQXntMdlDASHnlAcs1dbWzdjFpJI11V1UiCDIlgNmuyYrMycfe65ifFxTsrsIgg&oh=00_AQKgwVieZ-D4skfi7TUvw_pzIFKlFqi6pUIdC5xCUHe-EQ&oe=6AA6F9D9",
+          "https://instagram.fiba2-2.fna.fbcdn.net/v/t51.82787-15/780075362_18089679086242374_8016270148686091229_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=prTjhZV6aA4Q7kNvwGvvO7S&_nc_oc=AdrPWr2La0pBUJuWQSkdGv9nELZmRHdHWE1niws_CYgWW2ZXJ8Jy0thniJIiI2Uac1M&_nc_zt=23&_nc_ht=instagram.fiba2-2.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQLlOexJ3c2rPz-25RvQFFfKYJje3dE1YZjYJW3MvnFMHpGoHRgVkEHibwrhL7C6uW4kecsUh0FVYA&oh=00_AQH-6Moi25P1_Il_WG4_PmXH8dIctSSB06exBQmxy7xcdg&oe=6A9100D9"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Red on black"
+            ]
+          }
+        ],
+        "price": {
+          "value": 8500000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 8500000,
+          "max": 9200000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "unknown",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Clean Nigerian used",
+            "make": "Honda",
+            "model": "Accord EX-L",
+            "year": "2016"
+          },
+          "accepts_swap": true
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-2.fna.fbcdn.net/v/t51.82787-15/775319915_18089679083242374_2748514112496774818_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=N4_gtVapyBAQ7kNvwEjO4VN&_nc_oc=AdodFks9dpokE24jqL7m2gBHLbuW61UjOBWA0DYDSDgc_rTbrJeILOiqErkapG2sjk4&_nc_zt=23&_nc_ht=instagram.fabb1-2.fna&edm=ANQ71j8EAAAA&_nc_gid=QH8w4_x9Og-b5KbBhax76Q&_nc_tpa=Q5bMBQIxCJnajLh0mPw2BLRfxT5lp1dlJKdmaCdxuP0Sc33_t5FQGqutiR1Um1WnPst2dyfwHqzlbQAlOA&oh=00_AQJVShxsExS-0bdFH7ilAqdfCrCepMrMWv_o4GzTqXmHig&oe=6AA71952"
+  },
+  {
+    "post_id": "18128205745669337",
+    "media_type": "CAROUSEL_ALBUM",
+    "caption": "2018 Toyota Camry SE, Foreign used, just cleared 🇳🇬\n\n• 2.5L 4-cyl, automatic\n• 68,400 km\n• Pearl white / black leather\n• Reverse camera, dual-zone climate, Apple CarPlay\n• Custom duty fully paid, papers complete\n\nPrice: ₦14,500,000 (slightly negotiable)\n\nLocation: Lekki Phase 1, Lagos. Inspection welcome Mon–Sat.\n📞 08063805598\n\n#toyotacamry #camry2018 #carsforsaleinlagos #tokunbo #lagoscars #nigeriacars",
+    "permalink": "https://www.instagram.com/p/DcPCAeBEX5o/",
+    "timestamp": "2026-08-19T20:19:53+0000",
+    "has_carousel_children": true,
+    "comment_count": 0,
+    "comments": [],
+    "post_type": "product_listing",
+    "carousel_classification": "gallery",
+    "expected_flag": null,
+    "notes": "Slightly negotiable price.",
+    "products": [
+      {
+        "name": "2018 Toyota Camry SE",
+        "description": "2.5L 4-cyl, automatic, 68,400 km, Reverse camera, dual-zone climate, Apple CarPlay",
+        "images": [
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775799322_18089678465242374_750503814486932463_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=dn5bd91humEQ7kNvwHFsKZm&_nc_oc=AdpKqQYOtTXiuD3Lt1ESnIW9j7lOWgHzI32PqukYnevYAm6p7umWo9BQ84LzLZf81gg&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=bJkXejPcm-HhL9w5WBTxiw&_nc_tpa=Q5bMBQILZFJKgQRAaySIFF1t4H3ug3AXKzOaYwZldynSK2LVpnOnVC9h4qCVXMNuOwLZnt5L2UaudxljYQ&oh=00_AQLna6Iv_UxF2yKgeqrBDO5OH6IQvUrxWK1aHyZhiO92FA&oe=6AA6F286",
+          "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775799315_18089678450242374_1242377920701149117_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=14i_NeLJ34cQ7kNvwGksj3Z&_nc_oc=AdqhQ9DxO8C1T6hvCyw82MMSnTqmyODYlg560edZLgCcwpFHv8zTp1qyQbqULKqiUok&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=bJkXejPcm-HhL9w5WBTxiw&_nc_tpa=Q5bMBQJjv412l9AcLfpR8YecNGPfSnCDXHHkRuju5-wVVWMXZyqSOj-9e3PYTz1kXIVQB4hfPkxJwg4dpA&oh=00_AQKPyBAvFgI0vSTWuIKyannuSmQkAM41PR5jhAxuCGt5zQ&oe=6AA6F92E",
+          "https://instagram.fabb1-3.fna.fbcdn.net/v/t51.82787-15/779842323_18089678468242374_343475311371834929_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=LQd5RTYZ9sQQ7kNvwFQWdWP&_nc_oc=Adp6uz0uCFNNLHpoUDOOP9-VkPqzr87w0jjI19ecEPn2FEAgetLCtcH8eaZdR0ViFkg&_nc_zt=23&_nc_ht=instagram.fabb1-3.fna&edm=ANQ71j8EAAAA&_nc_gid=bJkXejPcm-HhL9w5WBTxiw&_nc_tpa=Q5bMBQJPCuT6WYDwZ58JUJtk7Dy4kfbSa4oSzJj1kMHzGyUX0ZggO9AMESueMW9O-nUPAI2O5kGgigXAjQ&oh=00_AQIxEeYbHLEusykXSEnQkrtPh9cZ1rrYM9G9CYM__3Kx7A&oe=6AA6F086",
+          "https://instagram.fiba2-3.fna.fbcdn.net/v/t51.82787-15/779842323_18089678468242374_343475311371834929_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=cA3n9dDdngMQ7kNvwEawPbm&_nc_oc=AdoK7cApyA0QfXNdgEzjFUrtPMz8k-yaOavmkeqQN9IB9ridenhBx5o22rUSUQQz6R4&_nc_zt=23&_nc_ht=instagram.fiba2-3.fna&edm=ANo9K5cEAAAA&_nc_gid=yExnFJq3btaaZ20Gujl8Vw&_nc_tpa=Q5bMBQJrp9iOutPz58Zo2cs7I1lUzUX5HUINqzX05HVZLrFSbej5PBUefZdqPfJuxqsrs6_hUMj-MGExVg&oh=00_AQFrV0YjlSeaNdVzyWygGNyfQBZekqVP9yvYmFg48M6xGg&oe=6A90F786"
+        ],
+        "variants": [
+          {
+            "type": "color",
+            "values": [
+              "Pearl white",
+              "black leather"
+            ]
+          }
+        ],
+        "price": {
+          "value": 14500000,
+          "currency": "NGN",
+          "source": "caption",
+          "confidence": null,
+          "min": 14500000,
+          "max": 14500000
+        },
+        "quantity_signal": {
+          "kind": "none",
+          "evidence": null,
+          "source": "none"
+        },
+        "negotiation_signal": "negotiable",
+        "extraction_confidence": null,
+        "extensions": {
+          "category": "automotive",
+          "attributes": {
+            "condition": "Foreign used",
+            "make": "Toyota",
+            "model": "Camry SE",
+            "year": "2018"
+          },
+          "accepts_swap": null
+        }
+      }
+    ],
+    "media_url": "https://instagram.fabb1-1.fna.fbcdn.net/v/t51.82787-15/775799322_18089678465242374_750503814486932463_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=dn5bd91humEQ7kNvwHFsKZm&_nc_oc=AdpKqQYOtTXiuD3Lt1ESnIW9j7lOWgHzI32PqukYnevYAm6p7umWo9BQ84LzLZf81gg&_nc_zt=23&_nc_ht=instagram.fabb1-1.fna&edm=ANQ71j8EAAAA&_nc_gid=bJkXejPcm-HhL9w5WBTxiw&_nc_tpa=Q5bMBQIC-VAYPX6YjsICa9ht3FJAy2M7x4ZgjbYHrU25LhEwv7TjEqpqcFwStsMCIGUWql-kO8Zp02LPmw&oh=00_AQJL6jb9a1HousWiybC1C86z3kZ2ApAiEBtuyrLy4XHWgQ&oe=6AA6F286"
+  }
+]
