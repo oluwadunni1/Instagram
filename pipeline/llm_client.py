@@ -26,7 +26,9 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import os
 import re
+import threading
 import time
 from collections import Counter
 from datetime import datetime, timezone
@@ -36,6 +38,8 @@ from typing import Type, TypeVar
 import httpx
 import litellm
 from pydantic import BaseModel, ValidationError
+
+import pipeline.settings  # noqa: F401 - import side effect: load_dotenv() before the env reads below
 
 # Suppress litellm's noisy "Provider List: https://..." startup banners and
 # debug output - these add nothing to eval runs and drown real log lines.
@@ -49,6 +53,69 @@ T = TypeVar("T", bound=BaseModel)
 
 _FENCE_RE = re.compile(r"```(?:json)?\s*(\{.*?\})\s*```", re.DOTALL)
 _BARE_OBJ_RE = re.compile(r"(\{.*\})", re.DOTALL)
+
+
+# Gemini's free tier allows 15 requests/minute/model - one call every 4 seconds.
+# Nothing here paced the calls, so a run burst straight through that ceiling: the
+# transient-retry loop below absorbed the resulting 429s until Stage 3 exhausted
+# its budget and dropped to _regex_fallback(), leaving the run reporting clean
+# scores over partly-heuristic output. Observed 2026-09-11 on a 20-call, 10-post
+# run, which lost one post that way.
+#
+# Spacing the calls costs roughly the wall-clock the backoff was burning anyway,
+# without the failures. 4.5s rather than the bare 60/15 = 4.0s: exactly at the
+# limit leaves no margin for however the provider bounds its window, and the
+# difference over a whole run is a few seconds. Set LLM_MIN_CALL_INTERVAL=0 to
+# disable on a paid tier.
+DEFAULT_CALL_INTERVAL_SECONDS = 4.5
+
+
+def _read_call_interval() -> float:
+    """LLM_MIN_CALL_INTERVAL as a float, treating unset-or-blank as the default.
+
+    The blank case is the one that matters: .env.example ships the key with an
+    empty value, so a copied .env yields "" and a bare float("") would raise at
+    import time and take the whole pipeline down. A malformed non-empty value
+    still raises - a typo'd interval should be loud, not silently ignored.
+    """
+    raw = (os.environ.get("LLM_MIN_CALL_INTERVAL") or "").strip()
+    if not raw:
+        return DEFAULT_CALL_INTERVAL_SECONDS
+    try:
+        return max(0.0, float(raw))
+    except ValueError:
+        raise ValueError(
+            f"LLM_MIN_CALL_INTERVAL must be a number of seconds (got {raw!r}). "
+            "Leave it blank for the default, or set 0 to disable throttling."
+        ) from None
+
+
+MIN_CALL_INTERVAL_SECONDS = _read_call_interval()
+
+_last_call_started_at = 0.0
+_throttle_lock = threading.Lock()
+
+
+def throttle() -> None:
+    """Blocks until MIN_CALL_INTERVAL_SECONDS have passed since the last call.
+
+    Must be called before EVERY request that reaches a provider, including the
+    vision Pass B calls in stage2_triage.py/stage3_extract.py that bypass
+    complete_structured() - they spend the same per-minute quota, so throttling
+    only this module's calls would still let a cascade trip the limit.
+
+    Spacing is measured from one call's start to the next, which is what a
+    requests-per-minute quota counts; a call that itself takes 3s therefore only
+    waits 1s afterwards.
+    """
+    global _last_call_started_at
+    if MIN_CALL_INTERVAL_SECONDS <= 0:
+        return
+    with _throttle_lock:
+        wait = MIN_CALL_INTERVAL_SECONDS - (time.monotonic() - _last_call_started_at)
+        if wait > 0:
+            time.sleep(wait)
+        _last_call_started_at = time.monotonic()
 
 
 def _extract_json(text: str) -> dict:
@@ -303,6 +370,7 @@ def complete_structured(
         response = None
         while True:
             try:
+                throttle()
                 response = litellm.completion(
                     model=model,
                     messages=messages,

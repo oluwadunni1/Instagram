@@ -42,6 +42,7 @@ def configure_logging(level: str | None = None) -> None:
     # Before the early return below, so a second configure_logging() call
     # re-applies it rather than silently skipping it.
     _suppress_http_wire_logs()
+    _suppress_litellm_logs()
 
     existing = next((h for h in root.handlers if isinstance(h, logging.StreamHandler)), None)
     if existing is not None:
@@ -52,6 +53,24 @@ def configure_logging(level: str | None = None) -> None:
     handler.setLevel(resolved_level)
     handler.setFormatter(_PlainInfoFormatter())
     root.addHandler(handler)
+
+
+def _suppress_litellm_logs() -> None:
+    """Keep litellm's per-call chatter out of the console.
+
+    litellm.suppress_debug_info / set_verbose (set in pipeline/llm_client.py)
+    do not cover its logger, which emits an INFO line per call plus, on Gemini 3
+    models, a temperature warning and a deprecation warning EVERY call - six
+    lines of boilerplate per request, which buries the pipeline's own progress
+    output entirely on a real run.
+
+    ERROR rather than WARNING because those two Gemini 3 notices are themselves
+    at WARNING and fire on every single call. Nothing is lost: the failures that
+    matter (transient retries, permanent provider errors, extraction falling
+    back to regex) are logged by this project's own loggers, not litellm's.
+    """
+    for noisy in ("LiteLLM", "litellm", "LiteLLM Router", "LiteLLM Proxy"):
+        logging.getLogger(noisy).setLevel(logging.ERROR)
 
 
 def _suppress_http_wire_logs() -> None:

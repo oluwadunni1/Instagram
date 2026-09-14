@@ -24,7 +24,7 @@ from typing import Literal
 import litellm
 from pydantic import BaseModel
 
-from pipeline.llm_client import complete_structured, log_token_usage
+from pipeline.llm_client import complete_structured, log_token_usage, throttle
 from pipeline.types import Post, vision_image_url
 
 POST_TYPES = Literal[
@@ -146,6 +146,9 @@ def _pass_b(
         },
     ]
 
+    # Bypasses complete_structured(), so it must throttle itself - this call
+    # spends the same per-minute provider quota as every other one.
+    throttle()
     response = litellm.completion(
         model=vision_model,
         messages=messages,

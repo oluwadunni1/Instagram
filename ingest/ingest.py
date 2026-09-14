@@ -46,6 +46,7 @@ import json
 import logging
 import sys
 import time
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -65,6 +66,65 @@ GRAPH_BASE = "https://graph.instagram.com"
 API_VERSION = "v26.0"  # bump as Meta ships new versions; check current in their docs
 RATE_LIMIT_SLEEP_SECONDS = 2  # gentle default pause between paginated calls
 MAX_RETRIES = 5
+
+CAPTION_SNIPPET_CHARS = 52
+
+
+def _caption_snippet(caption: str | None, width: int = CAPTION_SNIPPET_CHARS) -> str:
+    """Single-line, length-capped caption for one console trace line.
+
+    Captions are multi-line and can run for paragraphs, so the newlines have to
+    collapse or one post takes over the whole screen.
+    """
+    text = " ".join((caption or "").split())
+    if not text:
+        return "(no caption)"
+    return text if len(text) <= width else text[: width - 1] + "…"
+
+
+def _media_label(post: dict) -> str:
+    """Short display label for a post's media kind.
+
+    A Reel is media_type=VIDEO with media_product_type=REELS rather than its own
+    media_type, and the distinction is worth showing: Reels are the posts whose
+    media_url is a video file, so they are the ones that depend on thumbnail_url
+    for anything that needs a still image (see pipeline/types.py).
+    """
+    if post.get("media_product_type") == "REELS":
+        return "REEL"
+    media_type = post.get("media_type") or "?"
+    return "CAROUSEL" if media_type == "CAROUSEL_ALBUM" else media_type
+
+
+def log_ingest_summary(media_list: list[dict], out_path: Path) -> None:
+    """Stage 0 summary block.
+
+    Mirrors the per-stage summaries scripts/run_pipeline.py --live prints, so an
+    onboarding run reads as one continuous story from raw pull to routed catalog.
+    """
+    total = len(media_list)
+    kinds = Counter(_media_label(post) for post in media_list)
+    with_caption = sum(1 for post in media_list if (post.get("caption") or "").strip())
+    comments = sum(len(post.get("comments") or []) for post in media_list)
+    stamps = sorted(post["timestamp"] for post in media_list if post.get("timestamp"))
+
+    logger.info("")
+    logger.info("=== Stage 0: ingest complete (zero AI calls) ===")
+    logger.info("  Posts pulled       : %d", total)
+    if stamps:
+        logger.info("  Date range         : %s -> %s", stamps[0][:10], stamps[-1][:10])
+    logger.info("  Media types        : %s",
+                ", ".join(f"{kind} {count}" for kind, count in kinds.most_common()) or "none")
+    logger.info("  Captions           : %d with text, %d blank", with_caption, total - with_caption)
+    logger.info("  Comments retrieved : %d", comments)
+    if total and comments == 0:
+        # Every post, every account - see CLAUDE.md. Saying so here means the
+        # zeros in the trace above are explained before anyone has to ask.
+        logger.info("    Comment TEXT is withheld by Meta until instagram_business_manage_comments")
+        logger.info("    clears App Review (the app is in Development mode). Counts are real, text")
+        logger.info("    is not available - so Stage 4 reads captions only on this account.")
+    logger.info("  Raw dump           : %s", out_path)
+    logger.info("")
 
 
 def _get(url: str, params: dict, token: str) -> dict:
@@ -206,7 +266,12 @@ def ingest_account(account_label: str, token_env: str = "IG_ACCESS_TOKEN") -> Pa
     logger.info("[3/3] Fetching comments per post (this is the slow part)...")
     for i, post in enumerate(media_list, start=1):
         post["comments"] = fetch_comments(post["id"], token, debug=(i == 1))
-        logger.info("  -> [%d/%d] %s: %d comments", i, len(media_list), post["id"], len(post["comments"]))
+        logger.info(
+            "  [%d/%d]  %s  %-8s  %-*s  %d comments",
+            i, len(media_list), post["id"], _media_label(post),
+            CAPTION_SNIPPET_CHARS, _caption_snippet(post.get("caption")),
+            len(post["comments"]),
+        )
         time.sleep(RATE_LIMIT_SLEEP_SECONDS)
 
     dump = {
@@ -218,14 +283,25 @@ def ingest_account(account_label: str, token_env: str = "IG_ACCESS_TOKEN") -> Pa
 
     out_path = run_dir / f"dump_{pulled_at.replace(':', '-')}.json"
     out_path.write_text(json.dumps(dump, indent=2, ensure_ascii=False), encoding="utf-8")
-    logger.info("Done. Raw dump cached at: %s", out_path)
+    log_ingest_summary(media_list, out_path)
     logger.info("Re-run the pipeline against this file offline — no need to re-hit the API.")
+    logger.info("Next: uv run scripts/run_pipeline.py --account %s --live", account_label)
     return out_path
 
 
 if __name__ == "__main__":
     from pipeline.exceptions import PipelineError
     from pipeline.logging_config import configure_logging
+
+    # Both streams, before anything logs: the per-post trace prints caption text,
+    # and a caption with an emoji raises UnicodeEncodeError on a cp1252 Windows
+    # console mid-run. configure_logging() writes to stderr, so stdout alone is
+    # not enough here.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except Exception:  # pragma: no cover - non-reconfigurable stream
+            pass
 
     configure_logging()
 

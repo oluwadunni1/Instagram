@@ -21,6 +21,7 @@ make ingest ACCOUNT=vendor_gadgets_01 TOKEN_ENV=IG_ACCESS_TOKEN_GADGETS
 make golden ACCOUNT=vendor_gadgets_01          # labeling skeleton; refuses to overwrite
 make update-golden ACCOUNT=vendor_gadgets_01   # append only newly-pulled posts
 make harness GOLDEN=eval/golden/vendor_gadgets_01.json CONFIG=pipeline/config/experiments/default.yaml
+make pipeline ACCOUNT=vendor_autos_01 [LIMIT=N] [INGEST=1] [LIVE=1] [FORCE_PROFILE=1]
 make stage5  GOLDEN=... STAGE2=... STAGE3=... STAGE4=... LABEL="..." [APPEND=1]
 make snapshot VENDOR=<ig_username> GOLDEN=...  # Stage 6 baseline
 make sync     VENDOR=<ig_username> GOLDEN=... CHANGES=report/changes_x.json TOKEN_ENV=...
@@ -152,6 +153,8 @@ defaults to `None`, so it is guarded by
 | Raw dump | `runs/<account_label>/raw/dump_<ts>.json` | account_label |
 | Stage 1 profile cache | `runs/<account_label>/profile.json` | account_label |
 | Golden set | `eval/golden/<account_label>.json` | account_label |
+| Chained catalog | `runs/<account_label>/catalog.json` | account_label |
+| Stage 5 bucket split | `runs/<account_label>/buckets/{auto_import,needs_attention,auto_exclude}.json` | account_label |
 | Harness predictions | `report/<vendor_id>/stage{2,3,4}_<model>_predictions.json` | vendor_id + model |
 | Token log | `report/token_log.csv` | append-only, has `vendor_id` column |
 | Stage 6 snapshot | `data/snapshots/<vendor_handle>/` | vendor_handle |
@@ -183,6 +186,16 @@ sanctioned workaround, not something to re-investigate — see `FINDINGS.md` 202
 `media_product_type=REELS`; its `media_url` ends in `.mp4`. Never hand it to a vision model or
 `PIL.Image.open()`. Always resolve through `pipeline/types.py::vision_image_url()`, which
 prefers `thumbnail_url` (a `.jpg`, present only on VIDEO media) and falls back to `media_url`.
+
+**Gemini's free tier caps at 15 requests/minute/model, not just ~400/day.** A
+10-post run makes ~20 calls and bursts straight through it if nothing paces them; the
+429s are then absorbed by `complete_structured()`'s transient-retry loop until Stage 3
+exhausts its budget and drops to `_regex_fallback()`, so the run reports clean scores
+over partly-heuristic output and fails `make verify` on the fallback check.
+`pipeline/llm_client.py::throttle()` spaces every provider call by
+`LLM_MIN_CALL_INTERVAL` seconds (default 4.5; set 0 on a paid tier). **Any new call
+site that reaches a provider must call it** — the vision Pass B calls bypass
+`complete_structured()` and throttle themselves for exactly this reason.
 
 **`estimated_cost_usd` in `report/token_log.csv` is hardcoded to 0.0.** Every "Cost: $X" the
 harness prints is `cost_per_call_usd` × call count, not real spend. Real cost must be computed

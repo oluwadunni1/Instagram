@@ -34,14 +34,22 @@ Cost and escalation figures in the summary are read back from
 model string passed to litellm at call time, so the summary cannot be fooled
 by a config's display label (FINDINGS.md 2026-09-07).
 
+Stages run batched - Stage 2 over every post, then Stage 3 over only the posts
+Stage 2 called listings, and so on - rather than one post through all five. The
+work and the call count are identical either way (Stages 3/4 are still gated on
+Stage 2's prediction); batching just means each stage has a moment where it is
+finished, which is what `--live` prints a summary at.
+
 Usage:
     uv run scripts/run_pipeline.py --account vendor_gadgets_01
     uv run scripts/run_pipeline.py --account vendor_gadgets_01 --limit 8
     uv run scripts/run_pipeline.py --account vendor_new --ingest --token-env IG_ACCESS_TOKEN_GADGETS
     uv run scripts/run_pipeline.py --account vendor_autos_01 --changes report/changes.json
+    uv run scripts/run_pipeline.py --account vendor_new_01 --live --limit 10
 
-Writes only runs/<account>/catalog.json (and rows in report/token_log.csv).
-Never touches eval/golden/ or data/snapshots/.
+Writes runs/<account>/catalog.json, one JSON file per Stage 5 bucket under
+runs/<account>/buckets/, and rows in report/token_log.csv. Never touches
+eval/golden/ or data/snapshots/.
 """
 
 from __future__ import annotations
@@ -98,6 +106,170 @@ def normalize_post(raw: dict, vendor_username: str | None) -> Post:
     }
 
 
+BUCKETS = ("auto_import", "needs_attention", "auto_exclude")
+
+NAME_SNIPPET_CHARS = 32
+
+
+def _banner(title: str) -> None:
+    print("")
+    print(f"=== {title} ".ljust(78, "="))
+
+
+def _trace(index: int, total: int, post_id: str, detail: str) -> None:
+    print(f"  [{index}/{total}] {post_id}  {detail}")
+
+
+def _money(price: dict | None) -> str:
+    """Human-readable price, distinguishing 'no price exists' from 'a price was
+    claimed but no number came back' - the second is a model defect worth seeing
+    on screen, the first is a correct and common answer (brief section 11)."""
+    price = price or {}
+    value = price.get("value")
+    if not isinstance(value, int):
+        source = price.get("source") or "none"
+        return "no price" if source == "none" else f"price missing (source={source})"
+    return f"{price.get('currency') or ''}{value:,}".strip()
+
+
+def _triage_brief(result: dict) -> str:
+    post_type = result.get("post_type") or "unknown"
+    confidence = result.get("confidence")
+    shown = f"{confidence:.2f}" if isinstance(confidence, (int, float)) else "?"
+    return f"{post_type:<18} conf={shown}" + ("  [vision]" if result.get("escalated") else "")
+
+
+def _product_brief(products: list[dict]) -> str:
+    if not products:
+        return "no products extracted"
+    first = products[0]
+    name = (first.get("name") or "(unnamed)")[:NAME_SNIPPET_CHARS]
+    extra = f"  (+{len(products) - 1} more)" if len(products) > 1 else ""
+    return f"{len(products)} product(s)  {name} - {_money(first.get('price'))}{extra}"
+
+
+def _stage_calls(run_id: str, stage: str) -> int:
+    """Calls logged for one stage of this run, read back from
+    report/token_log.csv rather than counted in-process - the same reason
+    print_summary() reads usage from the log (FINDINGS.md 2026-09-07)."""
+    return read_run_usage(run_id)["by_stage"].get(stage, {}).get("calls", 0)
+
+
+def _print_stage1(profile: dict) -> None:
+    _banner("Stage 1: account profile - one LLM call, cached per account")
+    print(json.dumps(profile, indent=2, ensure_ascii=False))
+
+
+def _print_stage2_summary(stage2_by_id: dict[str, dict]) -> None:
+    total = len(stage2_by_id)
+    kinds = Counter(result.get("post_type") or "unknown" for result in stage2_by_id.values())
+    escalated = sum(1 for result in stage2_by_id.values() if result.get("escalated"))
+    rate = escalated / total if total else 0.0
+
+    print("")
+    print(f"  Triaged {total} post(s):")
+    for kind, count in kinds.most_common():
+        print(f"    {kind:<20} {count:>3}")
+    print(f"    {'vision escalations':<20} {escalated:>3}/{total} = {rate * 100:.0f}%")
+    if rate > 0.4:
+        print("    *** >40% - brief section 5 says fix the text prompt before reaching "
+              "for a bigger model ***")
+
+
+def _print_stage3_summary(stage3_by_id: dict[str, list[dict]], run_id: str) -> None:
+    products = [product for result in stage3_by_id.values() for product in result]
+    sources = Counter((product.get("price") or {}).get("source") or "none" for product in products)
+    confidences = [
+        product["extraction_confidence"] for product in products
+        if isinstance(product.get("extraction_confidence"), (int, float))
+    ]
+    priced = sum(count for source, count in sources.items() if source != "none")
+
+    print("")
+    print(f"  Extracted {len(products)} product(s) from {len(stage3_by_id)} listing(s):")
+    print(f"    {'with a price':<20} {priced:>3}/{len(products)}")
+    for source, count in sources.most_common():
+        print(f"      price.source={source:<12} {count:>3}")
+    if confidences:
+        print(f"    {'avg confidence':<20} {sum(confidences) / len(confidences):.2f}")
+    print(f"    {'vision escalations':<20} {_stage_calls(run_id, 'stage3_extract_pass_b'):>3}")
+
+    # No golden set on this path, so there is no accuracy to report - showing a
+    # few real extractions is what makes the numbers above mean something.
+    if products:
+        print("    Sample:")
+        for product in products[:3]:
+            name = (product.get("name") or "(unnamed)")[:44]
+            print(f"      {name} - {_money(product.get('price'))}")
+
+
+def _print_stage4_summary(stage4_by_id: dict[str, list[dict]], run_id: str) -> None:
+    signals = Counter(signal.get("signal") for result in stage4_by_id.values() for signal in result)
+    with_signals = sum(1 for result in stage4_by_id.values() if result)
+    calls = _stage_calls(run_id, "stage4_signals")
+    considered = len(stage4_by_id)
+
+    print("")
+    print(f"  Signals on {with_signals}/{considered} listing(s):")
+    for signal, count in signals.most_common():
+        print(f"    {signal:<22} {count:>3}")
+    if not signals:
+        print("    (none detected)")
+    print(f"    {'LLM calls made':<22} {calls:>3}/{considered}")
+    # Only claim the prefilter did the saving when the stage demonstrably reached
+    # a model at all - zero logged calls means something else is going on.
+    if 0 < calls < considered:
+        print(f"    {'prefilter skipped':<22} {considered - calls:>3}  at zero cost")
+
+
+def _print_stage5_summary(items: list[dict]) -> None:
+    """Per-post routing detail - which posts need a human, and why.
+
+    print_summary() reports the same buckets as counts; this is the part a
+    reviewer actually acts on, so it names posts rather than totalling them.
+    """
+    buckets = Counter(item["bucket"] for item in items)
+
+    print("")
+    for bucket in BUCKETS:
+        count = buckets.get(bucket, 0)
+        share = count / len(items) * 100 if items else 0.0
+        print(f"    {bucket:<18} {count:>3}/{len(items)} ({share:.0f}%)")
+
+    attention = [item for item in items if item["bucket"] == "needs_attention"]
+    if attention:
+        print("")
+        print("  Needs attention - these go to a human, with the reason attached:")
+        for item in attention:
+            print(f"    {item['post_id']}: {'; '.join(item['flags'])}")
+
+    excluded = [item for item in items if item["bucket"] == "auto_exclude"]
+    if excluded:
+        print("")
+        print("  Auto-excluded - not product listings:")
+        for item in excluded:
+            print(f"    {item['post_id']}: {item.get('post_type')}")
+
+
+def write_bucket_files(catalog: dict, catalog_path: Path) -> dict[str, Path]:
+    """One JSON file per Stage 5 bucket, beside the catalog.
+
+    catalog.json holds every post in one list, so inspecting just the posts that
+    need a human means filtering it by hand. These are the same item objects,
+    pre-split - each carries the `flags` that explain why it landed where it did.
+    """
+    bucket_dir = catalog_path.parent / "buckets"
+    bucket_dir.mkdir(parents=True, exist_ok=True)
+
+    written: dict[str, Path] = {}
+    for bucket in BUCKETS:
+        items = [item for item in catalog["items"] if item["bucket"] == bucket]
+        path = bucket_dir / f"{bucket}.json"
+        path.write_text(json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8")
+        written[bucket] = path
+    return written
+
+
 def posts_needing_work(changes_path: Path) -> set[str]:
     """Post ids from a Stage 6 sync report that still need Stages 2-5 run on them.
 
@@ -131,11 +303,21 @@ def run_pipeline(
     limit: int | None = None,
     out_path: Path | None = None,
     post_ids: set[str] | None = None,
+    live: bool = False,
+    force_profile: bool = False,
 ) -> dict:
     """Runs Stages 1-5 chained over the latest raw dump and returns the catalog.
 
     post_ids restricts the run to those posts - the incremental path a Stage 6
     sync feeds. Applied before `limit`, so the two compose predictably.
+
+    live prints a per-post trace and a summary as each stage finishes, for
+    walking an audience through an onboarding run. It changes what is printed,
+    never what is computed or called.
+
+    force_profile re-runs Stage 1 even when runs/<account>/profile.json already
+    exists - otherwise a rehearsed demo silently shows a cached profile and makes
+    no call.
     """
     config = load_experiment_config(config_path)
     dump_path = latest_dump(account_label)
@@ -169,11 +351,14 @@ def run_pipeline(
 
     # --- Stage 1: once per account, cached on disk after the first run ------
     profile_model = config.stage1_profile.model if config.stage1_profile else None
-    profile = get_or_create_profile(account_label, profile_model=profile_model)
+    profile = get_or_create_profile(account_label, profile_model=profile_model,
+                                    force_refresh=force_profile)
     profile_dict = profile.model_dump()
     logger.info("Stage 1 profile: category=%s style=%s pricing=%s vendor=%s",
                 profile_dict.get("business_category"), profile_dict.get("seller_style"),
                 profile_dict.get("pricing_behavior"), profile_dict.get("vendor_username"))
+    if live:
+        _print_stage1(profile_dict)
 
     triage_fn, triage_label, _ = load_stage_fn(
         config, "stage2_triage", run_id=run_id, vendor_id=vendor_id
@@ -187,14 +372,16 @@ def run_pipeline(
             config, "stage4_signals", run_id=run_id, vendor_id=vendor_id
         )
 
-    items: list[dict] = []
     stage_reach = Counter()   # how many posts each stage was actually invoked on
     errors: list[dict] = []
+    total_posts = len(posts)
 
-    for post in posts:
+    # --- Stage 2: every post ------------------------------------------------
+    if live:
+        _banner("Stage 2: triage - which posts are product listings?")
+    stage2_by_id: dict[str, dict] = {}
+    for index, post in enumerate(posts, start=1):
         post_id = post["post_id"]
-
-        # --- Stage 2 ------------------------------------------------------
         stage_reach["stage2"] += 1
         try:
             stage2 = triage_fn(post, profile_dict)
@@ -205,34 +392,70 @@ def run_pipeline(
             logger.error("[stage2 ERROR] %s: %s: %s", post_id, type(exc).__name__, exc)
             errors.append({"post_id": post_id, "stage": "stage2", "error": str(exc)})
             stage2 = {"post_type": "unknown", "confidence": 0.0, "escalated": False}
+        stage2_by_id[post_id] = stage2
+        if live:
+            _trace(index, total_posts, post_id, _triage_brief(stage2))
+    if live:
+        _print_stage2_summary(stage2_by_id)
 
-        is_listing = stage2.get("post_type") == "product_listing"
+    # --- Stages 3 + 4: only for predicted listings --------------------------
+    # route_post() returns auto_exclude for anything that isn't a
+    # product_listing before it reads either result, so calling them for a
+    # non-listing would be spend with no effect on the outcome. This is the
+    # chaining saving the harness cannot show.
+    listings = [post for post in posts
+                if stage2_by_id[post["post_id"]].get("post_type") == "product_listing"]
+    total_listings = len(listings)
 
-        # --- Stage 3 + 4: only for predicted listings ----------------------
-        # route_post() returns auto_exclude for anything that isn't a
-        # product_listing before it reads either result, so calling them for
-        # a non-listing would be spend with no effect on the outcome. This is
-        # the chaining saving the harness cannot show.
+    if live:
+        _banner(f"Stage 3: extraction - {total_listings} of {total_posts} post(s) qualify")
+    stage3_by_id: dict[str, list[dict]] = {}
+    for index, post in enumerate(listings, start=1):
+        post_id = post["post_id"]
+        stage_reach["stage3"] += 1
         stage3: list[dict] = []
-        stage4: list[dict] = []
+        try:
+            stage3 = extract_fn(post, profile_dict)
+        except Exception as exc:
+            logger.error("[stage3 ERROR] %s: %s: %s", post_id, type(exc).__name__, exc)
+            errors.append({"post_id": post_id, "stage": "stage3", "error": str(exc)})
+        stage3_by_id[post_id] = stage3
+        if live:
+            _trace(index, total_listings, post_id, _product_brief(stage3))
+    if live:
+        _print_stage3_summary(stage3_by_id, run_id)
 
-        if is_listing:
-            stage_reach["stage3"] += 1
+    stage4_by_id: dict[str, list[dict]] = {}
+    if signals_fn is not None:
+        if live:
+            _banner("Stage 4: signals - free regex prefilter gates every LLM call")
+        for post in listings:
+            post_id = post["post_id"]
+            stage_reach["stage4"] += 1
+            stage4: list[dict] = []
             try:
-                stage3 = extract_fn(post, profile_dict)
+                stage4 = signals_fn(post, profile_dict)
             except Exception as exc:
-                logger.error("[stage3 ERROR] %s: %s: %s", post_id, type(exc).__name__, exc)
-                errors.append({"post_id": post_id, "stage": "stage3", "error": str(exc)})
+                logger.error("[stage4 ERROR] %s: %s: %s", post_id, type(exc).__name__, exc)
+                errors.append({"post_id": post_id, "stage": "stage4", "error": str(exc)})
+            stage4_by_id[post_id] = stage4
+            # Only posts that actually carry a signal are worth a line: a post
+            # the prefilter skipped and a post the model cleared both return [],
+            # and printing 30 identical empty lines buries the ones that matter.
+            if live and stage4:
+                print(f"  {post_id}  {', '.join(signal.get('signal', '?') for signal in stage4)}")
+        if live:
+            _print_stage4_summary(stage4_by_id, run_id)
 
-            if signals_fn is not None:
-                stage_reach["stage4"] += 1
-                try:
-                    stage4 = signals_fn(post, profile_dict)
-                except Exception as exc:
-                    logger.error("[stage4 ERROR] %s: %s: %s", post_id, type(exc).__name__, exc)
-                    errors.append({"post_id": post_id, "stage": "stage4", "error": str(exc)})
-
-        # --- Stage 5: deterministic, zero LLM ------------------------------
+    # --- Stage 5: deterministic, zero LLM -----------------------------------
+    if live:
+        _banner("Stage 5: routing - deterministic, zero LLM calls")
+    items: list[dict] = []
+    for post in posts:
+        post_id = post["post_id"]
+        stage2 = stage2_by_id[post_id]
+        stage3 = stage3_by_id.get(post_id, [])
+        stage4 = stage4_by_id.get(post_id, [])
         routed = route_post(post, stage2, stage3, stage4)
 
         items.append({
@@ -252,6 +475,9 @@ def run_pipeline(
             "products": stage3,
             "signals": stage4,
         })
+
+    if live:
+        _print_stage5_summary(items)
 
     buckets = Counter(item["bucket"] for item in items)
     flags = Counter(flag for item in items for flag in item["flags"])
@@ -295,7 +521,12 @@ def run_pipeline(
     out_path = out_path or Path("runs") / account_label / "catalog.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(catalog, indent=2, ensure_ascii=False), encoding="utf-8")
+    bucket_paths = write_bucket_files(catalog, out_path)
+
     catalog["_out_path"] = str(out_path).replace("\\", "/")
+    catalog["_bucket_paths"] = {
+        bucket: str(path).replace("\\", "/") for bucket, path in bucket_paths.items()
+    }
     return catalog
 
 
@@ -369,15 +600,29 @@ def print_summary(catalog: dict) -> None:
 
     lines.append("")
     lines.append(f"  Catalog written to {catalog['_out_path']}")
+
+    bucket_paths = catalog.get("_bucket_paths") or {}
+    if bucket_paths:
+        lines.append("")
+        lines.append("  Inspect a bucket directly (each item carries the flags explaining it):")
+        for bucket in BUCKETS:
+            path = bucket_paths.get(bucket)
+            if path:
+                lines.append(f"    {bucket:<16} {s.get(bucket, 0):>3} post(s)  ->  {path}")
+
     print("\n".join(lines))
 
 
 def main() -> None:
     configure_logging()
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:  # pragma: no cover - non-reconfigurable stream
-        pass
+    # Both streams: --live prints caption-derived product names on stdout while
+    # configure_logging() writes errors to stderr, and an emoji reaching a cp1252
+    # Windows console raises UnicodeEncodeError mid-run.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except Exception:  # pragma: no cover - non-reconfigurable stream
+            pass
 
     parser = argparse.ArgumentParser(
         description="Run Stages 1-5 chained on live predictions and emit a catalog JSON. "
@@ -405,6 +650,14 @@ def main() -> None:
                              "makes no Instagram API calls at all.")
     parser.add_argument("--token-env", default="IG_ACCESS_TOKEN",
                         help="Env var holding the IG token, used only with --ingest")
+    parser.add_argument("--live", action="store_true",
+                        help="Print a per-post trace and a summary as each stage finishes, "
+                             "for walking through an onboarding run. Changes what is printed, "
+                             "never what is computed or called.")
+    parser.add_argument("--force-profile", action="store_true",
+                        help="Re-run Stage 1 even if runs/<account>/profile.json exists. Without "
+                             "it a repeated run reuses the cached profile and makes no Stage 1 "
+                             "call - which is correct, but looks like nothing happened.")
     args = parser.parse_args()
 
     if args.ingest:
@@ -422,7 +675,10 @@ def main() -> None:
         post_ids = {pid.strip() for pid in args.post_ids.split(",") if pid.strip()}
 
     catalog = run_pipeline(args.account, args.config, limit=args.limit, out_path=args.out,
-                            post_ids=post_ids)
+                            post_ids=post_ids, live=args.live,
+                            force_profile=args.force_profile)
+    if args.live:
+        _banner("Run complete")
     print_summary(catalog)
 
 

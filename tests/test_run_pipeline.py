@@ -142,3 +142,49 @@ def test_a_sync_with_nothing_to_do_selects_nothing(tmp_path: Path) -> None:
     path = _changes(tmp_path, [{"post_id": "p1", "change_type": "content_changed"}])
 
     assert run_pipeline.posts_needing_work(path) == set()
+
+
+# --- per-bucket output files -----------------------------------------------
+
+def _catalog(items: list[dict]) -> dict:
+    return {"account_label": "vendor_demo", "items": items}
+
+
+def test_every_bucket_file_is_written_even_when_empty(tmp_path: Path) -> None:
+    """An empty bucket must still produce its file. These paths get printed and
+    then opened by hand; a path that exists only when it happens to be non-empty
+    is one someone reads as a broken run."""
+    catalog = _catalog([{"post_id": "p1", "bucket": "auto_import", "flags": []}])
+
+    written = run_pipeline.write_bucket_files(catalog, tmp_path / "catalog.json")
+
+    assert set(written) == set(run_pipeline.BUCKETS)
+    for bucket, path in written.items():
+        assert path.exists(), f"{bucket} file missing"
+    assert json.loads(written["needs_attention"].read_text(encoding="utf-8")) == []
+
+
+def test_items_are_partitioned_with_their_flags_intact(tmp_path: Path) -> None:
+    """The flags are the reason a post landed in needs_attention, so they are
+    the whole point of splitting the catalog up - a reviewer opens the file and
+    reads why without cross-referencing anything."""
+    catalog = _catalog([
+        {"post_id": "keep", "bucket": "auto_import", "flags": []},
+        {"post_id": "check", "bucket": "needs_attention", "flags": ["Missing price"]},
+        {"post_id": "skip", "bucket": "auto_exclude", "flags": []},
+    ])
+
+    written = run_pipeline.write_bucket_files(catalog, tmp_path / "catalog.json")
+    attention = json.loads(written["needs_attention"].read_text(encoding="utf-8"))
+
+    assert [item["post_id"] for item in attention] == ["check"]
+    assert attention[0]["flags"] == ["Missing price"]
+    assert len(json.loads(written["auto_import"].read_text(encoding="utf-8"))) == 1
+
+
+def test_bucket_files_land_beside_the_catalog(tmp_path: Path) -> None:
+    """--out moves the catalog; the buckets have to follow it rather than
+    scattering back into runs/<account>/."""
+    written = run_pipeline.write_bucket_files(_catalog([]), tmp_path / "nested" / "catalog.json")
+
+    assert written["auto_import"].parent == tmp_path / "nested" / "buckets"
