@@ -22,6 +22,7 @@ from pipeline.settings import (
     gemini_auth_headers,
     redact_tokens,
     strip_url_credentials,
+    typesafe_auth_headers,
 )
 
 SENTINEL = "AIzaFAKEtestkeyDONOTUSE0123456789"
@@ -74,6 +75,27 @@ def test_gemini_auth_headers_uses_header_and_tolerates_missing_key() -> None:
     # No key configured must not produce a header with a None value (requests
     # raises on that); let the API return its own "missing key" error.
     assert gemini_auth_headers(None) == {}
+
+
+# --- typesafe_auth_headers -------------------------------------------------
+
+def test_typesafe_auth_headers_uses_bearer_and_tolerates_missing_key() -> None:
+    headers = typesafe_auth_headers(SENTINEL)
+    assert headers["Authorization"] == f"Bearer {SENTINEL}"
+    assert headers["Content-Type"] == "application/json"
+    # Same rule as gemini_auth_headers: no key means no header, so the caller
+    # gets TypeSafe's own "missing credentials" error instead of requests
+    # raising on a None header value.
+    assert typesafe_auth_headers(None) == {}
+
+
+def test_typesafe_bearer_header_is_redactable() -> None:
+    """Jev is reached outside complete_structured() (it is not an
+    OpenAI-compatible endpoint), so its call site logs its own errors. The
+    existing Bearer rule must already cover the header this helper builds,
+    or the third credential leak in this project writes itself."""
+    leaked = f"401 Client Error: {typesafe_auth_headers(SENTINEL)}"
+    assert SENTINEL not in redact_tokens(leaked)
 
 
 # --- compute_caption_embedding --------------------------------------------

@@ -67,6 +67,42 @@ def gemini_auth_headers(api_key: str | None) -> dict[str, str]:
     return {"x-goog-api-key": api_key} if api_key else {}
 
 
+def get_typesafe_api_key(var_name: str = "TYPESAFE_API_KEY") -> str | None:
+    """Looks up the TypeSafe (Jev) API key by env var name.
+
+    Jev is reached at POST https://api.typesafe.ai/v1/systemone, which is
+    NOT an OpenAI-compatible endpoint - it takes {state, model, questions}
+    and returns typed decisions rather than text, so it cannot go through
+    litellm's completion() or complete_structured(). Any call site that
+    reaches it therefore resolves the key here and sets its own headers,
+    the same way the raw Gemini embedding call in media_fingerprint.py does.
+
+    Takes a var_name for the same reason get_ig_access_token() does: a
+    second key (a teammate's, or a separate billing account) can live in
+    .env under its own name without overwriting this one.
+    """
+    return os.environ.get(var_name)
+
+
+def typesafe_auth_headers(api_key: str | None) -> dict[str, str]:
+    """Authorization + content-type headers for a TypeSafe System One call.
+
+    Bearer auth, per docs.typesafe.ai/api. Same reasoning as
+    ig_auth_headers() and gemini_auth_headers(): the credential goes in a
+    header and never in the URL, so a 429 or a connection error cannot print
+    it through an exception message that embeds the request URL. Note that
+    redact_tokens() already scrubs `Bearer <value>`, so a leaked header in a
+    logged exception is covered too - provided the call site logs
+    redact_tokens(exc) rather than a bare exc.
+
+    Returns {} when the key is unset, so the caller gets TypeSafe's own
+    "missing credentials" error rather than a header with a None value.
+    """
+    if not api_key:
+        return {}
+    return {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
+
 # Credential-carrying query parameters, stripped from any URL that gets
 # followed (pagination) and redacted out of anything that gets logged.
 CREDENTIAL_QUERY_PARAMS = frozenset({"access_token", "key", "api_key", "api-key", "client_secret"})
