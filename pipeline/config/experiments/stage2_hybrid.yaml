@@ -1,0 +1,49 @@
+name: stage2_hybrid
+description: >-
+  Stage 2 as a cross-provider cascade: Jev Pass A, Gemini on escalation, binary
+  product-vs-not. Run with --only-stage 2; stage3_extract below is required by the
+  config schema but never invoked.
+
+  Two triggers with deliberately different targets. An empty caption goes straight
+  to VISION and skips Jev entirely - there is no text to read. Low confidence WITH
+  a caption goes to TEXT, because the low-confidence cases observed are textual
+  boundary calls where re-reading the photo adds nothing, and text is far cheaper.
+
+  Gate a run from this config with THREE --expect-model flags (jev-1.13.0,
+  gemini/gemini-3.5-flash-lite, gemini/gemini-3.5-flash); a cascade legitimately
+  calls all three and omitting one reads as a violation.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage_hybrid
+  function: triage_post_hybrid
+  jev_model: jev-latest
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash
+  threshold: 0.5
+  escalate_below: 0.80
+  model: Jev + Gemini Hybrid
+  cost_per_call_usd: 0.0
+  note: >-
+    TWO THRESHOLDS, not one, and they do different jobs. `threshold` is Jev's
+    product/not decision boundary. `escalate_below` is the confidence under which
+    the post is handed to Gemini. Conflating them would be silent, hence the
+    distinct names.
+
+    escalate_below 0.80 was selected on the TUNE half (vendor_autos_01) only,
+    where 0.80 and 0.85 both reach 100% so the cheaper escalation rate wins.
+    vendor_gadgets_01 reaches 40/41 at 0.85, but that was observed with knowledge
+    of the test half and is deliberately not what ships here.
+
+    None of these keys is named `model` - that is reserved and stripped by
+    load_stage_fn(), which raises rather than binding silently. The `model` value
+    above is a display label for log lines and the predictions filename.
+
+# REQUIRED BY THE SCHEMA, NEVER INVOKED with --only-stage 2.
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  model: Gemini Family (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: Not part of this experiment. Present only because ExperimentConfig requires it.

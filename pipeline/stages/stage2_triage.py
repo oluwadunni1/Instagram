@@ -128,8 +128,16 @@ def _pass_a(
     run_id: str | None,
     vendor_id: str | None,
     post_id: str,
+    stage_name: str = "stage2_triage_pass_a",
 ) -> TriageResult:
-    """Cheap text-only classification pass."""
+    """Cheap text-only classification pass.
+
+    stage_name defaults to this stage's own label and exists so another
+    cascade can reuse this pass while keeping its rows distinguishable in
+    report/token_log.csv - stage2_triage_hybrid.py calls it as Gemini's
+    escalation target, and without a distinct label its cost could not be
+    told apart from a pure-Gemini run.
+    """
     caption = post.get("caption") or ""
     profile_context = f"Account profile: {profile}" if profile else "Account profile: unavailable"
     user_prompt = f"{profile_context}\n\nCaption:\n{caption}"
@@ -139,7 +147,7 @@ def _pass_a(
         system_prompt=PASS_A_SYSTEM_PROMPT,
         user_prompt=user_prompt,
         schema=TriageResult,
-        stage_name="stage2_triage_pass_a",
+        stage_name=stage_name,
         run_id=run_id,
         vendor_id=vendor_id,
         post_id=post_id,
@@ -156,6 +164,7 @@ def _pass_b(
     run_id: str | None,
     vendor_id: str | None,
     post_id: str,
+    stage_name: str = "stage2_triage_pass_b",
 ) -> TriageResult:
     """Vision escalation. NOTE: complete_structured() currently only sends
     text messages - this constructs a multimodal message directly via
@@ -188,7 +197,7 @@ def _pass_b(
         messages=messages,
         temperature=0.0,
         response_format={"type": "json_object"},
-        metadata={"run_name": "stage2_triage_pass_b", "tags": ["stage2_triage_pass_b"]},
+        metadata={"run_name": stage_name, "tags": [stage_name]},
     )
     parsed = json.loads(response.choices[0].message.content)
     result = TriageResult.model_validate(parsed)
@@ -200,7 +209,7 @@ def _pass_b(
             run_id=run_id,
             vendor_id=vendor_id or "unknown",
             post_id=post_id,
-            stage="stage2_triage_pass_b",
+            stage=stage_name,
             model=vision_model,
             prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
             completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
