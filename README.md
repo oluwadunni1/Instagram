@@ -49,9 +49,15 @@ calls bypass it (multimodal message shapes) and log and throttle themselves.
 Every figure comes from a run that passed `scripts/verify_run.py`. `report/token_log.csv` is the
 audit trail. Two vendors: `vendor_autos_01` (30 posts), `vendor_gadgets_01` (41 posts).
 
+> **Stage 2 was re-baselined on 2026-09-21** and the triage row below is stale. The five post
+> types had never been defined anywhere in the repo, so every model was reproducing a class
+> boundary nobody had written down. `eval/LABEL_CODEBOOK.md` now defines them and both Stage 2
+> prompts carry the definitions, which makes figures measured before that date incomparable.
+> See [Stage 2, re-baselined](#stage-2-re-baselined) for what is currently gated.
+
 | Target | Measured (Gemini cascade) | |
 |---|---|---|
-| Triage precision >= 90% | 97% autos (29/30), 93% gadgets (38/41) | met |
+| Triage precision >= 90% | 97% autos (29/30), 93% gadgets (38/41) | met, **pre-codebook** |
 | Price accuracy >= 85% | 100% (19/19, 31/31) | met |
 | Missing-price recall 100% | 6/6, 3/3 | met |
 | Stale/stock flag precision >= 75% | micro F1 88% autos, 77% gadgets | met |
@@ -83,6 +89,57 @@ gate twice on invalid JSON and has no recorded numbers.
 In the first Stage 2 comparison, Llama and Gemini both scored 27/30 while getting zero of the
 same posts wrong, both at 0.8 to 0.95 confidence on their own errors. A confidence threshold
 only catches uncertainty a model admits to.
+
+### Stage 2, re-baselined
+
+Everything in this subsection is scored on **product vs not-product**, which is the brief's
+actual target and what every downstream consumer reduces `post_type` to anyway: Stage 5, Stage 6
+and `run_pipeline.py` all test only `!= "product_listing"`.
+
+| | autos (tune) | gadgets (test) | precision | escalation |
+|---|---|---|---|---|
+| Jev alone (binary) | 28/30 = 93% | 33/41 = 80% | 100% | n/a, no vision |
+| **Jev + Gemini hybrid** | **30/30 = 100%** | **38/41 = 93%** | **100%** | 20% / 15% |
+| Gemini alone | 30/30 = 100% | see caveat | 97% | 1/30 |
+
+Run ids: `stage2_jev_20260921T084428Z`, `stage2_jev_20260921T084716Z`,
+`stage2_hybrid_20260921T091816Z`, `stage2_hybrid_20260921T092310Z`,
+`family_gemini_20260921T081023Z`. All passed the gate.
+
+**The hybrid** runs Jev as a text-only Pass A and escalates two ways: a caption-less post goes
+straight to Gemini vision (skipping Jev entirely, since there is nothing to read), and a
+low-confidence post with a caption goes to Gemini text. Jev alone loses mainly because five
+gadgets posts have no caption at all and carry their price on the image, which a text-only model
+cannot reach.
+
+**Cost is where the funnel shows itself.** On gadgets the hybrid spent $0.0084 across 42 calls:
+
+| | calls | cost | share |
+|---|---|---|---|
+| Jev | 36 | $0.000956 | 11% |
+| Gemini vision | 5 | $0.007175 | **86%** |
+| Gemini text | 1 | $0.000244 | 3% |
+
+Five vision calls are 86% of the bill. The cheap first pass is close to free, so the lever worth
+pulling is the escalation rate, not the Pass A model.
+
+**Jev's confidence is better calibrated than Gemini's**, which is the property a
+confidence-triggered cascade actually needs: separation between confidence-when-right and
+confidence-when-wrong is +0.217 on autos and +0.113 on gadgets, against Gemini's +0.074.
+
+**Caveat on Gemini alone for gadgets.** Not currently measurable. Two attempts on the new prompt
+both failed the gate on provider 503s (36/41 and 34/41, with 1 and 3 errored posts). The 39/41
+previously recorded is from the definition-free prompt and is not comparable.
+
+**The codebook has a known defect, unfixed.** All three remaining hybrid misses on gadgets are
+posts the codebook mis-specifies: two marked SOLD while still listing a price, and one
+"available soon". The codebook says a completed sale is a `testimonial_repost`, which puts a
+Stage 4 concern (is it still available) into a Stage 2 category (is this a product post). One of
+those posts escalated to Gemini and **Gemini agreed with Jev**, so two independent models given
+the same definitions disagree with the gold in the same direction. The autos labels and the
+gadgets labels genuinely differ on this, and the codebook encoded the autos convention as
+universal. Fixing it means editing the clause, not the models. It is unfixed because those posts
+are in the test half.
 
 ## Cost
 
