@@ -1,13 +1,19 @@
 """
 Stage 2 triage as a cross-provider cascade: Jev Pass A, Gemini on escalation.
 
-    caption empty/emoji-only?  --yes-->  Gemini VISION   (no Jev call at all)
-             | no
+    caption empty/emoji-only?  --yes-->  OCR the image (local, free)
+             | no                          |
+             |                             +-- text found --> Jev on the OCR text
+             |                             |                    +-- unsure --> Gemini VISION
+             |                             +-- nothing found --> Gemini VISION
              v
           Jev noul  --confidence < escalate_below-->  Gemini TEXT
              | else
              v
           Jev's answer
+
+Three tiers, cheapest first, which is the brief's funnel applied to the
+escalation path itself rather than only to the main line.
 
 WHY THIS SHAPE. Two gated runs measured what each model can do alone on the
 binary product-vs-not question:
@@ -30,9 +36,11 @@ all-Gemini cascade's escalation trigger was never a reliable safety net.
 
 TWO TRIGGERS, TWO TARGETS, deliberately different:
 
-  - An empty caption goes to VISION. There is no text to re-read, so a second
-    text pass would ask the same unanswerable question. Jev is skipped
-    entirely for these, since a text model has nothing to work with.
+  - An empty caption goes to OCR first, then vision only if OCR reads nothing
+    or Jev is still unsure. A spike over the five caption-less gadgets posts
+    read the product name on 5/5 and the price on 5/5, and those five posts
+    were 86% of the hybrid's gadgets bill. OCR is local and free, so a failed
+    attempt costs latency and nothing else.
   - Low confidence WITH a caption goes to TEXT (flash-lite), not vision. The
     low-confidence cases observed are textual boundary calls - a post marked
     SOLD while still listing a price, an "available soon" - where looking at
@@ -48,6 +56,7 @@ from __future__ import annotations
 import logging
 
 from pipeline.jev_client import DEFAULT_JEV_MODEL
+from pipeline.ocr import DEFAULT_MIN_CHARS, extract_text
 from pipeline.stages.stage2_triage import (
     MODEL as GEMINI_MODEL,
     TriageResult,
@@ -90,6 +99,8 @@ def triage_post_hybrid(
     vision_model: str = GEMINI_MODEL,
     threshold: float = DEFAULT_THRESHOLD,
     escalate_below: float = DEFAULT_ESCALATE_BELOW,
+    use_ocr: bool = True,
+    ocr_min_chars: int = DEFAULT_MIN_CHARS,
     run_id: str | None = None,
     vendor_id: str | None = None,
 ) -> dict:
@@ -118,14 +129,42 @@ def triage_post_hybrid(
     # the Jev call here is the point: a text model on an empty caption is a
     # guaranteed waste.
     if _is_uninformative_caption(caption) and image_url:
-        logger.info("[stage2_hybrid] %s: no caption - straight to vision", post_id)
+        # Try OCR before paying for vision. These posts carry the product and
+        # price printed on the picture, which is what OCR is for, and a spike
+        # over the five caption-less gadgets posts read the name on 5/5 and the
+        # price on 5/5. OCR is local and free, so a failed attempt costs only
+        # latency and we fall through to vision exactly as before.
+        ocr_text = None
+        if use_ocr:
+            ocr_text, ocr_reason = extract_text(
+                image_url, post_id=post_id, account_label=vendor_id, min_chars=ocr_min_chars,
+            )
+            logger.info("[stage2_hybrid] %s: no caption - OCR %s", post_id, ocr_reason)
+
+        if ocr_text:
+            # OCR turned a caption-less post into a text-bearing one, which
+            # puts it back inside Jev's reach. This is the whole point: Jev
+            # cannot see images, and that was its one structural limit as a
+            # Pass A.
+            ocr_post = {**post, "caption": ocr_text}
+            jev_ocr = triage_post_jev(
+                ocr_post, profile=profile, jev_model=jev_model, threshold=threshold,
+                run_id=run_id, vendor_id=vendor_id,
+            )
+            if jev_ocr["confidence"] >= escalate_below:
+                return {**jev_ocr, "escalated": True, "escalation_reason": "ocr"}
+            # Jev is unsure even with the OCR text. Vision is still the
+            # fallback - OCR narrows the vision path, it does not replace it.
+            logger.info("[stage2_hybrid] %s: OCR read but Jev unsure (%.2f) - vision",
+                         post_id, jev_ocr["confidence"])
+
         vision = _pass_b(post, profile, vision_model, run_id, vendor_id, post_id,
                           stage_name=VISION_STAGE_NAME)
         return {
             "post_type": _to_binary(vision),
             "confidence": vision.confidence,
             "escalated": True,
-            "escalation_reason": "no_caption",
+            "escalation_reason": "no_caption_vision",
             "p_product": None,
         }
 

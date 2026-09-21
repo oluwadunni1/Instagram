@@ -1,0 +1,12 @@
+OmniBookXFlipLaptopNGAI16-as0023dxultra7
+Processor1TBSolidStateDrive16GBon-board
+LPDDR5XSDRAMWindows11Touchscreen,Multi
+touchenabled4-cell,68Wh
+CCe
+-16.0"2K (1920x1200) IPSLED Display(400 nits)
+HP5MPIRCamera
+PRICENGN1,400,000
+16Pk
+OmniBook
+olusesi
+technologies

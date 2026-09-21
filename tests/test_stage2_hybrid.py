@@ -29,8 +29,20 @@ def _no_key_or_sleep(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture
 def calls(monkeypatch: pytest.MonkeyPatch) -> dict:
-    """Records which passes ran, so routing can be asserted directly."""
-    seen: dict = {"jev": 0, "text": 0, "vision": 0, "text_stage": None, "vision_stage": None}
+    """Records which passes ran, so routing can be asserted directly.
+
+    `ocr_text` controls what the OCR tier returns: None means it read nothing
+    and the caller should fall through to vision.
+    """
+    seen: dict = {"jev": 0, "text": 0, "vision": 0, "ocr": 0,
+                  "text_stage": None, "vision_stage": None, "ocr_text": None}
+
+    def fake_ocr(image_url, post_id="", account_label=None, min_chars=12, use_cache=True):
+        seen["ocr"] += 1
+        text = seen.get("ocr_text")
+        return (text, "ok") if text else (None, "too little text")
+
+    monkeypatch.setattr(hybrid, "extract_text", fake_ocr)
 
     def fake_jev(*a: object, **k: object) -> FakeResponse:
         seen["jev"] += 1
@@ -61,22 +73,64 @@ def post(caption: str = "2024 Toyota Hilux, brand new", image: bool = True) -> d
 
 # --- trigger 1: no caption -------------------------------------------------
 
-def test_empty_caption_goes_to_vision_and_skips_jev(calls: dict) -> None:
-    """The point of running the free regex first: a text model on an empty
-    caption is a guaranteed waste, so Jev must not be called at all."""
+def test_empty_caption_tries_ocr_before_vision(calls: dict) -> None:
+    """OCR is local and free, so it must be attempted before anything is paid
+    for. When OCR reads nothing, vision is still the fallback."""
     result = hybrid.triage_post_hybrid(post(caption=""))
+    assert calls["ocr"] == 1, "OCR must be tried before vision"
     assert calls["vision"] == 1
-    assert calls["jev"] == 0, "Jev must not be called when there is no text to read"
-    assert calls["text"] == 0
-    assert result["escalated"] is True
-    assert result["escalation_reason"] == "no_caption"
+    assert calls["jev"] == 0, "Jev cannot help when neither caption nor OCR has text"
+    assert result["escalation_reason"] == "no_caption_vision"
+
+
+def test_ocr_text_goes_to_jev_and_avoids_vision(calls: dict) -> None:
+    """The whole point of the tier. OCR turns a caption-less post into a
+    text-bearing one, which puts it back inside Jev's reach - Jev cannot see
+    images, and that was its one structural limit as a Pass A."""
+    calls["ocr_text"] = "iPhone 15 Pro Max 256GB Price:NGN730,000"
+    calls["p_yes"] = 0.96
+    result = hybrid.triage_post_hybrid(post(caption=""))
+    assert calls["ocr"] == 1
+    assert calls["jev"] == 1
+    assert calls["vision"] == 0, "a confident Jev read of OCR text must not reach vision"
+    assert result["post_type"] == "product_listing"
+    assert result["escalation_reason"] == "ocr"
+
+
+def test_ocr_read_but_jev_unsure_still_falls_back_to_vision(calls: dict) -> None:
+    """OCR narrows the vision path, it does not replace it. A garbled read
+    that leaves Jev uncertain must not silently become an answer."""
+    calls["ocr_text"] = "sdkfj 88 ???"
+    calls["p_yes"] = 0.55          # confidence 0.55, below the 0.80 default
+    result = hybrid.triage_post_hybrid(post(caption=""))
+    assert calls["ocr"] == 1
+    assert calls["jev"] == 1
+    assert calls["vision"] == 1, "an unsure Jev on OCR text must still escalate"
+    assert result["escalation_reason"] == "no_caption_vision"
+
+
+def test_use_ocr_false_restores_the_old_behaviour(calls: dict) -> None:
+    """The flag exists so the OCR saving can be measured by difference, and so
+    a clone without rapidocr installed behaves identically."""
+    result = hybrid.triage_post_hybrid(post(caption=""), use_ocr=False)
+    assert calls["ocr"] == 0, "use_ocr=False must not even attempt OCR"
+    assert calls["vision"] == 1
+    assert result["escalation_reason"] == "no_caption_vision"
 
 
 def test_emoji_only_caption_counts_as_empty(calls: dict) -> None:
     result = hybrid.triage_post_hybrid(post(caption="🔥🔥🔥"))
+    assert calls["ocr"] == 1
     assert calls["vision"] == 1
-    assert calls["jev"] == 0
-    assert result["escalation_reason"] == "no_caption"
+    assert result["escalation_reason"] == "no_caption_vision"
+
+
+def test_a_caption_bearing_post_never_reaches_ocr(calls: dict) -> None:
+    """OCR is only for posts with nothing to read. Running it on a post that
+    already has a caption would spend latency to learn nothing."""
+    calls["p_yes"] = 0.95
+    hybrid.triage_post_hybrid(post())
+    assert calls["ocr"] == 0
 
 
 def test_empty_caption_without_an_image_falls_through_to_jev(calls: dict) -> None:

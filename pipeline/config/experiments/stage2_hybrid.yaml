@@ -4,10 +4,15 @@ description: >-
   product-vs-not. Run with --only-stage 2; stage3_extract below is required by the
   config schema but never invoked.
 
-  Two triggers with deliberately different targets. An empty caption goes straight
-  to VISION and skips Jev entirely - there is no text to read. Low confidence WITH
-  a caption goes to TEXT, because the low-confidence cases observed are textual
-  boundary calls where re-reading the photo adds nothing, and text is far cheaper.
+  Three tiers on the escalation path, cheapest first. An empty caption goes to
+  local OCR (free); if OCR reads text, that text goes to Jev; only if OCR reads
+  nothing, or Jev is still unsure, does the post reach a vision model. Low
+  confidence WITH a caption goes to Gemini TEXT instead, because those cases are
+  textual boundary calls where re-reading the photo adds nothing.
+
+  use_ocr can be set false to measure the cascade without the OCR tier, which is
+  how the OCR saving gets quantified. With rapidocr-onnxruntime not installed the
+  effect is the same, because pipeline/ocr.py degrades to "no text".
 
   Gate a run from this config with THREE --expect-model flags (jev-1.13.0,
   gemini/gemini-3.5-flash-lite, gemini/gemini-3.5-flash); a cascade legitimately
@@ -21,6 +26,8 @@ stage2_triage:
   vision_model: gemini/gemini-3.5-flash
   threshold: 0.5
   escalate_below: 0.80
+  use_ocr: true
+  ocr_min_chars: 12
   model: Jev + Gemini Hybrid
   cost_per_call_usd: 0.0
   note: >-
