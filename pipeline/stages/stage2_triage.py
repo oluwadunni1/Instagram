@@ -56,10 +56,42 @@ class TriageResult(BaseModel):
                               # confidence} response before we override this ourselves
 
 
-PASS_A_SYSTEM_PROMPT = """You are triaging an Instagram post for a vendor \
+# The post-type definitions, shared by both passes. Derived from
+# eval/LABEL_CODEBOOK.md, which reconstructs the labeler's decision rule from
+# the golden set's own notes. Before 2026-09-21 both prompts listed the five
+# names and defined none of them, so the model was asked to reproduce a
+# boundary nobody had written down. Adding these RE-BASELINES every Stage 2
+# figure: numbers measured before and after are not comparable.
+POST_TYPE_DEFINITIONS = """Decide in this order and take the first match:
+
+1. product_listing - a specific item is being offered for sale right now. \
+Pre-orders count when a real offer is attached. A stated price is NOT \
+required; "DM for price" is still an offer.
+2. testimonial_repost - a sale that already completed: a delivery, a \
+handover, or a customer's own words reshared. The product is often named \
+and visible but is no longer available.
+3. announcement - the business is informing customers: opening hours, \
+location, policy, availability, or the mechanics of a promotion. No \
+specific item is offered. Clearance sales, financing offers and recurring \
+discount days belong HERE. So do posts naming products that are not \
+purchasable yet, such as unreleased models.
+4. ad_creative - a produced engagement device built around products, such \
+as a poll or a "pick one" question, whose purpose is interaction rather \
+than an offer. RARE.
+5. meme_personal - personal or lifestyle content in a conversational voice. \
+Nothing sold, no business information conveyed.
+
+Two rules that decide most hard cases: being promotional or enthusiastic \
+does NOT by itself make a post an ad_creative, and a post that reads like a \
+listing but offers nothing purchasable is an announcement."""
+
+
+PASS_A_SYSTEM_PROMPT = f"""You are triaging an Instagram post for a vendor \
 account, to decide whether it's a product listing or something else. Use \
 the account profile for context (e.g. a "food" account's "portions left" \
 language differs from a "fashion" account's "sizes 10-16").
+
+{POST_TYPE_DEFINITIONS}
 
 Return ONLY a JSON object with exactly these fields:
 - post_type: one of product_listing, announcement, testimonial_repost, meme_personal, ad_creative
@@ -68,10 +100,12 @@ the caption text provided. If the caption is vague, short, or could \
 plausibly be more than one category, give a LOW confidence rather than \
 guessing - a downstream step will look at the image when confidence is low."""
 
-PASS_B_SYSTEM_PROMPT = """You are triaging an Instagram post for a vendor \
+PASS_B_SYSTEM_PROMPT = f"""You are triaging an Instagram post for a vendor \
 account. The caption text was not enough to classify this post confidently, \
 so you are being shown the actual photo instead. Use the account profile \
 for context.
+
+{POST_TYPE_DEFINITIONS}
 
 Return ONLY a JSON object with exactly these fields:
 - post_type: one of product_listing, announcement, testimonial_repost, meme_personal, ad_creative
