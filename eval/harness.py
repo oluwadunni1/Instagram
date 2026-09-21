@@ -142,11 +142,21 @@ def score_stage2(posts: list[Post], triage_fn: Callable[[Post, dict | None], dic
     non_escalated_correct = 0
     total_cost = 0.0
     predictions = []
+    # Per-class tallies. Overall accuracy on this golden set is close to the
+    # majority-class base rate - product_listing is 83% of labeled posts, and
+    # three of the five classes have n <= 2 - so a single headline number can
+    # sit at 94% while both rare classes are at zero. Track gold counts and
+    # what each class was predicted as, because the failure mode seen in
+    # practice is one option acting as a magnet (see eval/LABEL_CODEBOOK.md).
+    per_class: dict[str, dict[str, int]] = {}
+    predicted_as: Counter = Counter()
 
     for post in posts:
         gold_type = post.get("post_type")
         if gold_type is None:
             continue  # unlabeled - skip rather than penalize
+        bucket = per_class.setdefault(gold_type, {"correct": 0, "total": 0})
+        bucket["total"] += 1
         try:
             result = triage_fn(post, profile)
         except Exception as exc:
@@ -166,6 +176,9 @@ def score_stage2(posts: list[Post], triage_fn: Callable[[Post, dict | None], dic
         total += 1
         is_escalated = bool(result.get("escalated"))
         is_correct = result["post_type"] == gold_type
+        predicted_as[result["post_type"]] += 1
+        if is_correct:
+            per_class[gold_type]["correct"] += 1
         if is_escalated:
             escalated_count += 1
         else:
@@ -193,8 +206,33 @@ def score_stage2(posts: list[Post], triage_fn: Callable[[Post, dict | None], dic
     non_escalated_accuracy = non_escalated_correct / non_escalated_count if non_escalated_count else None
     escalated_accuracy = escalated_correct / escalated_count if escalated_count else None
 
+    # Macro average: every class counts equally, so a rare class failing
+    # outright cannot be hidden by the majority class. Quote this next to
+    # overall accuracy, never instead of it - they answer different questions.
+    class_accuracies = [b["correct"] / b["total"] for b in per_class.values() if b["total"]]
+    macro_accuracy = sum(class_accuracies) / len(class_accuracies) if class_accuracies else 0.0
+
     logger.info("\nStage 2 (triage) - model: %s", model_name)
-    logger.info("  Accuracy: %d/%d = %.0f%%", correct, total, accuracy * 100)
+    logger.info("  Accuracy: %d/%d = %.0f%%  (micro)", correct, total, accuracy * 100)
+    logger.info("  Macro accuracy (classes weighted equally): %.0f%%", macro_accuracy * 100)
+    logger.info("  Per class:")
+    for label in sorted(per_class, key=lambda k: -per_class[k]["total"]):
+        bucket = per_class[label]
+        share = bucket["total"] / total if total else 0.0
+        thin = "   << n<=2, anecdote not measurement" if bucket["total"] <= 2 else ""
+        logger.info("    %-20s %2d/%-2d = %3.0f%%   (%.0f%% of gold)%s",
+                     label, bucket["correct"], bucket["total"],
+                     bucket["correct"] / bucket["total"] * 100, share * 100, thin)
+    # Prediction distribution against gold distribution. A class predicted far
+    # more often than it occurs is a magnet, which is a prompt defect rather
+    # than a model one - exactly how ad_creative took 7 of 11 Jev predictions
+    # while being 1 of 71 gold posts.
+    logger.info("  Predicted vs gold counts:")
+    for label in sorted(set(per_class) | set(predicted_as)):
+        got = predicted_as.get(label, 0)
+        want = per_class.get(label, {}).get("total", 0)
+        magnet = "   << over-predicted" if want and got > want * 2 else ""
+        logger.info("    %-20s predicted %2d, gold %2d%s", label, got, want, magnet)
     if non_escalated_accuracy is not None:
         logger.info("    Pass A only (not escalated): %d/%d = %.0f%%",
                      non_escalated_correct, non_escalated_count, non_escalated_accuracy * 100)
