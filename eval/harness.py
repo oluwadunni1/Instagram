@@ -150,6 +150,10 @@ def score_stage2(posts: list[Post], triage_fn: Callable[[Post, dict | None], dic
     # practice is one option acting as a magnet (see eval/LABEL_CODEBOOK.md).
     per_class: dict[str, dict[str, int]] = {}
     predicted_as: Counter = Counter()
+    # Product-vs-not, the brief's actual success criterion. An errored post
+    # counts as a false negative when its gold is product_listing, because a
+    # post that produced nothing would not have reached Stage 3 either.
+    binary_tp = binary_fp = binary_fn = binary_tn = 0
 
     for post in posts:
         gold_type = post.get("post_type")
@@ -170,13 +174,40 @@ def score_stage2(posts: list[Post], triage_fn: Callable[[Post, dict | None], dic
             total += 1
             error_count += 1
             total_cost += cost_per_call
+            # An errored post produced no decision at all. For the binary view
+            # that is a miss on the positive class and a correct rejection is
+            # not claimable either, so score it the way the pipeline would have
+            # behaved: nothing reached Stage 3.
+            if gold_type == "product_listing":
+                binary_fn += 1
+            else:
+                binary_tn += 1
             predictions.append({"post_id": post["post_id"], "gold": gold_type, "error": str(exc)})
             continue
         total_cost += cost_per_call
         total += 1
         is_escalated = bool(result.get("escalated"))
-        is_correct = result["post_type"] == gold_type
+        # A binary stage (stage2_triage_jev.py) answers a different question,
+        # so judge it on that question. Its "not_product" is correct for any
+        # gold that is not product_listing; scoring it for five-way equality
+        # would report every announcement and testimonial as a miss and make
+        # the per-post log unreadable. A five-way model never emits
+        # "not_product", so its behaviour is unchanged.
+        if result["post_type"] == "not_product":
+            is_correct = gold_type != "product_listing"
+        else:
+            is_correct = result["post_type"] == gold_type
         predicted_as[result["post_type"]] += 1
+        gold_is_product = gold_type == "product_listing"
+        pred_is_product = result["post_type"] == "product_listing"
+        if gold_is_product and pred_is_product:
+            binary_tp += 1
+        elif not gold_is_product and pred_is_product:
+            binary_fp += 1
+        elif gold_is_product and not pred_is_product:
+            binary_fn += 1
+        else:
+            binary_tn += 1
         if is_correct:
             per_class[gold_type]["correct"] += 1
         if is_escalated:
@@ -212,27 +243,61 @@ def score_stage2(posts: list[Post], triage_fn: Callable[[Post, dict | None], dic
     class_accuracies = [b["correct"] / b["total"] for b in per_class.values() if b["total"]]
     macro_accuracy = sum(class_accuracies) / len(class_accuracies) if class_accuracies else 0.0
 
+    # A binary stage (pipeline/stages/stage2_triage_jev.py) emits only
+    # product_listing / not_product. Scoring it for exact five-way equality
+    # would count every announcement, meme and testimonial gold as a miss and
+    # print a meaningless number, so suppress the five-way view for it. The
+    # binary block below is computed for BOTH kinds and is what compares them.
+    is_binary_model = bool(predicted_as) and set(predicted_as) <= {"product_listing", "not_product"}
+
     logger.info("\nStage 2 (triage) - model: %s", model_name)
-    logger.info("  Accuracy: %d/%d = %.0f%%  (micro)", correct, total, accuracy * 100)
-    logger.info("  Macro accuracy (classes weighted equally): %.0f%%", macro_accuracy * 100)
-    logger.info("  Per class:")
-    for label in sorted(per_class, key=lambda k: -per_class[k]["total"]):
-        bucket = per_class[label]
-        share = bucket["total"] / total if total else 0.0
-        thin = "   << n<=2, anecdote not measurement" if bucket["total"] <= 2 else ""
-        logger.info("    %-20s %2d/%-2d = %3.0f%%   (%.0f%% of gold)%s",
-                     label, bucket["correct"], bucket["total"],
-                     bucket["correct"] / bucket["total"] * 100, share * 100, thin)
-    # Prediction distribution against gold distribution. A class predicted far
-    # more often than it occurs is a magnet, which is a prompt defect rather
-    # than a model one - exactly how ad_creative took 7 of 11 Jev predictions
-    # while being 1 of 71 gold posts.
-    logger.info("  Predicted vs gold counts:")
-    for label in sorted(set(per_class) | set(predicted_as)):
-        got = predicted_as.get(label, 0)
-        want = per_class.get(label, {}).get("total", 0)
-        magnet = "   << over-predicted" if want and got > want * 2 else ""
-        logger.info("    %-20s predicted %2d, gold %2d%s", label, got, want, magnet)
+    if is_binary_model:
+        logger.info("  Binary model (product vs not) - five-way accuracy not applicable")
+    else:
+        logger.info("  Accuracy: %d/%d = %.0f%%  (micro)", correct, total, accuracy * 100)
+        logger.info("  Macro accuracy (classes weighted equally): %.0f%%", macro_accuracy * 100)
+        logger.info("  Per class:")
+        for label in sorted(per_class, key=lambda k: -per_class[k]["total"]):
+            bucket = per_class[label]
+            share = bucket["total"] / total if total else 0.0
+            thin = "   << n<=2, anecdote not measurement" if bucket["total"] <= 2 else ""
+            logger.info("    %-20s %2d/%-2d = %3.0f%%   (%.0f%% of gold)%s",
+                         label, bucket["correct"], bucket["total"],
+                         bucket["correct"] / bucket["total"] * 100, share * 100, thin)
+        # Prediction distribution against gold distribution. A class predicted
+        # far more often than it occurs is a magnet, which is a prompt defect
+        # rather than a model one - exactly how ad_creative took 7 of 11 Jev
+        # predictions while being 1 of 71 gold posts.
+        logger.info("  Predicted vs gold counts:")
+        for label in sorted(set(per_class) | set(predicted_as)):
+            got = predicted_as.get(label, 0)
+            want = per_class.get(label, {}).get("total", 0)
+            magnet = "   << over-predicted" if want and got > want * 2 else ""
+            logger.info("    %-20s predicted %2d, gold %2d%s", label, got, want, magnet)
+
+    # --- the brief's actual target ----------------------------------------
+    # "Product-vs-not-product triage precision >= 90%". Everything downstream
+    # collapses post_type to this same boolean anyway (stage5_reconcile,
+    # stage6_sync and run_pipeline all test `!= "product_listing"`), so this is
+    # the number that describes what Stage 2 actually decides. Computed from
+    # whatever the model emitted, so a five-way and a binary model are directly
+    # comparable here and nowhere else.
+    logger.info("  Product vs not-product (the brief's target):")
+    logger.info("    tp=%d fp=%d fn=%d tn=%d", binary_tp, binary_fp, binary_fn, binary_tn)
+    binary_correct = binary_tp + binary_tn
+    binary_total = binary_tp + binary_fp + binary_fn + binary_tn
+    if binary_total:
+        logger.info("    Accuracy:  %d/%d = %.0f%%", binary_correct, binary_total,
+                     binary_correct / binary_total * 100)
+    precision = binary_tp / (binary_tp + binary_fp) if (binary_tp + binary_fp) else None
+    recall = binary_tp / (binary_tp + binary_fn) if (binary_tp + binary_fn) else None
+    if precision is not None:
+        target = "" if precision >= 0.90 else "   << below the brief's 90% target"
+        logger.info("    Precision: %.0f%%%s", precision * 100, target)
+    if recall is not None:
+        logger.info("    Recall:    %.0f%%", recall * 100)
+    if precision and recall:
+        logger.info("    F1:        %.0f%%", 2 * precision * recall / (precision + recall) * 100)
     if non_escalated_accuracy is not None:
         logger.info("    Pass A only (not escalated): %d/%d = %.0f%%",
                      non_escalated_correct, non_escalated_count, non_escalated_accuracy * 100)

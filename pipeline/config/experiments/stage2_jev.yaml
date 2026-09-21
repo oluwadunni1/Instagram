@@ -1,0 +1,45 @@
+name: stage2_jev
+description: >-
+  Stage 2 triage on TypeSafe's Jev as a BINARY decision - product listing, or not.
+  Run it with --only-stage 2; the stage3_extract block below is required by the
+  config schema (ExperimentConfig forbids extra keys and requires that stage) but
+  is never invoked, so this experiment costs ~1 Jev call per post and nothing else.
+
+  Scoring note that must travel with any number from this config: Jev picks
+  between 2 options while the Gemini stage picks between 5, so part of any Jev
+  advantage is the smaller option set rather than the model. Both are scored on
+  the same binary product-vs-not metric, which is the brief's actual success
+  criterion, but the comparison is not like-for-like.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage_jev
+  function: triage_post_jev
+  jev_model: jev-latest
+  threshold: 0.5
+  model: Jev (TypeSafe System One)
+  cost_per_call_usd: 0.0
+  note: >-
+    jev_model, NOT model - `model` is reserved and stripped by
+    load_stage_fn(), which now raises rather than binding silently. The value
+    above is a display label used for log lines and the predictions filename.
+
+    jev-latest resolves server-side to a versioned model; report/token_log.csv
+    records the RESOLVED value (currently jev-1.13.0), so gate this run with
+    `--expect-model jev-1.13.0`, not jev-latest.
+
+    threshold 0.5 is the neutral starting point, not a tuned value. Sweeping it
+    is calibration work and belongs on the tune half (vendor_autos_01) only.
+
+# REQUIRED BY THE SCHEMA, NEVER INVOKED with --only-stage 2. Kept identical to
+# family_gemini.yaml so that if someone does run all stages, Stage 3 is the
+# known-good Gemini path rather than a surprise.
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  model: Gemini Family (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Not part of this experiment. Present only because ExperimentConfig requires
+    stage3_extract. Run with --only-stage 2 and it never executes.
