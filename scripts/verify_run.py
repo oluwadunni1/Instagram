@@ -271,7 +271,21 @@ def main() -> None:
     print(f"=== Verifying run {args.run_id} ===")
     print("\n".join(lines))
     print()
-    if passed:
+
+    # A skipped check is not a passed check, and the verdict must not imply it
+    # is. Run family_gemini_20260921T075907Z printed "VALIDATED" while the
+    # errored-posts check was skipped for want of --predictions; passing them
+    # turned the same run into a FAIL on a post that had died with a provider
+    # 503. The word VALIDATED is therefore reserved for a run where every
+    # check actually ran. Exit code is unchanged: skipping is opt-in by not
+    # passing the flags, so `make harness && make verify` still chains.
+    skipped = [line.split(":", 1)[0].replace("  [skip]", "").strip()
+                for line in lines if line.startswith("  [skip]")]
+    if passed and skipped:
+        print(f"INCOMPLETE - {len(skipped)} check(s) never ran: {', '.join(skipped)}.")
+        print("Every check that DID run passed, but this is not a validated run.")
+        print("Re-run with the missing flags before publishing anything from it.")
+    elif passed:
         print("VALIDATED - this run's numbers are safe to publish.")
     else:
         print("NOT VALIDATED - discard this run and repeat it. Do not publish its numbers.")
