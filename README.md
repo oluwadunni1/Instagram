@@ -65,8 +65,8 @@ audit trail. Two vendors: `vendor_autos_01` (30 posts), `vendor_gadgets_01` (41 
 | Target | Measured (Gemini cascade) | |
 |---|---|---|
 | Triage precision >= 90% | 97% autos (29/30), 93% gadgets (38/41) | met, **pre-codebook** |
-| Price accuracy >= 85% | 100% (19/19, 31/31) | met |
-| Missing-price recall 100% | 6/6, 3/3 | met |
+| Price accuracy >= 85% | first product 100% (19/19, 31/31); **all products 100% autos, 97% gadgets** (24/24, 88/91) | met |
+| Missing-price recall 100% | first product 6/6, 2/2; all products 6/6, 6/6 | met |
 | Stale/stock flag precision >= 75% | micro F1 88% autos, 77% gadgets | met |
 | Escalation below 40% | 1/30, 5/41 | met |
 | Attention <= 10 per 100 posts | 18% autos, 15% gadgets | **missed** |
@@ -87,6 +87,10 @@ Per-stage harness scores, each stage scored independently against gold labels:
 | autos | Llama | 87% | 79% | 87% | 6/6 | 48% / **51%** | 0/30 | 92,878 |
 | gadgets | **Gemini** | **93%** | **100%** | **81%** | 3/3 | 67% / **77%** | 5/41 | **115,281** |
 | gadgets | Llama | 90% | 87% | 72% | 3/3 | 38% / **43%** | 5/41 † | 136,193 |
+
+**The `S3 price` column above is the first-product metric** - it scores `predicted[0]` against
+`gold[0]` only, which is 34% of gadgets' priced products. See below for what those models score
+when every product is counted; the ranking changes.
 
 † Llama's gadgets escalation is inflated by a `max_tokens` bug: 3 of those 5 vision calls only
 repaired a truncated Pass A. Accuracy stands, escalation and cost do not.
@@ -193,6 +197,46 @@ The defensible part of this change is that a label contradicting its own codeboo
 accuracy gain that falls out of it is close to worthless as evidence.
 
 ### Stage 3, scored on every product - 2026-09-24
+
+Every cached prediction file re-scored through the corrected scorer. No model calls: this
+re-scores the exact output those runs produced, so the numbers are comparable to each other but
+carry their original runs' caveats, noted under the table.
+
+| vendor | config | first product | **all products** | under-extracted posts | products returned / gold |
+|---|---|---|---|---|---|
+| autos | Gemini flash-lite | 19/19 = 100% | **24/24 = 100%** | 0 | 30 / 30 |
+| autos | Gemini + OCR | 19/19 = 100% | **24/24 = 100%** | 0 | 30 / 30 |
+| autos | Qwen | 17/19 = 89% | **20/24 = 83%** | 0 | 30 / 30 |
+| autos | Llama | 15/19 = 79% | **20/24 = 83%** | 0 | 30 / 30 |
+| autos | GPT-4o Mini | 16/19 = 84% | **19/24 = 79%** | 0 | 30 / 30 |
+| gadgets | Gemini flash-lite | 31/31 = 100% | **89/91 = 98%** | 3 | 91 / 97 |
+| gadgets | Gemini + OCR | 31/31 = 100% | **88/91 = 97%** | 4 | 90 / 97 |
+| gadgets | Qwen | 26/31 = 84% | **86/91 = 95%** | **0** | **97 / 97** |
+| gadgets | Llama | 27/31 = 87% | **75/91 = 82%** | 4 | 91 / 97 |
+| gadgets | dummy-heuristic | 27/31 = 87% | **63/91 = 69%** | 5 | 69 / 97 |
+| gadgets | GPT-4o Mini | 19/31 = 61% | **39/91 = 43%** | 7 | 57 / 97 |
+
+**The ranking changes on gadgets.** Qwen looks worse than Llama on the first-product metric
+(84% vs 87%) and clearly better on every product (95% vs 82%), because it is the only config
+that returned **all 97 gold products with no under-extraction at all** - better completeness than
+Gemini, which drops 3 to 6. Reading a multi-product catalog from the first product of each post
+was ranking models on a tenth of their output.
+
+**Three provenance caveats, none of which the table can carry on its own:**
+
+- **Qwen has no gated run.** It failed `verify_run.py` twice on invalid JSON, which is why it
+  carries no numbers in the comparison above. These figures come from cached predictions of
+  ungated runs and are a reason to re-run it properly, not a result.
+- **GPT-4o Mini's gadgets file predates the `max_tokens` fix** (2026-09-08 vs 2026-09-10), so its
+  43% is substantially truncation, not judgment. It is the clearest illustration of the gap:
+  truncated output loses whole products, and the first-product metric cannot see that.
+- **`dummy-heuristic` is the regex fallback**, not a model. Its 87% first-product against 69% all
+  products is what a single-product heuristic scores when the catalog is multi-product.
+
+**Gemini + OCR is marginally worse than Gemini alone here** (97% vs 98%, one more
+under-extracted post). Within noise on a 91-product denominator, but worth recording rather than
+rounding away, since the OCR tier's case was never about extraction completeness.
+
 
 `score_stage3` compared `predicted[0]` against `gold[0]` and nothing else, so on
 `vendor_gadgets_01` **31 of 91 priced gold products were ever checked - 34%**. 19 of its 34
