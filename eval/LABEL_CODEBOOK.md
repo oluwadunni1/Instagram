@@ -1,6 +1,7 @@
-# Label codebook: `post_type`
+# Label codebook
 
-The definitions behind the golden set's five `post_type` values.
+The conventions behind the golden set: the five `post_type` values, and how a post's products are
+split into rows.
 
 **Why this file exists.** Until now the five values were declared in two places and defined in
 neither: the FIELD GUIDE in `eval/make_golden_skeleton.py` lists the names, and
@@ -208,6 +209,41 @@ Changing this re-baselines every Stage 2 figure. The wording is carried in
 
 ---
 
+## Product granularity: one row per purchasable variant
+
+**Test:** one product row per thing a buyer could ask for by name and be quoted a price for.
+
+A listing offering an iPhone 12 in 64GB, 128GB and 256GB is **three rows**, not one row with a
+storage variant - even when no price is given for any of them. What makes them separate is that
+they are separately purchasable, not that they are separately priced.
+
+| Example | Gold | Why |
+|---|---|---|
+| `18091786415437652` | 4 rows | iPhone 17 Air and 17 Pro Max, each in its own colour band, four distinct prices. |
+| `18115331426067887` | 2 rows | Galaxy Tab S10 FE 128GB (N680,000) and 256GB (N900,000). |
+| `18047192480810719` | 3 rows | iPhone 12 in 64/128/256GB, **every price null** ("DM for price"). Still three rows. |
+| `18027958613896333` | 3 rows | Two Samsung S26 Ultra rows at different prices whose captions are otherwise identical. The caption never says what differs, and neither gold nor any model invents a distinguishing attribute - see the note below. |
+| `17966735571148449` | 3 rows | iPhone 14 Pro Max 128/256/512GB, all prices null. |
+
+**`variants` is for options that do NOT create a row.** A colour choice offered at one price for
+one item ("available in Red and White, N450,000") is one row with a colour variant. The moment the
+options carry their own prices, or are listed as separate things a buyer picks between, they are
+rows.
+
+**Why this is written down now.** It never was. The Stage 3 prompt said the opposite - "only
+return multiple products when the post is genuinely offering different items for sale (different
+make/model, different trim, or explicitly different price points)" - and told the model to put
+options in a `variants` array. The model followed it exactly, so on four gadgets posts it returned
+one row where gold had two, three, three and five. That looked like under-extraction in the
+scores and was a spec nobody had recorded, the same failure as the `post_type` values above: a
+boundary defined in a labeler's head and contradicted in a prompt. Recorded 2026-09-24.
+
+**A known limit this exposes.** When two rows are genuinely indistinguishable from the caption -
+the two S26 Ultras - nothing downstream flags it. `stage5_reconcile.route_post()` checks missing
+price, unknown name and low confidence, so two rows with the same name at different prices route
+`auto_import` and a buyer sees one of them at random. Extraction confidence is 1.0 and correctly
+so: it measures fidelity to the caption, not whether the resulting catalog is coherent.
+
 ## Class balance, and what it means for any number quoted
 
 Across both golden sets:
@@ -236,3 +272,6 @@ per class with denominators, and treat any single minority cell as anecdote unti
 - **Jev criteria:** `scripts/smoke_jev.py` builds its `criteria` rubrics from this file. Jev
   requires a rubric per option, which the Gemini prompt historically did not have, so keep the
   two wordings aligned or the comparison stops being like for like.
+- **Product granularity:** `pipeline/stages/stage3_extract.py` carries the one-row-per-variant
+  rule in its system prompt. Changing it re-baselines every Stage 3 extraction number, so record
+  the change and re-run both vendors rather than comparing across the boundary.

@@ -199,8 +199,14 @@ set to "none". Do NOT return an empty products array for a product-listing post.
 
 For carousel/gallery posts, if the same item appears across multiple slides (e.g.
 different angles or photos of one car), treat it as ONE product - do not duplicate it.
-Only return multiple products when the post is genuinely offering different items for
-sale (different make/model, different trim, or explicitly different price points).
+
+ONE ELEMENT PER PURCHASABLE VARIANT. If the post offers the same model in several
+storage sizes, colours or configurations that a buyer picks between, return one element
+per option, NOT one element with the options collected into `variants`. This holds even
+when no price is given for any of them: "iPhone 12 64GB / 128GB / 256GB - DM for price"
+is THREE elements, each with price.source "none", because a buyer asks for a specific
+one. Name each element with its own spec ("Premium UK used iPhone 12 128GB"), and give
+each the price stated for that option, or null where the post gives none.
 
 Each element of `products` must have exactly these fields:
 - name: string or null. Include year, make, model, and trim/spec EXACTLY as
@@ -239,9 +245,13 @@ Each element of `products` must have exactly these fields:
     "non-negotiable", "no lowballers").
   - "unknown": no signal either way - this includes plain "DM for price" posts with no
     further negotiation language either way.
-- variants: if the vendor explicitly lists distinct options for this product (e.g.
-  "available in Red and White"), return them as a list of objects, one per variant
-  type, e.g. [{"type": "color", "values": ["Red", "White"]}]. Otherwise return [].
+- variants: ONLY for options that do not make a separate purchasable item - a single
+  item at a single price that happens to come in a choice of finish ("available in Red
+  and White, N450,000"). Return them as a list of objects, one per variant type, e.g.
+  [{"type": "color", "values": ["Red", "White"]}]. Otherwise return []. If an option
+  carries its own price, or is one of several things a buyer picks between, it is its
+  own element of `products` and must NOT appear here - see ONE ELEMENT PER PURCHASABLE
+  VARIANT above. Never list an option in `variants` and also as its own product.
 - images: always return [] - the pipeline populates this separately from cached
   carousel slides, do not attempt to extract or invent image URLs yourself.
 - extraction_confidence: a float 0.0-1.0 for how confident you are in this product's

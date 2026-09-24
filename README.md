@@ -255,8 +255,42 @@ so this re-scores the exact output the original runs produced:
 | Products returned / gold | | **90 / 97** | | 30 / 30 |
 | Coverage of the legacy metric | 34% | | 79% | |
 
-**Gadgets price accuracy is 97%, not 100%.** Three priced products were wrong, all of them by
-never being returned at all:
+**Re-run 2026-09-24 with the granularity rule written down.** The four "under-extracting" posts
+were not a model failure - the Stage 3 prompt said *"only return multiple products when the post
+is genuinely offering different items for sale (different make/model, different trim, or
+explicitly different price points)"* and told the model to collect options into `variants`. The
+model followed it exactly; gold splits per purchasable variant regardless of price. That
+convention had never been written down anywhere, which is the same failure as the `post_type`
+values a stage earlier. It is now in `eval/LABEL_CODEBOOK.md` under "Product granularity" and in
+the Stage 3 system prompt, and both say one row per purchasable variant even when every price is
+null.
+
+Runs `stage3_ocr_20260924T194202Z` (gadgets) and `stage3_ocr_20260924T194614Z` (autos), both
+VALIDATED.
+
+| gadgets | before | after |
+|---|---|---|
+| Price accuracy, all products | 88/91 = 97% | **89/91 = 98%** |
+| Products returned / gold | 90 / 97 | **95 / 97** |
+| Under-extracted posts | 4 | **1** |
+| Name similarity, all products | 74% | **85%** |
+| Name similarity, first product | 76% | **88%** |
+| Missing-price recall, all products | 6/6 | 6/6 |
+
+Autos is unmoved at 24/24, 30/30 products, name similarity 91→92% - it has only three
+multi-variant posts and none of them collapsed, which is why it never showed the problem.
+
+**The name-similarity jump is the clearest signal it was a spec disagreement.** 74% to 85% on
+gadgets, from the same model on the same captions: gold names carry the variant
+("Premium UK used iPhone 12 128GB") and now so do the predictions. A collapsed row could never
+have matched that name however well it read the caption.
+
+**One genuine miss survives.** `18094596503428757` still returns 3 of 5 Starlink products,
+dropping *Starlink Hook* (N60,000) and *Hook & pipe* (N120,000) from the tail of a five-item
+caption. No variants are involved - these are separate accessories, simply omitted. That is the
+one real extraction failure the corrected scorer found, and it is unfixed.
+
+**Before the granularity fix, gadgets read 97% and looked like three price errors:**
 
 | post | product | gold price |
 |---|---|---|
@@ -264,11 +298,12 @@ never being returned at all:
 | `18094596503428757` | Starlink Hook | ₦60,000 |
 | `18094596503428757` | Starlink Hook & pipe | ₦120,000 |
 
-**Under-extraction is the failure mode, and it was completely invisible.** Four of 19
+**Under-extraction was the failure mode, and it was completely invisible.** Four of 19
 multi-product gadgets posts returned fewer products than gold - 2→1, 3→1, 3→1, 5→3 - and every
-one of them scored 100% before, because `products[0]` was right in all four. Seven gold products
-were never returned. Autos shows none of this: 30 gold, 30 returned, which is why the vendor that
-tops out at 3 products per post hid the problem, exactly as it hid the `max_tokens` truncation.
+one scored 100%, because `products[0]` was right in all four. Autos showed none of it: 30 gold,
+30 returned, which is why the vendor that tops out at 3 products per post hid the problem,
+exactly as it hid the `max_tokens` truncation. Three of the four were the spec disagreement
+described above and are now fixed; the fourth is the Starlink omission.
 
 **Missing-price recall holds at 6/6 across all products** on both vendors, so nothing was
 invented on the products the metric could not previously see. A gold product with no price that
