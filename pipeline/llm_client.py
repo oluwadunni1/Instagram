@@ -188,6 +188,77 @@ def _is_permanent_provider_error(exc: Exception) -> bool:
     return any(marker in text for marker in _PERMANENT_ERROR_MARKERS)
 
 
+# ---------------------------------------------------------------------------
+# Real cost, per row.
+#
+# estimated_cost_usd was hardcoded 0.0 from the start, on the reasoning that
+# everything was running on a free tier. The consequence was that every "Cost:
+# $X" this project printed was cost_per_call_usd from a YAML times a call
+# count - a config's OPINION of what a call costs, not what the call cost - and
+# every real figure in README.md had to be worked out by hand from token counts.
+#
+# Rates are $ per 1,000,000 tokens, (prompt, completion).
+#
+# A model that is not in this table is priced 0.0 and WARNED about, never
+# guessed at. A silently-guessed rate is worse than no rate: it produces a
+# number that looks like evidence and is not, which is the failure this whole
+# column already had once.
+#
+# HISTORY IS MIXED, and every reader of the column has to know it: rows written
+# before this landed are 0.0 regardless of what they actually cost. Old rows
+# are deliberately NOT recomputed in place - the log is append-only evidence,
+# and rewriting history destroys the one property that makes it the record.
+# read_run_usage() therefore reports priced_calls alongside calls so a caller
+# can say how much of a total is real.
+MODEL_RATES: dict[str, tuple[float, float]] = {
+    # Jev's published input rate, with free output. Source: scripts/smoke_jev.py,
+    # which has been quoting it since the model was introduced.
+    "jev-1.13.0": (0.042, 0.0),
+    "jev-latest": (0.042, 0.0),
+}
+
+# Models seen in the log with no rate on file. Kept separate from MODEL_RATES so
+# the gap is visible rather than implied by absence, and so filling one in is a
+# single-line edit against a named source.
+#
+# UNPRICED, needs a rate from the provider's own page before any cost figure
+# that includes these rows can be quoted:
+#   gemini/gemini-3.5-flash-lite  - README records the COMPLETION rate as
+#       $2.50/M, but the prompt rate has never been written down anywhere in
+#       this repo, and the per-post figures in README.md were derived without
+#       recording it. Half a rate cannot price a row.
+#   gemini/gemini-3.5-flash       - same.
+#   the GPT-4o Mini / Llama / Qwen strings from the model comparison.
+#   gemini-embedding-001          - Stage 6's caption embeddings
+#       (pipeline/media_fingerprint.py). Google prices embeddings per input
+#       token on a separate sheet from the generative models, and embedContent
+#       returns no usage block, so these rows carry 0 tokens: the row proves the
+#       call happened and nothing more. A Stage 6 cost figure needs the call
+#       COUNT against the published embedding rate, not this column.
+
+_warned_unpriced: set[str] = set()
+
+
+def estimate_cost_usd(model: str, prompt_tokens: int, completion_tokens: int) -> float:
+    """Dollar cost of one call, or 0.0 when the model has no rate on file.
+
+    Warns once per unknown model per process. Once, because a harness run would
+    otherwise emit one warning per post and the signal would be lost in it.
+    """
+    rate = MODEL_RATES.get(model)
+    if rate is None:
+        if model not in _warned_unpriced:
+            _warned_unpriced.add(model)
+            logger.warning(
+                "[token_log] no rate on file for model %r - its rows are priced 0.0 and "
+                "any cost total including them understates. Add it to MODEL_RATES.",
+                model,
+            )
+        return 0.0
+    prompt_rate, completion_rate = rate
+    return (prompt_tokens * prompt_rate + completion_tokens * completion_rate) / 1_000_000
+
+
 TOKEN_LOG_PATH = Path("report") / "token_log.csv"
 TOKEN_LOG_FIELDNAMES = [
     "run_id",
@@ -220,8 +291,10 @@ def log_token_usage(
 ) -> None:
     """Append one row to report/token_log.csv, writing the header first if the file doesn't exist yet.
 
-    estimated_cost_usd is hardcoded to 0.0 - every model we're running is
-    currently on a free tier, so real cost tracking isn't wired up yet.
+    estimated_cost_usd is computed from MODEL_RATES. A model with no rate on
+    file is priced 0.0 and warned about - see the note above MODEL_RATES for
+    why an unknown rate is never guessed, and why rows written before that
+    landed are left at 0.0 rather than recomputed.
     """
     TOKEN_LOG_PATH.parent.mkdir(exist_ok=True)
     write_header = not TOKEN_LOG_PATH.exists()
@@ -238,7 +311,7 @@ def log_token_usage(
         "total_tokens": total_tokens if total_tokens is not None else prompt_tokens + completion_tokens,
         "escalated": escalated,
         "fallback_used": fallback_used,
-        "estimated_cost_usd": 0.0,
+        "estimated_cost_usd": estimate_cost_usd(model, prompt_tokens, completion_tokens),
     }
 
     with TOKEN_LOG_PATH.open("a", newline="", encoding="utf-8") as f:
@@ -262,7 +335,7 @@ def read_run_usage(run_id: str) -> dict:
     scripts/run_pipeline.py and scripts/verify_run.py read through this.
     """
     empty = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0,
-             "fallbacks": 0, "by_stage": {}, "models": []}
+             "fallbacks": 0, "cost_usd": 0.0, "priced_calls": 0, "by_stage": {}, "models": []}
     if not TOKEN_LOG_PATH.exists():
         return empty
 
@@ -270,6 +343,12 @@ def read_run_usage(run_id: str) -> dict:
     models: Counter = Counter()
     totals = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0,
               "fallbacks": 0}
+    # Tracked apart from the token totals because cost is only as trustworthy as
+    # its coverage: rows predating MODEL_RATES, and rows for a model with no rate
+    # on file, both carry 0.0. priced_calls < calls means the total understates,
+    # and a caller quoting the figure has to say so.
+    cost_usd = 0.0
+    priced_calls = 0
 
     with TOKEN_LOG_PATH.open(encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
@@ -284,18 +363,30 @@ def read_run_usage(run_id: str) -> dict:
 
             stage = row.get("stage") or "unknown"
             entry = by_stage.setdefault(
-                stage, {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+                stage,
+                {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0,
+                 "total_tokens": 0, "cost_usd": 0.0},
             )
             for key in ("prompt_tokens", "completion_tokens", "total_tokens"):
                 entry[key] += _int(key)
                 totals[key] += _int(key)
             entry["calls"] += 1
             totals["calls"] += 1
+
+            try:
+                row_cost = float(row.get("estimated_cost_usd") or 0.0)
+            except ValueError:
+                row_cost = 0.0
+            entry["cost_usd"] += row_cost
+            cost_usd += row_cost
+            if row_cost > 0.0:
+                priced_calls += 1
             if (row.get("fallback_used") or "").strip().lower() == "true":
                 totals["fallbacks"] += 1
             models[row.get("model") or "unknown"] += 1
 
-    return {**totals, "by_stage": by_stage, "models": sorted(models)}
+    return {**totals, "cost_usd": cost_usd, "priced_calls": priced_calls,
+            "by_stage": by_stage, "models": sorted(models)}
 
 
 def complete_structured(

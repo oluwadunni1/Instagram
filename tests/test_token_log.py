@@ -125,3 +125,76 @@ def test_read_run_usage_counts_regex_fallbacks(
     assert usage["fallbacks"] == 1
     assert usage["calls"] == 2
     assert usage["total_tokens"] == 55
+
+
+# --- real cost -------------------------------------------------------------
+
+def test_a_priced_model_gets_a_real_cost() -> None:
+    """Jev's published rate: $0.042 per 1M input tokens, output free."""
+    cost = llm_client.estimate_cost_usd("jev-1.13.0", 1_000_000, 500_000)
+    assert cost == pytest.approx(0.042), "output must not be charged for Jev"
+
+
+def test_an_unknown_model_is_priced_zero_and_warned_about(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Never guess a rate. A guessed rate produces a number that looks like
+    evidence and is not, which is the failure this column already had once."""
+    monkeypatch.setattr(llm_client, "_warned_unpriced", set())
+    with caplog.at_level("WARNING"):
+        cost = llm_client.estimate_cost_usd("some/unpriced-model", 1000, 1000)
+    assert cost == 0.0
+    assert "some/unpriced-model" in caplog.text
+
+
+def test_the_unknown_model_warning_fires_once_per_process(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A harness run would otherwise emit one warning per post and bury it."""
+    monkeypatch.setattr(llm_client, "_warned_unpriced", set())
+    with caplog.at_level("WARNING"):
+        for _ in range(5):
+            llm_client.estimate_cost_usd("some/unpriced-model", 10, 10)
+    assert caplog.text.count("no rate on file") == 1
+
+
+def test_read_run_usage_reports_how_much_of_the_cost_is_real(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The column's history is mixed: every row written before MODEL_RATES
+    existed is 0.0 regardless of what it cost, and old rows are deliberately
+    not recomputed. priced_calls is what lets a caller say a total understates
+    instead of presenting it as the whole bill."""
+    _log(
+        tmp_path,
+        monkeypatch,
+        "r,t,v,p1,stage2_triage_jev,jev-1.13.0,1000,20,1020,False,False,0.000042\n"
+        "r,t,v,p2,stage3_extract_pass_a,gemini/lite,2000,100,2100,False,False,0.0\n",
+    )
+
+    usage = read_run_usage("r")
+
+    assert usage["calls"] == 2
+    assert usage["priced_calls"] == 1, "the unpriced row must not count as priced"
+    assert usage["cost_usd"] == pytest.approx(0.000042)
+    assert usage["by_stage"]["stage2_triage_jev"]["cost_usd"] == pytest.approx(0.000042)
+    assert usage["by_stage"]["stage3_extract_pass_a"]["cost_usd"] == 0.0
+
+
+def test_a_run_predating_real_cost_reports_zero_priced_calls(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every historical run in report/token_log.csv looks like this. It must
+    read as 'no cost data', not as 'this run was free'."""
+    _log(
+        tmp_path,
+        monkeypatch,
+        "old,t,v,p1,stage3_extract_pass_a,gemini/lite,2000,100,2100,False,False,0.0\n"
+        "old,t,v,p2,stage3_extract_pass_b,gemini/flash,3000,200,3200,True,False,0.0\n",
+    )
+
+    usage = read_run_usage("old")
+
+    assert usage["calls"] == 2
+    assert usage["cost_usd"] == 0.0
+    assert usage["priced_calls"] == 0

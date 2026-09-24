@@ -1,0 +1,79 @@
+name: stage3_ocr
+description: >-
+  default.yaml with ONE change: Stage 3 gets the local OCR tier. Stage 2 is
+  carried over unchanged on purpose - this config exists to isolate Stage 3's
+  OCR tier, and a second moving part would make the comparison unreadable.
+  Compare against a default.yaml run on the same golden set, and read the
+  outcome out of report/token_log.csv: stage3_extract_pass_b rows are the
+  vision calls this is trying to remove, stage3_extract_pass_a_ocr rows are
+  the tier's reach, and any stage3_extract_fallback row invalidates the run.
+
+stage1_profile:
+  module: pipeline.stages.stage1_profile
+  function: get_or_create_profile
+  model: gemini/gemini-3.5-flash-lite
+  cost_per_call_usd: 0.0
+  note: >-
+    Changed 2026-09-07 from openrouter/stealth/ox-alpha. Stage 1 is the first step
+    run against every new account, so an anonymized stealth model that "may
+    rotate/disappear without notice" (the previous note's own warning) was the wrong
+    default. gemini-3.5-flash-lite is free-tier, is what Stage 2/3/4 already use, and
+    won the 2026-09-07 Stage 4 comparison at 78% macro F1. Verified on
+    vendor_gadgets_01: 4 of 5 profile fields correct against independently-known
+    ground truth (see README.md). NOTE: Stage 1 still has no scored
+    evaluation - the harness does not score it - so this is a reasoned default, not
+    a measured winner.
+
+stage2_triage:
+  module: pipeline.stages.stage2_triage
+  function: triage_post
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash
+  confidence_threshold: 0.7
+  model: Gemini Cascade (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Fixed 2026-09-07. Previously openrouter/google/gemini-flash-1.5-8b, which has been
+    retired and 404s - so the ACTIVE DEFAULT config failed every Stage 2 call, and a
+    bare `make harness` was broken. Now the same cascade as stage2_gemini_cascade.yaml
+    (cheap text Pass A, stronger vision Pass B), which scored 27/30 in the 2026-09-01
+    comparison. confidence_threshold 0.7 matches every other cascade config.
+
+stage3_extract:
+  module: pipeline.stages.stage3_extract
+  function: extract_product
+  text_model: gemini/gemini-3.5-flash-lite
+  vision_model: gemini/gemini-3.5-flash-lite
+  use_ocr: true
+  ocr_min_chars: 12
+  model: gemini-3.5-flash-lite + OCR
+  cost_per_call_usd: 0.0
+  note: >-
+    default.yaml's Stage 3 plus the local OCR tier, and nothing else. OCR text
+    reaches the model in its own IMAGE TEXT block, never as the caption:
+    stage2_triage_hybrid.py can substitute it for the caption because a garbled
+    read only costs it a product/not-product call, while this stage reads the
+    price. Any price the model marks price.source="image" must clear
+    _guard_ocr_prices, which requires the exact integer to be recoverable from
+    the raw OCR text and refuses ambiguous separators - "N500.000" is 500000 or
+    nothing, never 500. An ungrounded price is voided and escalates to vision,
+    so the guard can cost a call but never a wrong price. use_ocr defaults to
+    False in code, so every other YAML in this directory still reproduces its
+    recorded run unchanged. Needs `uv sync --extra ocr`; without the engine
+    every read reports no text and the cascade escalates to vision as before.
+    The model: label differs from default.yaml's ON PURPOSE even though the
+    litellm strings are identical: the harness names its predictions file
+    after that label, so sharing it made the OCR run silently overwrite the
+    baseline it was meant to be compared against.
+
+stage4_signals:
+  module: pipeline.stages.stage4_signals
+  function: detect_signals
+  signals_model: gemini/gemini-3.5-flash-lite
+  model: gemini-3.5-flash-lite (Google AI Studio)
+  cost_per_call_usd: 0.0
+  note: >-
+    Added 2026-09-07 - default.yaml previously had no stage4_signals block at all, so
+    the active default never scored Stage 4. gemini-3.5-flash-lite won the 2026-09-07
+    Stage 4 re-run at 78% macro F1 (vs GPT-4o Mini 68%, Llama 40%, Qwen 10%) and is
+    free-tier. Note signals_model, not model - see the invariant in CLAUDE.md.

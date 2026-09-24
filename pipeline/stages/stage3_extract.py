@@ -31,6 +31,8 @@ import litellm
 from pydantic import BaseModel
 
 from pipeline.llm_client import complete_structured, log_token_usage, throttle
+from pipeline.ocr import DEFAULT_MIN_CHARS, extract_text
+from pipeline.stages.stage2_triage import _is_uninformative_caption
 from pipeline.types import Post, ProductPrediction, vision_image_url
 
 logger = logging.getLogger(__name__)
@@ -44,6 +46,98 @@ PASS_B_SUFFIX = (
     "closely at the provided image to see if the product name, specs, or "
     "price are written directly on the photo."
 )
+
+# ---------------------------------------------------------------------------
+# The OCR price guard.
+#
+# Stage 2 only asks "is this a product?", so a garbled OCR read is a cheap
+# error. Stage 3 reads the PRICE, which the brief calls the one unforgivable
+# failure mode - eval/harness.py prints "MUST BE 100%" on missing-price recall
+# for exactly this reason. pipeline/ocr.py's docstring records the three things
+# its spike found, and two of them are attacks on the price specifically:
+#
+#   - "N500.000", a period used as the thousands separator. float() on that
+#     gives 500, not 500000 - a 1000x error on a real listing.
+#   - distractor numbers everywhere: an IMEI (352142373198245), model codes
+#     (A3288S), storage sizes. "longest digit run is the price" returns an IMEI.
+#
+# So a price the model attributes to the image is only allowed to stand when
+# the exact integer is recoverable from the raw OCR text by rules that REFUSE
+# to guess. Ungrounded means voided and escalated to vision, which is the
+# behaviour that existed before OCR - the guard can cost a call, never a price.
+#
+# Checked against the five committed caches in runs/vendor_gadgets_01/ocr/
+# before this was wired: 5/5 grounded against their gold prices, and the IMEI
+# produced no candidate at all, because it carries no currency marker.
+
+# A money-shaped token: a currency marker, then digits separated by . , or
+# SAME-LINE whitespace. \s would be wrong here - it crosses newlines, and
+# "PRICENGN1,400,000" followed by a line reading "16Pk" then parses as the
+# group sequence 1/400/000/16 and is refused. That was a real miss in the spike.
+OCR_MONEY_RE = re.compile(
+    r"(?:\u20a6|NGN|N|\$)\s*([0-9][0-9.,\t ]*[0-9]|[0-9])",
+    re.IGNORECASE,
+)
+
+# Below this a "price" is a page number or a spec figure, not a naira asking price.
+MIN_PLAUSIBLE_OCR_PRICE = 100
+
+
+def _normalise_ocr_price(token: str) -> int | None:
+    """One money token as an integer, or None when it is ambiguous.
+
+    A separator followed by exactly three digits is a thousands separator and
+    is stripped, so "500.000" is 500000. A trailing group of one or two digits
+    could be a decimal fraction OR a mangled read, and there is no safe way to
+    tell them apart - so it is refused rather than guessed. That one rule is
+    what stops the 1000x error, and it is why this returns None instead of a
+    best effort.
+    """
+    groups = [g for g in re.split(r"[.,\t ]+", token.strip()) if g]
+    if not groups:
+        return None
+    if len(groups) == 1:
+        return int(groups[0])
+    if any(len(g) != 3 for g in groups[1:]) or len(groups[0]) > 3:
+        return None
+    return int("".join(groups))
+
+
+def _ocr_price_candidates(ocr_text: str | None) -> set[int]:
+    """Every integer the raw OCR text could legitimately be asserting as a price."""
+    out: set[int] = set()
+    for match in OCR_MONEY_RE.finditer(ocr_text or ""):
+        value = _normalise_ocr_price(match.group(1))
+        if value is not None and value >= MIN_PLAUSIBLE_OCR_PRICE:
+            out.add(value)
+    return out
+
+
+def _guard_ocr_prices(result: "ProductExtractionResult", ocr_text: str | None) -> bool:
+    """Void any image-sourced price the OCR text does not actually support.
+
+    Only touches products whose price.source is "image" - a price read from the
+    caption or from a vendor comment was never OCR's to get wrong. Returns True
+    when anything was voided, which means the post still needs escalation.
+    """
+    candidates = _ocr_price_candidates(ocr_text)
+    voided = False
+    for item in result.products:
+        if item.price.source != "image" or item.price.value is None:
+            continue
+        if item.price.value in candidates:
+            continue
+        logger.warning(
+            "[stage3_extract] voiding ungrounded OCR price %s (candidates: %s)",
+            item.price.value,
+            sorted(candidates) or "none",
+        )
+        item.price.value = None
+        item.price.currency = None
+        item.price.source = "none"
+        item.price.confidence = 0.0
+        voided = True
+    return voided
 
 NAIRA_RE = re.compile(r"₦\s?([\d,]+)")
 USD_RE = re.compile(r"\$\s?([\d,]+)")
@@ -169,6 +263,20 @@ actual asking price:
 - Prices quoted for a different, unrelated product mentioned only as a comparison
   (e.g. "why pay 95m for a Prado when...").
 
+ABOUT THE "IMAGE TEXT" BLOCK (only present on some posts):
+That block is raw optical character recognition output from the photo. It is
+LOWER TRUST than the caption. It carries character-level errors (a zero for the
+letter O, as in "IPH0NE"), it is unordered, and it is full of numbers that are
+not prices - IMEIs, model codes, storage sizes, spec figures.
+- Use it to identify the product and its price only where the caption and the
+  vendor's comments do not already answer that.
+- A price taken only from that block must have price.source set to "image".
+- Never treat a number as the price unless the image text actually presents it
+  as one (next to "Price", "NGN", or a currency symbol). A long bare digit run
+  is an IMEI or a serial number, never a price.
+- Correct obvious character errors when reading the product NAME, but never
+  "correct" a price figure - report the digits exactly as they appear.
+
 Never fabricate a name, price, or spec detail that isn't stated or clearly
 shown in the post."""
 
@@ -249,15 +357,36 @@ def _regex_fallback(post: Post, profile: dict | None = None) -> list[ProductPred
     }]
 
 
-def _build_user_prompt(post: Post, profile: dict | None, vendor_comments: list[str]) -> str:
+def _build_user_prompt(
+    post: Post,
+    profile: dict | None,
+    vendor_comments: list[str],
+    ocr_text: str | None = None,
+) -> str:
+    """The Pass A prompt, optionally carrying an OCR block.
+
+    The OCR text goes in its OWN labelled block and never into the caption -
+    that is the whole point of the shape. stage2_triage_hybrid.py can afford to
+    substitute OCR text for the caption because its question is "is this a
+    product?", where a garbled read is a cheap error. Here the model must be
+    able to tell a caption the vendor wrote from text a recogniser guessed at,
+    because one of them is trustworthy about a price and the other is not.
+    """
     caption = post.get("caption") or ""
     profile_context = f"Account profile: {profile}" if profile else "Account profile: unavailable"
     comments_block = "\n".join(vendor_comments) if vendor_comments else "(none)"
-    return (
+    prompt = (
         f"{profile_context}\n\n"
         f"Caption:\n{caption}\n\n"
         f"Vendor's own comment replies (if any):\n{comments_block}"
     )
+    if ocr_text:
+        prompt += (
+            "\n\nIMAGE TEXT (read off the photo by OCR - may contain character "
+            "errors, unordered lines, and numbers that are not prices):\n"
+            f"{ocr_text}"
+        )
+    return prompt
 
 
 def _needs_escalation(result: ProductExtractionResult) -> bool:
@@ -292,6 +421,37 @@ def _pass_a(
         vendor_id=vendor_id,
         post_id=post_id,
         escalated=False,
+        max_tokens=max_tokens,
+    )
+
+
+def _pass_a_ocr(
+    user_prompt: str,
+    text_model: str,
+    run_id: str | None,
+    vendor_id: str | None,
+    post_id: str,
+    max_tokens: int = DEFAULT_MAX_TOKENS,
+) -> ProductExtractionResult:
+    """Text pass over a prompt that carries an OCR block.
+
+    Same model and same schema as _pass_a - only the prompt differs. It gets its
+    own token-log stage name so the tier's reach and cost are separable from the
+    plain text pass, mirroring how stage2_triage_hybrid.py splits its Gemini
+    text and vision stage names. Without that split the OCR tier is invisible in
+    report/token_log.csv, which is the only artifact that records what actually
+    reached a model.
+    """
+    return complete_structured(
+        model=text_model,
+        system_prompt=SYSTEM_PROMPT,
+        user_prompt=user_prompt,
+        schema=ProductExtractionResult,
+        stage_name="stage3_extract_pass_a_ocr",
+        run_id=run_id,
+        vendor_id=vendor_id,
+        post_id=post_id,
+        escalated=True,
         max_tokens=max_tokens,
     )
 
@@ -375,50 +535,117 @@ def extract_product(
     run_id: str | None = None,
     vendor_id: str | None = None,
     max_tokens: int = DEFAULT_MAX_TOKENS,
+    use_ocr: bool = False,
+    ocr_min_chars: int = DEFAULT_MIN_CHARS,
 ) -> list[ProductPrediction]:
-    """Extracts one or more products from a post via the Pass A -> Pass B
-    vision-escalation cascade.
+    """Extracts one or more products from a post via a three-tier cascade.
 
-    Pass B only runs when Pass A left a product missing a name, missing a
-    price entirely, or under-confident, AND the post has a media_url to
-    escalate to, AND the post isn't a confirmed "DM for price" case (see
-    DM_FOR_PRICE_RE) - Pass A already correctly determined no price exists
-    there, so vision has nothing left to find.
+        caption uninformative + use_ocr  ->  OCR first, then ONE text pass
+                                             carrying the IMAGE TEXT block
+        caption present                  ->  Pass A (text)
+                                             +-- unfinished --> OCR, text pass again
+                                                 +-- still unfinished --> vision Pass B
+
+    WHY OCR SITS HERE. Stage 2's cascade already drove its own vision spend to
+    zero by inserting local OCR ahead of the vision model, which left this stage
+    holding every remaining vision call in the project - 214 of them, 67% of all
+    vision cost, while Stage 3 overall is 74% of all token spend. pipeline/ocr.py
+    was already caching the text for exactly these posts and nothing read it.
+
+    WHY IT IS NOT WIRED THE WAY STAGE 2 WIRES IT. Stage 2 substitutes OCR text
+    for the caption, which it can afford because its question is only whether a
+    post is a product. This stage reads the PRICE. OCR text therefore arrives in
+    its own labelled block (see _build_user_prompt) and any price attributed to
+    the image must clear _guard_ocr_prices before it is allowed to stand.
+
+    Vision is NOT removed. Every failure path in pipeline/ocr.py returns None,
+    and None still means escalate to vision, exactly as before OCR existed.
 
     Args:
         post: Post dict with "caption" and optionally "comments"/"media_url".
         profile: Stage 1's AccountProfile, as a dict or the pydantic model
             itself (both are accepted here, see _vendor_comment_texts).
-        text_model: litellm model string for Pass A. Defaults to MODEL so
-            existing callers/configs that don't set this explicitly are
-            unaffected.
-        vision_model: litellm model string for Pass B. Same default as
-            text_model.
-        run_id: Groups this call's report/token_log.csv row with the rest of
-            one eval/harness.py run - token usage is only logged when this
-            is set (see log_token_usage() in pipeline/llm_client.py).
-        vendor_id: Account label, for the token log's "vendor_id" column.
+        text_model: litellm model string for Pass A and for the OCR text pass.
+        vision_model: litellm model string for Pass B.
+        run_id: Groups this call's report/token_log.csv rows with the rest of
+            one eval/harness.py run - token usage is only logged when set.
+        vendor_id: Account label, for the token log's "vendor_id" column. Also
+            the account the OCR cache is keyed under.
+        use_ocr: Enables the OCR tier. Defaults to False IN CODE so every
+            experiment YAML written before this tier existed reproduces its
+            recorded run unchanged; stage3_ocr.yaml is what turns it on.
+        ocr_min_chars: Below this many recognised characters the read counts as
+            failed and the cascade escalates to vision as it did before.
 
     Returns:
-        A list of ProductPrediction, one per distinct product the model
-        found. Falls back to _regex_fallback() (always a single product)
-        if any LLM call in the cascade fails for any reason.
+        A list of ProductPrediction, one per distinct product the model found.
+        Falls back to _regex_fallback() (always a single product) if any LLM
+        call in the cascade fails for any reason.
     """
     vendor_comments = _vendor_comment_texts(post, profile)
-    user_prompt = _build_user_prompt(post, profile, vendor_comments)
     post_id = post.get("post_id") or post.get("id") or ""
+    caption = post.get("caption") or ""
+    image_url = vision_image_url(post)
 
-    # "DM for price" (or "inbox/call for price") means the vendor has
-    # confirmed, in their own words, that no price is stated anywhere -
-    # not that Pass A merely failed to find one. The price isn't sitting on
-    # the photo either in that case, so escalating to vision would just
-    # re-ask the same already-answered question at 2x cost.
-    search_text = " ".join(vendor_comments) + " \n " + (post.get("caption") or "")
+    # "DM for price" (or "inbox/call for price") means the vendor has confirmed,
+    # in their own words, that no price is stated anywhere - not that Pass A
+    # merely failed to find one. The price is not sitting on the photo either in
+    # that case, so neither OCR nor vision has anything left to find and both
+    # would only re-ask an already-answered question.
+    search_text = " ".join(vendor_comments) + " \n " + caption
     confirmed_no_price = bool(DM_FOR_PRICE_RE.search(search_text))
+    ocr_allowed = use_ocr and bool(image_url) and not confirmed_no_price
+
+    ocr_text: str | None = None
+    ocr_attempted = False
+
+    def _read_image_text() -> str | None:
+        nonlocal ocr_attempted
+        ocr_attempted = True
+        text, reason = extract_text(
+            image_url,
+            post_id=post_id,
+            account_label=vendor_id,
+            min_chars=ocr_min_chars,
+        )
+        logger.info("[stage3_extract] %s: OCR %s", post_id, reason)
+        return text
 
     try:
-        result = _pass_a(user_prompt, text_model, run_id, vendor_id, post_id, max_tokens)
-        if _needs_escalation(result) and vision_image_url(post) and not confirmed_no_price:
+        # Tier 0. With no caption to read, Pass A would spend a call on an empty
+        # prompt and escalate regardless, so OCR goes first and its text rides
+        # along on that one call rather than costing an extra one.
+        if ocr_allowed and _is_uninformative_caption(caption):
+            ocr_text = _read_image_text()
+
+        user_prompt = _build_user_prompt(post, profile, vendor_comments, ocr_text)
+        if ocr_text:
+            result = _pass_a_ocr(user_prompt, text_model, run_id, vendor_id, post_id, max_tokens)
+        else:
+            result = _pass_a(user_prompt, text_model, run_id, vendor_id, post_id, max_tokens)
+
+        needs_escalation = _needs_escalation(result)
+        if ocr_text and _guard_ocr_prices(result, ocr_text):
+            needs_escalation = True
+
+        # Tier 1. A captioned post Pass A could not finish. A price printed on
+        # the photo is one of the three things _needs_escalation fires on, and
+        # it is reachable without paying for vision.
+        if needs_escalation and ocr_allowed and not ocr_attempted:
+            ocr_text = _read_image_text()
+            if ocr_text:
+                logger.info("[stage3_extract] %s: retrying text pass with OCR", post_id)
+                user_prompt = _build_user_prompt(post, profile, vendor_comments, ocr_text)
+                result = _pass_a_ocr(
+                    user_prompt, text_model, run_id, vendor_id, post_id, max_tokens
+                )
+                needs_escalation = _needs_escalation(result)
+                if _guard_ocr_prices(result, ocr_text):
+                    needs_escalation = True
+
+        # Tier 2. Unchanged, and still the only paid escalation - now reached
+        # only when the free tiers could not answer.
+        if needs_escalation and image_url and not confirmed_no_price:
             logger.info("[stage3_extract] %s: escalating to vision Pass B", post_id)
             result = _pass_b(post, user_prompt, vision_model, run_id, vendor_id, post_id)
     except Exception as exc:
