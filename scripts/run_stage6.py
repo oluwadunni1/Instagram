@@ -2,13 +2,15 @@
 """
 Stage 6 - Sync, Step 2: pulls fresh posts for the connected vendor from the
 Instagram Graph API and diffs them against the Step 1 snapshot
-(data/snapshots/<vendor-handle>/). Writes report/changes.json.
+(data/snapshots/<vendor-handle>/). Writes
+report/<vendor-handle>/changes_<sync-timestamp>.json, and archives the
+snapshot it diffed against under data/snapshots/<vendor-handle>/history/
+before advancing it, so the pair stays re-scorable.
 
 Usage:
     uv run scripts/run_stage6.py
     uv run scripts/run_stage6.py --vendor-handle gadget.hub.ng \\
-        --golden eval/golden/vendor_gadgets_01.json \\
-        --changes report/changes_gadgets.json
+        --golden eval/golden/vendor_gadgets_01.json
 
 Defaults reproduce the original ayodele.akinbohun / vendor_autos_01 run.
 --vendor-handle must match the actual Instagram username the connected
@@ -24,6 +26,7 @@ same --vendor-handle.
 import argparse
 import json
 import logging
+import shutil
 import sys
 import time
 from datetime import datetime, timezone
@@ -56,21 +59,26 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_VENDOR_HANDLE = "ayodele.akinbohun"
 DEFAULT_GOLDEN_PATH = Path("eval/golden/vendor_autos_01.json")
-DEFAULT_CHANGES_PATH = Path("report/changes.json")
 
-# Reassigned from CLI args in main() via `global` before run_sync()/
-# _advance_snapshot() run - both read these by module-global lookup rather
-# than taking them as parameters, so this needs to happen before either is
-# called, not just at import time. GOLDEN_PATH stays a plain alias (never
-# reassigned) purely so scripts/simulate_stage6.py's existing
-# `from scripts.run_stage6 import GOLDEN_PATH, ...` keeps working unchanged -
-# that script always simulates against the default vendor, independent of
-# whatever --vendor-handle this file's own main() is invoked with.
-VENDOR_HANDLE = DEFAULT_VENDOR_HANDLE
-SNAPSHOT_DIR = Path("data/snapshots") / VENDOR_HANDLE
-GOLDEN_PATH = DEFAULT_GOLDEN_PATH
+# run_sync()/_advance_snapshot() take vendor_handle and snapshot_dir as
+# explicit parameters rather than reading module globals. They used to read
+# globals that main() reassigned, which meant scripts/simulate_stage6.py -
+# which imports them rather than calling main() - could only ever simulate
+# whichever vendor those globals named at import time.
+
+
+def snapshot_dir_for(vendor_handle: str) -> Path:
+    """Snapshot root for a vendor. Keyed by the real Instagram handle, not the
+    local account_label - see CLAUDE.md on the two identifiers."""
+    return Path("data/snapshots") / vendor_handle
+
 
 GRAPH_BASE = "https://graph.instagram.com"
+# Skew, deliberate: ingest/ingest.py is on v26.0 while this script and
+# scripts/refresh_media_urls.py are on v21.0. Aligning needs a live call
+# confirming comments_count and children{} still resolve the same way on v26.0
+# for THIS app's access level; until someone runs that check against a live
+# token, a blind bump risks silently dropping a field the diff depends on.
 API_VERSION = "v21.0"
 MEDIA_FIELDS = (
     # thumbnail_url/media_product_type: only populated for media_type=VIDEO
@@ -116,6 +124,50 @@ REPOST_KEYWORDS = ["sold", "delivered", "handed over"]
 # heavily-edited "SOLD" reposts this session added keyword-gated matching
 # for) is a real edit a vendor should see, not a no-brainer merge.
 AUTO_MERGE_PHASH_MAX_DISTANCE = 0
+
+# A snapshot entry in one of these states is a record of a post that is no
+# longer a live catalog item. Two things follow, and both are load-bearing:
+#
+#   - "archived" means the post was already reported deleted. Without this set,
+#     an absent post lands in deleted_ids on EVERY subsequent sync and is
+#     re-reported forever, each time with requires_vendor_action - asking the
+#     vendor to archive the same post again at every sync. Verified before the
+#     fix: three syncs after a single deletion reported it three times.
+#   - "superseded" means an exact repost took over the post's catalog identity.
+#     The post is still live, so it must stay in the snapshot to diff as the
+#     no-op it is, but it must not be a match candidate - a later repost has to
+#     match the live post, not the tombstone.
+TERMINAL_LIFECYCLE_STATES = frozenset({"archived", "superseded"})
+
+
+def _is_terminal(entry: dict) -> bool:
+    return entry.get("lifecycle_state") in TERMINAL_LIFECYCLE_STATES
+
+
+SNAPSHOT_FILES = ("latest.json", "embeddings.npy", "embedding_index.json")
+
+
+def archive_snapshot(snapshot_dir: Path, sync_timestamp: str) -> Path | None:
+    """Copies the current snapshot trio to history/<sync_timestamp>/ before it
+    is overwritten. Returns where it went, or None if there was nothing to
+    archive (the first sync after a baseline build).
+
+    A sync used to destroy its own "before": latest.json, embeddings.npy and
+    embedding_index.json were written in place, so no sync was repeatable and
+    no before/after pair could ever be re-scored. Keeping every version is what
+    makes a measured sync re-scorable without re-running it against a live
+    account whose state has since moved on.
+    """
+    present = [name for name in SNAPSHOT_FILES if (snapshot_dir / name).exists()]
+    if not present:
+        return None
+    # ':' is legal in an ISO timestamp and illegal in a Windows path component.
+    history_dir = snapshot_dir / "history" / sync_timestamp.replace(":", "-")
+    history_dir.mkdir(parents=True, exist_ok=True)
+    for name in present:
+        shutil.copy2(snapshot_dir / name, history_dir / name)
+    logger.info("Archived %d snapshot file(s) -> %s", len(present), history_dir)
+    return history_dir
 
 
 def _fetch_all_media(token: str) -> list[dict]:
@@ -207,6 +259,7 @@ def _matched_keyword(caption: str | None) -> str | None:
 
 
 def _advance_snapshot(
+    vendor_handle: str,
     prev_index: dict,
     old_embedding_by_id: dict,
     fresh_by_id: dict,
@@ -217,6 +270,9 @@ def _advance_snapshot(
     embedding_by_new_id: dict,
     merged_pairs: list[tuple[str, str]],
     deleted_ids: set,
+    already_archived_ids: set | None = None,
+    run_id: str | None = None,
+    vendor_id: str | None = None,
 ) -> tuple[list[dict], list[list[float]]]:
     """Builds the snapshot that becomes the "previous run" for the *next*
     sync - without this, latest.json is never rewritten and every future
@@ -242,7 +298,9 @@ def _advance_snapshot(
         old_entry = prev_index[pid]
         fresh = fresh_by_id[pid]
         if fresh.get("caption") != old_entry.get("caption"):
-            embedding, _ = compute_caption_embedding(fresh.get("caption"), post_id=pid)
+            embedding, _ = compute_caption_embedding(
+                fresh.get("caption"), post_id=pid, run_id=run_id, vendor_id=vendor_id
+            )
         else:
             embedding = old_embedding_by_id[pid]
         comments = fresh.get("comments") or []
@@ -254,7 +312,7 @@ def _advance_snapshot(
             "content_hash": compute_content_hash(fresh),
             "image_phash": old_entry.get("image_phash"),
             "comment_cursor": comments[-1]["id"] if comments else old_entry.get("comment_cursor"),
-            "lifecycle_state": compute_lifecycle_state(old_entry.get("post_type"), comments, VENDOR_HANDLE),
+            "lifecycle_state": compute_lifecycle_state(old_entry.get("post_type"), comments, vendor_handle),
             "catalog_products": old_entry.get("catalog_products", []),
             "post_type": old_entry.get("post_type"),
             "carousel_classification": old_entry.get("carousel_classification"),
@@ -269,6 +327,14 @@ def _advance_snapshot(
         entries[pid] = archived_entry
         embeddings[pid] = old_embedding_by_id[pid]
 
+    # 3b. Already archived by an earlier sync and still absent: carried forward
+    #     verbatim and reported as nothing. The entry has to survive, or the
+    #     post falls out of the snapshot and the next sync has no way to know
+    #     the deletion was already handled.
+    for pid in already_archived_ids or set():
+        entries[pid] = prev_index[pid]
+        embeddings[pid] = old_embedding_by_id[pid]
+
     # 4. Genuinely-new posts and non-exact repost matches (not auto-merged):
     #    tracked as their own catalog entries going forward. post_type stays
     #    None - Stage 2 hasn't classified them in this sync pass.
@@ -276,7 +342,9 @@ def _advance_snapshot(
         fresh = fresh_by_id[pid]
         embedding = embedding_by_new_id.get(pid)
         if embedding is None:
-            embedding, _ = compute_caption_embedding(fresh.get("caption"), post_id=pid)
+            embedding, _ = compute_caption_embedding(
+                fresh.get("caption"), post_id=pid, run_id=run_id, vendor_id=vendor_id
+            )
         comments = fresh.get("comments") or []
         entries[pid] = {
             "post_id": pid,
@@ -293,13 +361,45 @@ def _advance_snapshot(
         }
         embeddings[pid] = embedding
 
-    # 5. Auto-merged exact reposts: same catalog product, so the new post_id
-    #    supersedes the old one entirely - never carry both (never duplicate).
+    # 5. Auto-merged exact reposts: the catalog product moves to the new
+    #    post_id, and the old post is kept as a SUPERSEDED tombstone.
+    #
+    #    This used to pop the old entry outright, on the reasoning that
+    #    carrying both would duplicate the catalog. It does not - but dropping
+    #    it breaks the next sync. Reposting without deleting the original is
+    #    what a vendor actually does, so the old post is still live in
+    #    /me/media; with no snapshot entry for it, the next sync sees it as new,
+    #    pHash-matches it at distance 0, and merges back the other way. It then
+    #    alternates forever, reporting a repost_merge on every sync of an
+    #    account where nothing changed - against the one claim Stage 6 exists to
+    #    make. Verified before the fix: merge, flip, flip.
+    #
+    #    The tombstone carries no catalog_products, so nothing is duplicated;
+    #    it exists so the post is recognised, diffs as the no-op it genuinely
+    #    is, and stops being a match candidate (see match_candidates in
+    #    run_sync - a later repost must match the live post, not the tombstone).
     for new_pid, old_pid in merged_pairs:
         old_entry = prev_index[old_pid]
         fresh = fresh_by_id[new_pid]
-        entries.pop(old_pid, None)
-        embeddings.pop(old_pid, None)
+        if old_pid in fresh_by_id:
+            # Base the tombstone on whatever steps 1-2 already wrote for this
+            # post, NOT on prev_index - the vendor may have edited the caption
+            # of the very post being superseded, in the same window. Using the
+            # stale entry would bake the old caption and old content_hash into
+            # the tombstone, so the next sync would re-report that edit and
+            # rebuild the entry through step 2, silently dropping the
+            # superseded state and making it a match candidate again.
+            entries[old_pid] = {
+                **entries.get(old_pid, old_entry),
+                "lifecycle_state": "superseded",
+                "superseded_by": new_pid,
+                "catalog_products": [],
+            }
+            embeddings[old_pid] = embeddings.get(old_pid, old_embedding_by_id[old_pid])
+        # If the original is NOT in the fresh fetch, the vendor deleted it in
+        # the same window and step 3 has already archived it. Leave that record
+        # alone rather than popping it - an archived entry is how a deletion
+        # stays reported exactly once (see TERMINAL_LIFECYCLE_STATES).
         comments = fresh.get("comments") or []
         entries[new_pid] = {
             "post_id": new_pid,
@@ -309,7 +409,7 @@ def _advance_snapshot(
             "content_hash": compute_content_hash(fresh),
             "image_phash": phash_by_new_id.get(new_pid),
             "comment_cursor": comments[-1]["id"] if comments else None,
-            "lifecycle_state": compute_lifecycle_state(old_entry.get("post_type"), comments, VENDOR_HANDLE),
+            "lifecycle_state": compute_lifecycle_state(old_entry.get("post_type"), comments, vendor_handle),
             "catalog_products": old_entry.get("catalog_products", []),
             "post_type": old_entry.get("post_type"),
             "carousel_classification": old_entry.get("carousel_classification"),
@@ -330,6 +430,11 @@ def run_sync(
     golden_by_id: dict,
     changes_path: Path,
     persist_snapshot: bool = True,
+    vendor_handle: str = DEFAULT_VENDOR_HANDLE,
+    snapshot_dir: Path | None = None,
+    run_id: str | None = None,
+    vendor_id: str | None = None,
+    sync_timestamp: str | None = None,
 ) -> dict:
     """Everything after "we have a list of fresh posts, however obtained":
     diffs them against `snapshot`, writes `changes_path`, and (unless
@@ -340,6 +445,8 @@ def run_sync(
 
     Returns the same dict written to `changes_path`.
     """
+    snapshot_dir = snapshot_dir if snapshot_dir is not None else snapshot_dir_for(vendor_handle)
+    sync_timestamp = sync_timestamp or datetime.now(timezone.utc).isoformat()
     prev_index = {entry["post_id"]: entry for entry in snapshot}
     prev_ids = set(prev_index)
     old_embedding_by_id = {pid: emb_matrix[i] for i, pid in enumerate(post_ids_by_row)}
@@ -348,8 +455,21 @@ def run_sync(
     fresh_ids = set(fresh_by_id)
 
     new_ids = fresh_ids - prev_ids
-    deleted_ids = prev_ids - fresh_ids
+    absent_ids = prev_ids - fresh_ids
+    # Only a post that is not ALREADY archived is a new deletion. The rest are
+    # deletions this sync has reported before (TERMINAL_LIFECYCLE_STATES).
+    deleted_ids = {pid for pid in absent_ids if prev_index[pid].get("lifecycle_state") != "archived"}
+    already_archived_ids = absent_ids - deleted_ids
     common_ids = fresh_ids & prev_ids
+
+    # Superseded tombstones and archived posts are records, not live catalog
+    # items, so a repost must never match one. Both matchers are filtered here,
+    # together, so the two views cannot drift apart.
+    match_candidates = [entry for entry in snapshot if not _is_terminal(entry)]
+    live_rows = [i for i, pid in enumerate(post_ids_by_row)
+                 if not _is_terminal(prev_index.get(pid, {}))]
+    match_emb_matrix = emb_matrix[live_rows] if live_rows else np.empty((0, emb_matrix.shape[1]))
+    match_post_ids = [post_ids_by_row[i] for i in live_rows]
 
     changes: list[dict] = []
     no_op_ids: list[str] = []
@@ -451,15 +571,17 @@ def run_sync(
 
         phash, _phash_fail_reason = compute_image_phash(vision_image_url(fresh), post_id=post_id)
         phash_by_new_id[post_id] = phash
-        phash_match = find_phash_match(phash, snapshot, threshold=phash_threshold) if phash else None
+        phash_match = find_phash_match(phash, match_candidates, threshold=phash_threshold) if phash else None
 
         embedding_match = None
         if phash_match is None:
-            embedding, _ = compute_caption_embedding(caption, post_id=post_id)
+            embedding, _ = compute_caption_embedding(
+                caption, post_id=post_id, run_id=run_id, vendor_id=vendor_id
+            )
             embedding_by_new_id[post_id] = embedding
             embedding_match = find_embedding_match(
-                embedding, emb_matrix, post_ids_by_row, threshold=embedding_threshold
-            )
+                embedding, match_emb_matrix, match_post_ids, threshold=embedding_threshold
+            ) if len(match_post_ids) else None
 
         if phash_match is None and embedding_match is None:
             changes.append({
@@ -575,6 +697,7 @@ def run_sync(
 
     if persist_snapshot:
         next_entries, next_embeddings = _advance_snapshot(
+            vendor_handle=vendor_handle,
             prev_index=prev_index,
             old_embedding_by_id=old_embedding_by_id,
             fresh_by_id=fresh_by_id,
@@ -585,16 +708,20 @@ def run_sync(
             embedding_by_new_id=embedding_by_new_id,
             merged_pairs=merged_pairs,
             deleted_ids=deleted_ids,
+            already_archived_ids=already_archived_ids,
+            run_id=run_id,
+            vendor_id=vendor_id,
         )
-        SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
-        (SNAPSHOT_DIR / "latest.json").write_text(json.dumps(next_entries, indent=2, ensure_ascii=False), encoding="utf-8")
-        np.save(SNAPSHOT_DIR / "embeddings.npy", np.array(next_embeddings, dtype=np.float64))
+        snapshot_dir.mkdir(parents=True, exist_ok=True)
+        archived_to = archive_snapshot(snapshot_dir, sync_timestamp)
+        (snapshot_dir / "latest.json").write_text(json.dumps(next_entries, indent=2, ensure_ascii=False), encoding="utf-8")
+        np.save(snapshot_dir / "embeddings.npy", np.array(next_embeddings, dtype=np.float64))
         next_embedding_index = {str(i): entry["post_id"] for i, entry in enumerate(next_entries)}
-        (SNAPSHOT_DIR / "embedding_index.json").write_text(json.dumps(next_embedding_index, indent=2), encoding="utf-8")
+        (snapshot_dir / "embedding_index.json").write_text(json.dumps(next_embedding_index, indent=2), encoding="utf-8")
 
     output = {
-        "sync_timestamp": datetime.now(timezone.utc).isoformat(),
-        "vendor": VENDOR_HANDLE,
+        "sync_timestamp": sync_timestamp,
+        "vendor": vendor_handle,
         "summary": summary,
         "changes": changes,
         "no_op_post_ids": sorted(no_op_ids),
@@ -604,7 +731,7 @@ def run_sync(
     changes_path.write_text(json.dumps(output, indent=2, ensure_ascii=False), encoding="utf-8")
 
     bar = "─" * 33
-    print(f"Sync complete — {VENDOR_HANDLE}")
+    print(f"Sync complete — {vendor_handle}")
     print(bar)
     print(f"Fresh posts:     {summary['total_fresh']}")
     print(f"Previous posts:  {summary['total_prev']}")
@@ -623,7 +750,9 @@ def run_sync(
     print(f"Vendor action required: {vendor_action_required} items")
     print(f"Written → {changes_path}")
     if persist_snapshot:
-        print(f"Snapshot advanced → {SNAPSHOT_DIR / 'latest.json'}")
+        if archived_to is not None:
+            print(f"Previous snapshot archived → {archived_to}")
+        print(f"Snapshot advanced → {snapshot_dir / 'latest.json'}")
     else:
         print("Snapshot NOT written (persist_snapshot=False) - real baseline untouched")
 
@@ -641,26 +770,34 @@ def main() -> None:
     parser.add_argument("--golden", type=Path, default=DEFAULT_GOLDEN_PATH,
                          help="Golden-set file, only used for matched_permalink display "
                               "(default: eval/golden/vendor_autos_01.json)")
-    parser.add_argument("--changes", type=Path, default=DEFAULT_CHANGES_PATH,
-                         help="Where to write the sync's changes JSON (default: report/changes.json - "
-                              "pass a distinct path per vendor if you want to keep multiple around)")
+    parser.add_argument("--changes", type=Path, default=None,
+                         help="Where to write the sync's changes JSON (default: "
+                              "report/<vendor-handle>/changes_<sync-timestamp>.json, which is "
+                              "per-vendor and per-run; the old fixed report/changes.json collided "
+                              "across vendors and across syncs)")
     parser.add_argument("--token-env", default="IG_ACCESS_TOKEN",
                          help="Env var holding this account's access token (default: IG_ACCESS_TOKEN) - "
                               "use a different name to sync a second connected account without "
                               "overwriting the first one's token in .env")
     args = parser.parse_args()
 
-    global VENDOR_HANDLE, SNAPSHOT_DIR
-    VENDOR_HANDLE = args.vendor_handle
-    SNAPSHOT_DIR = Path("data/snapshots") / VENDOR_HANDLE
+    vendor_handle = args.vendor_handle
+    snapshot_dir = snapshot_dir_for(vendor_handle)
+    sync_timestamp = datetime.now(timezone.utc).isoformat()
+    vendor_id = args.golden.stem if args.golden is not None else vendor_handle
+    run_id = f"sync_{vendor_id}_{datetime.now(timezone.utc):%Y%m%dT%H%M%SZ}"
+
+    changes_path = args.changes
+    if changes_path is None:
+        changes_path = Path("report") / vendor_handle / f"changes_{sync_timestamp.replace(':', '-')}.json"
 
     token = get_ig_access_token(args.token_env)
     if not token:
         raise MissingCredentialsError(f"Set {args.token_env} in your environment first.")
 
-    snapshot = json.loads((SNAPSHOT_DIR / "latest.json").read_text(encoding="utf-8"))
-    emb_matrix = np.load(SNAPSHOT_DIR / "embeddings.npy")
-    embedding_index = json.loads((SNAPSHOT_DIR / "embedding_index.json").read_text(encoding="utf-8"))
+    snapshot = json.loads((snapshot_dir / "latest.json").read_text(encoding="utf-8"))
+    emb_matrix = np.load(snapshot_dir / "embeddings.npy")
+    embedding_index = json.loads((snapshot_dir / "embedding_index.json").read_text(encoding="utf-8"))
     post_ids_by_row = [embedding_index[str(i)] for i in range(len(embedding_index))]
 
     # Snapshot entries don't carry permalink (added after the snapshot schema
@@ -671,10 +808,23 @@ def main() -> None:
     if args.golden.exists():
         golden_by_id = {p["post_id"]: p for p in json.loads(args.golden.read_text(encoding="utf-8"))}
 
-    logger.info("Fetching fresh media list for %s...", VENDOR_HANDLE)
+    logger.info("Fetching fresh media list for %s (run_id=%s)...", vendor_handle, run_id)
     raw_posts = _fetch_all_media(token)
 
-    run_sync(raw_posts, snapshot, emb_matrix, post_ids_by_row, golden_by_id, args.changes, persist_snapshot=True)
+    run_sync(
+        raw_posts,
+        snapshot,
+        emb_matrix,
+        post_ids_by_row,
+        golden_by_id,
+        changes_path,
+        persist_snapshot=True,
+        vendor_handle=vendor_handle,
+        snapshot_dir=snapshot_dir,
+        run_id=run_id,
+        vendor_id=vendor_id,
+        sync_timestamp=sync_timestamp,
+    )
 
 
 if __name__ == "__main__":

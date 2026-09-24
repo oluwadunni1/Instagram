@@ -38,6 +38,10 @@ from pipeline.types import vision_image_url  # noqa: E402
 logger = logging.getLogger(__name__)
 
 GRAPH_BASE = "https://graph.instagram.com"
+# Skew, deliberate: ingest/ingest.py is on v26.0, this script and
+# scripts/run_stage6.py are on v21.0. Aligning needs a live call confirming
+# the fields these scripts read still resolve the same way on v26.0 for this
+# app's access level; nobody has run that check, so no blind bump.
 API_VERSION = "v21.0"
 REQUEST_TIMEOUT_SECONDS = 10
 RATE_LIMIT_SLEEP_SECONDS = 0.3  # basic tier: 200 calls/hour

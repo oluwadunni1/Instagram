@@ -15,7 +15,9 @@ TOKEN_ENV ?= IG_ACCESS_TOKEN
 VENDOR    ?= ayodele.akinbohun
 GOLDEN    ?= eval/golden/$(ACCOUNT).json
 CONFIG    ?= pipeline/config/experiments/default.yaml
-CHANGES   ?= report/changes.json
+# Empty by default: run_stage6.py then picks report/<VENDOR>/changes_<sync-timestamp>.json,
+# which is per-vendor and per-run. The old fixed report/changes.json collided on both.
+CHANGES   ?=
 LABEL     ?= Gemini Cascade
 # eval/harness.py writes predictions to report/<golden file stem>/, so these
 # follow ACCOUNT automatically; only the model half needs overriding per run.
@@ -40,8 +42,10 @@ help:
 	@echo "  pipeline        uv run scripts/run_pipeline.py --account \$$(ACCOUNT) --config \$$(CONFIG)  [LIMIT=N caps posts; INGEST=1 pulls a fresh dump first; LIVE=1 traces each stage as it finishes; FORCE_PROFILE=1 re-runs Stage 1]"
 	@echo "  stage5          uv run scripts/run_stage5.py --golden \$$(GOLDEN) --stage2 \$$(STAGE2) --stage3 \$$(STAGE3) --stage4 \$$(STAGE4) --label \"\$$(LABEL)\"  [APPEND=1 adds --append-findings]"
 	@echo "  verify          uv run scripts/verify_run.py --run-id \$$(RUN_ID) [--expect-model \$$(EXPECT)] [--posts \$$(POSTS)] [--predictions \$$(PREDS)]   (RUN_ID= alone lists the log's run_ids)"
-	@echo "  snapshot        uv run scripts/run_build_snapshot.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN)"
-	@echo "  sync            uv run scripts/run_stage6.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN) --changes \$$(CHANGES) --token-env \$$(TOKEN_ENV)"
+	@echo "  snapshot        uv run scripts/run_build_snapshot.py --vendor-handle \$$(VENDOR) --account \$$(ACCOUNT)"
+	@echo "                  (baseline from the latest raw dump; pass GOLDEN= for the legacy golden-set path)"
+	@echo "  sync            uv run scripts/run_stage6.py --vendor-handle \$$(VENDOR) --golden \$$(GOLDEN) --token-env \$$(TOKEN_ENV)"
+	@echo "                  (changes default to report/\$$(VENDOR)/changes_<sync-timestamp>.json; CHANGES= overrides)"
 	@echo "  simulate-sync   uv run scripts/simulate_stage6.py"
 	@echo ""
 	@echo "Live demo (no arguments - account and token are baked in):"
@@ -59,7 +63,7 @@ help:
 	@echo "  data-pull       download data from R2 (use on a fresh clone)"
 	@echo "  data-status     show what differs between local, cache, and R2"
 	@echo ""
-	@echo "Variables (override with VAR=value): ACCOUNT TOKEN_ENV VENDOR GOLDEN CONFIG CHANGES LABEL STAGE2 STAGE3 STAGE4 APPEND LIMIT INGEST LIVE FORCE_PROFILE RUN_ID EXPECT POSTS PREDS DEMO_ACCOUNT DEMO_TOKEN_ENV"
+	@echo "Variables (override with VAR=value): ACCOUNT TOKEN_ENV VENDOR GOLDEN GOLDEN_SNAPSHOT CONFIG CHANGES LABEL STAGE2 STAGE3 STAGE4 APPEND LIMIT INGEST LIVE FORCE_PROFILE RUN_ID EXPECT POSTS PREDS DEMO_ACCOUNT DEMO_TOKEN_ENV"
 	@echo "Current defaults: ACCOUNT=$(ACCOUNT) TOKEN_ENV=$(TOKEN_ENV) VENDOR=$(VENDOR) GOLDEN=$(GOLDEN) CONFIG=$(CONFIG)"
 	@echo "                  DEMO_ACCOUNT=$(DEMO_ACCOUNT) DEMO_TOKEN_ENV=$(DEMO_TOKEN_ENV)"
 
@@ -109,14 +113,17 @@ stage5:
 verify:
 	uv run scripts/verify_run.py $(if $(RUN_ID),--run-id $(RUN_ID),--list) $(foreach m,$(EXPECT),--expect-model $(m)) $(if $(POSTS),--posts $(POSTS),) $(foreach p,$(PREDS),--predictions $(p))
 
+# Builds from the latest raw dump for ACCOUNT - the baseline is then the same
+# live feed the sync re-fetches. GOLDEN_SNAPSHOT=1 uses the legacy golden-set
+# path instead, which re-discovers posts a live sync already had.
 snapshot:
-	uv run scripts/run_build_snapshot.py --vendor-handle $(VENDOR) --golden $(GOLDEN)
+	uv run scripts/run_build_snapshot.py --vendor-handle $(VENDOR) $(if $(GOLDEN_SNAPSHOT),--golden $(GOLDEN),--account $(ACCOUNT))
 
 sync:
-	uv run scripts/run_stage6.py --vendor-handle $(VENDOR) --golden $(GOLDEN) --changes $(CHANGES) --token-env $(TOKEN_ENV)
+	uv run scripts/run_stage6.py --vendor-handle $(VENDOR) --golden $(GOLDEN) $(if $(CHANGES),--changes $(CHANGES),) --token-env $(TOKEN_ENV)
 
 simulate-sync:
-	uv run scripts/simulate_stage6.py
+	uv run scripts/simulate_stage6.py --vendor-handle $(VENDOR) --golden $(GOLDEN)
 
 # --- Offline checks -------------------------------------------------------
 # eval/harness.py remains the verification mechanism for model quality; these

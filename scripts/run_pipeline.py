@@ -283,10 +283,17 @@ def posts_needing_work(changes_path: Path) -> set[str]:
       comment_delta  - new comments; Stage 4 reads them for sold/stock signals
 
     Deliberately excluded: `content_changed` (the content hash moved but neither
-    caption nor comment count did - CDN churn, not new information),
-    `repost_match` and `repost_merge` (already resolved against an existing
-    item), and every no-op. Re-running the cascade on those is exactly the spend
-    Stage 6 exists to avoid.
+    caption nor comment count did), `repost_match` and `repost_merge` (already
+    resolved against an existing item), and every no-op. Re-running the cascade
+    on those is exactly the spend Stage 6 exists to avoid.
+
+    This used to explain `content_changed` as CDN churn. That was wrong, and it
+    is worth recording because the wrong explanation is what kept the real cause
+    hidden: `compute_content_hash()` has always excluded `media_url` precisely
+    so rotating oh=/oe= params cannot move it. The actual cause was the hash's
+    `len(comments)` component - a live fetch returns an empty comments array
+    while the golden-derived baseline had hand-authored ones - and that
+    component is gone. See README.md.
     """
     report = json.loads(changes_path.read_text(encoding="utf-8"))
     actionable = {"new_post", "caption_edit", "comment_delta"}

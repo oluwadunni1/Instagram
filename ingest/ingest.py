@@ -189,8 +189,16 @@ def fetch_media_list(token: str) -> list[dict]:
     # (Reels included) - media_url there is the video file, not an image.
     # See pipeline/types.py::vision_image_url() for which field downstream
     # vision calls/pHash actually use.
+    # comments_count: a real number even though the comments *edge* comes back
+    # empty (Meta withholds third-party comment text until App Review grants
+    # Advanced Access - see CLAUDE.md). It is therefore a half-signal: a sync
+    # can tell that comments arrived, never what they say. It is requested here
+    # because scripts/run_build_snapshot.py builds a baseline from this dump and
+    # scripts/run_stage6.py reads comments_count off the live fetch - without it
+    # the baseline records 0 for every post and the first sync fires a spurious
+    # comment_delta on every post that has any comments at all.
     fields = ("id,caption,timestamp,media_type,media_url,thumbnail_url,media_product_type,"
-              "permalink,children{media_type,media_url,thumbnail_url}")
+              "permalink,comments_count,children{media_type,media_url,thumbnail_url}")
     url = f"{GRAPH_BASE}/{API_VERSION}/me/media"
     params = {"fields": fields, "limit": 50}
     all_media = []

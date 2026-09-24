@@ -15,8 +15,21 @@ import numpy as np
 def compute_content_hash(post: dict) -> str:
     """Stable hash of a post's non-URL content. CDN query params (oh=/oe=)
     rotate on every refresh even when nothing about the post itself
-    changed, so the hash deliberately excludes media_url."""
-    content = f"{post['caption']}|{post['comment_count']}|{len(post.get('comments', []))}"
+    changed, so the hash deliberately excludes media_url.
+
+    It also excludes len(comments), which it used to include. That component
+    is redundant with comment_count when both come from the same source, and
+    actively wrong when they do not - which is every live sync. Meta withholds
+    comment *text* (Standard Access, see CLAUDE.md), so a live fetch always
+    returns an empty comments array while comment_count is a real number; a
+    baseline carrying hand-authored golden comments therefore hashed
+    differently from the identical live post and reported content_changed on
+    every sync, forever.
+
+    Hashes are NOT comparable across this change. Every stored content_hash
+    written before it is invalid and its snapshot must be rebuilt.
+    """
+    content = f"{post['caption']}|{post['comment_count']}"
     return hashlib.sha256(content.encode()).hexdigest()
 
 
