@@ -65,7 +65,7 @@ audit trail. Two vendors: `vendor_autos_01` (30 posts), `vendor_gadgets_01` (41 
 | Target | Measured (Gemini cascade) | |
 |---|---|---|
 | Triage precision >= 90% | 97% autos (29/30), 93% gadgets (38/41) | met, **pre-codebook** |
-| Price accuracy >= 85% | first product 100% (19/19, 31/31); **all products 100% autos, 97% gadgets** (24/24, 88/91) | met |
+| Price accuracy >= 85% | first product 100% (19/19, 31/31); **all products 100% autos, 98% gadgets** (24/24, 89/91) | met |
 | Missing-price recall 100% | first product 6/6, 2/2; all products 6/6, 6/6 | met |
 | Stale/stock flag precision >= 75% | micro F1 88% autos, 77% gadgets | met |
 | Escalation below 40% | 1/30, 5/41 | met |
@@ -202,6 +202,14 @@ Every cached prediction file re-scored through the corrected scorer. No model ca
 re-scores the exact output those runs produced, so the numbers are comparable to each other but
 carry their original runs' caveats, noted under the table.
 
+> **Every row here was produced under the PRE-2026-09-24 Stage 3 prompt**, which told the model to
+> collapse purchasable variants into a `variants` array. Only Gemini + OCR has been re-run since
+> the granularity rule landed, and it moved from 97% to **98%** with 95 of 97 products returned.
+> Comparing any row below against that re-run compares two prompt regimes, not two models - the
+> confound is the whole lesson of the Gemini MMLU table, where the model ranking flips depending
+> on which regime you compare in. The rows below are like-for-like with **each other** and nothing
+> else.
+
 | vendor | config | first product | **all products** | under-extracted posts | products returned / gold |
 |---|---|---|---|---|---|
 | autos | Gemini flash-lite | 19/19 = 100% | **24/24 = 100%** | 0 | 30 / 30 |
@@ -233,9 +241,12 @@ was ranking models on a tenth of their output.
 - **`dummy-heuristic` is the regex fallback**, not a model. Its 87% first-product against 69% all
   products is what a single-product heuristic scores when the catalog is multi-product.
 
-**Gemini + OCR is marginally worse than Gemini alone here** (97% vs 98%, one more
-under-extracted post). Within noise on a 91-product denominator, but worth recording rather than
-rounding away, since the OCR tier's case was never about extraction completeness.
+**Gemini + OCR looked marginally worse than Gemini alone under the old prompt** (97% vs 98%, one
+more under-extracted post) - within noise on a 91-product denominator, and both were prompt-matched
+so the comparison was fair at the time. It no longer holds either way: Gemini + OCR has since been
+re-run at 98% under the new prompt and Gemini alone has not, so there is currently **no
+like-for-like comparison between them**. Re-running the rest of the configs under the new prompt is
+what would restore one.
 
 
 `score_stage3` compared `predicted[0]` against `gold[0]` and nothing else, so on
@@ -246,6 +257,8 @@ this date stay comparable.
 
 Replayed through the corrected scorer from the cached `stage3_ocr` predictions - no model calls,
 so this re-scores the exact output the original runs produced:
+
+Under the pre-granularity prompt (see the re-run below for the current figures):
 
 | | gadgets first-product | gadgets **all products** | autos first-product | autos **all products** |
 |---|---|---|---|---|
