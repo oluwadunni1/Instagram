@@ -301,47 +301,11 @@
     "has_carousel_children": false,
     "comment_count": 0,
     "comments": [],
-    "post_type": "product_listing",
+    "post_type": "announcement",
     "carousel_classification": "not_carousel",
     "expected_flag": "missing_price",
     "notes": "'available soon' = not yet in stock; no price anywhere in caption. Extraction trap: '( Phone not included )' - the iPhone must NOT be extracted as a product.",
-    "products": [
-      {
-        "name": "iPhone Ultra Protective Case",
-        "description": "iPhone Ultra Protective Case, phone not included.",
-        "images": [
-          "https://scontent.cdninstagram.com/v/t51.82787-15/798589463_18104989717984202_914911105871957706_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=hnCdEnl3-E8Q7kNvwGj8gkn&_nc_oc=Adqrczux0fSr4QBDKeRw5ld4WK0cSpToOz0P9OkhO1-tTmykrmf5Hqa6-TL2OESSHmU&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&edm=ANQ71j8EAAAA&_nc_gid=DWocGphMGtiXkf1noSBnOg&_nc_tpa=Q5bMBQJ0iO7zI-0w_Ac5p9piBXCB6UvEVTA8963lOa23EjkiiTD44npRD_JfUkqJW9EnAKQP_sRJV7lO-Q&oh=00_AQIOrjQ9j4F4Dp7Bso6CxMjTpYl7pnTvyCE_dHho5y6TFw&oe=6AB6B82A"
-        ],
-        "variants": [],
-        "price": {
-          "value": null,
-          "currency": null,
-          "source": "none",
-          "confidence": null,
-          "min": null,
-          "max": null
-        },
-        "quantity_signal": {
-          "kind": "restock",
-          "evidence": "available soon",
-          "source": "caption"
-        },
-        "negotiation_signal": "unknown",
-        "extraction_confidence": null,
-        "extensions": {
-          "category": null,
-          "attributes": {
-            "category": "accessory"
-          },
-          "accepts_swap": null,
-          "staleness": {
-            "verdict": null,
-            "evidence": null,
-            "source": null
-          }
-        }
-      }
-    ],
+    "products": [],
     "expected_signals": []
   },
   {

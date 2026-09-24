@@ -21,8 +21,10 @@ labels are the authority; this document describes them.
 Apply in order. The first match wins.
 
 1. **Is a specific product being offered for sale, right now?** Yes, then `product_listing`.
-2. **Is the post about a sale that already happened**, a delivery, a handover, or a customer's
-   own words? Yes, then `testimonial_repost`.
+2. **Is a completed sale itself the subject of the post** - a delivery, a handover, or a
+   customer's own words? Yes, then `testimonial_repost`. Ask what the post is *about*, not
+   whether a sale happened: a SOLD mark on a post whose subject is still an item, with its
+   specs and its price, does not move it out of step 1.
 3. **Is it the business informing customers** about hours, location, policy, availability, or
    the mechanics of a promotion? Yes, then `announcement`.
 4. **Is it a produced engagement device built around products**, such as a poll or a "pick one"?
@@ -50,6 +52,18 @@ still be an `announcement` if the items are not actually for sale yet.
 Includes pre-orders when a real offer is attached, and multi-item posts where each item is a
 genuine offer. A price is not required: "DM for price" is still an offer.
 
+**Deferred availability with no offer attached is an `announcement`, not a listing.** "Available
+soon", "coming soon" and "expected September" all describe something a buyer cannot ask to
+purchase today, which is what the test above asks. The dividing line is whether an offer is
+attached, not whether the words sound promotional: "Pre-order yours today" is an offer and stays
+a `product_listing`; "available soon" on its own, with no price and no call to action, is the
+business telling customers what is coming - step 3.
+
+A SOLD mark does **not** move a post out of this class, and that is a different question
+entirely: a completed sale is a fact about an item that exists, whereas deferred availability
+means the item is not purchasable yet. Both prompts stated these as one rule until 2026-09-23
+and contradicted themselves, which is what `18024559289696773` exposed - see below.
+
 | Example | Why |
 |---|---|
 | `18075852833375244` | "2024 Toyota Hilux Adventure" with condition, engine, trim. A single unambiguous offer. |
@@ -71,6 +85,7 @@ This is the largest non-product class and absorbs most promotional content.
 | `17894529186657159` | **Clearance sale.** Promotional, still `announcement`: no specific unit is listed. |
 | `18331493713257979` | **Financing offer** with partner banks. Promotional, still `announcement`. |
 | `17983552128060866` | Commentary on an unreleased iPhone. Nothing is for sale. |
+| `18024559289696773` | **"iPhone Ultra Protective Case available soon ( Phone not included )".** Relabeled from `product_listing` on 2026-09-23. No price, no call to action - a heads-up, not an offer. Gold carries no products, matching `18163097968466814` below. See the note in README.md on what this cost. |
 | `18163097968466814` | **The documented trap.** Names three iPhone 18 models and reads exactly like a listing, but they are unreleased ("Expected September 9"). Gold carries no products. |
 | `17897690802571800` | "Happy new month to all our clients worldwide." Institutional voice, addressed to clients. |
 
@@ -78,10 +93,16 @@ This is the largest non-product class and absorbs most promotional content.
 
 ## `testimonial_repost`
 
-**Test:** a sale that already completed, or someone else's words being reshared.
+**Test:** a completed sale is the *subject* of the post, or someone else's words are being
+reshared.
 
-The product is usually visible and often named. It is still not a listing, because the unit in
-the photo is gone.
+The product is usually visible and often named. It is still not a listing, because the post is
+about the handover rather than about the item.
+
+**This is a subject test, not a sale-status test.** A post that is shaped like a listing - the
+item, its specs, its price - stays a `product_listing` even when it also carries a SOLD mark or
+an available-soon date. There the sale status is an attribute of the listing, not what the post
+is about. See the 2026-09-21 decision below.
 
 | Example | Why |
 |---|---|
@@ -152,6 +173,38 @@ of anything.
   which is structurally close to the `ad_creative` poll above. Gold treats it as a listing,
   presumably because both vehicles are genuinely for sale with a stated budget. Jev split
   0.510 / 0.490 on exactly this post.
+
+---
+
+### Changed 2026-09-21: the SOLD-with-price clause
+
+This file's stated position is that the gold labels are the authority and this document
+describes them. **This one clause inverts that, deliberately, and says so here rather than
+smoothing it over.**
+
+As written before this date, step 2 asked whether a sale had happened. That filed a
+SOLD-with-price listing and an "available soon" listing as `testimonial_repost`, which writes a
+Stage 4 concern (*is this still available?*) into a Stage 2 category (*is this a product post?*).
+
+What forced the change: all three remaining misses of the Jev+Gemini hybrid on
+`vendor_gadgets_01` were posts of exactly this shape, and on one of them the escalation to
+Gemini **agreed with Jev against the gold label**. Two models, given the same written
+definitions, disagreeing with the label in the same direction is evidence about the definition.
+
+The underlying inconsistency is the one recorded below: autos files a delivery/handover post as
+`testimonial_repost`, gadgets files a SOLD-with-price listing as `product_listing`. Both are
+defensible and no single rule satisfies both, so the codebook was always picking a side - it
+previously picked the autos convention without recording that it was a choice. The subject test
+picks the gadgets convention and keeps the autos handover posts, because in those the handover
+genuinely *is* the subject.
+
+**Caveat, and it is a real one: the posts that motivated this are in the TEST half.** The change
+was made with knowledge of the test set, so any improvement it produces on `vendor_gadgets_01`
+is not a clean held-out result and must not be quoted as one.
+
+Changing this re-baselines every Stage 2 figure. The wording is carried in
+`pipeline/stages/stage2_triage.py`'s `POST_TYPE_DEFINITIONS` and in `scripts/smoke_jev.py`'s
+`criteria` rubrics; all three were changed together.
 
 ---
 

@@ -84,8 +84,12 @@ POST_TYPE_CRITERIA = {
         "offers and recurring discount days belong HERE, not in ad_creative. Also covers posts "
         "that name products which are not purchasable yet, such as unreleased models.",
     "testimonial_repost":
-        "A sale that already completed: a delivery, a handover, or a customer's own words "
-        "reshared. The product is often named and visible but is no longer available.",
+        "The COMPLETED SALE ITSELF is the subject: a delivery, a handover, or a customer's "
+        "own words reshared. Ask what the post is ABOUT, not whether a sale happened. A post "
+        "whose subject is an item, with its specs and its price, is a product_listing even "
+        "when it also carries a SOLD mark. That covers a sale that has ALREADY happened, "
+        "never an item that is not purchasable yet - an item still to come is an "
+        "announcement.",
     "meme_personal":
         "Personal or lifestyle content in a conversational voice. Nothing is sold and no "
         "business information is conveyed.",

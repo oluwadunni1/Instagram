@@ -67,9 +67,12 @@ POST_TYPE_DEFINITIONS = """Decide in this order and take the first match:
 1. product_listing - a specific item is being offered for sale right now. \
 Pre-orders count when a real offer is attached. A stated price is NOT \
 required; "DM for price" is still an offer.
-2. testimonial_repost - a sale that already completed: a delivery, a \
-handover, or a customer's own words reshared. The product is often named \
-and visible but is no longer available.
+2. testimonial_repost - the COMPLETED SALE ITSELF is the subject: a \
+delivery, a handover, or a customer's own words reshared. Ask what the \
+post is ABOUT, not whether a sale happened: a post whose subject is an \
+item, with its specs and its price, is a product_listing even when it \
+also carries a SOLD mark - there the listing \
+is the subject and the sale status is an attribute of it. This covers a sale that has ALREADY happened, never an item that is not purchasable yet - an item still to come is rule 3.
 3. announcement - the business is informing customers: opening hours, \
 location, policy, availability, or the mechanics of a promotion. No \
 specific item is offered. Clearance sales, financing offers and recurring \
@@ -81,9 +84,11 @@ than an offer. RARE.
 5. meme_personal - personal or lifestyle content in a conversational voice. \
 Nothing sold, no business information conveyed.
 
-Two rules that decide most hard cases: being promotional or enthusiastic \
-does NOT by itself make a post an ad_creative, and a post that reads like a \
-listing but offers nothing purchasable is an announcement."""
+Three rules decide most hard cases: being promotional or enthusiastic \
+does NOT by itself make a post an ad_creative; a post that reads like a \
+listing but offers nothing purchasable is an announcement; and a SOLD \
+mark on an otherwise ordinary listing does NOT move it to \
+testimonial_repost."""
 
 
 PASS_A_SYSTEM_PROMPT = f"""You are triaging an Instagram post for a vendor \
