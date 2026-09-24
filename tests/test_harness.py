@@ -304,3 +304,114 @@ def test_micro_f1_survives_a_model_that_predicts_nothing(
 
     assert "pooled tp=0 fp=0 fn=1" in caplog.text
     assert "R=0% F1=0%" in caplog.text
+
+
+# --- score_stage3 all-product scoring --------------------------------------
+#
+# The scorer compared predicted[0] against gold[0] and nothing else, which on
+# vendor_gadgets_01 left 34% of priced gold products checked - 31 of 91. These
+# pin the all-product pass and, just as importantly, that the legacy
+# first-product metric still reports the same number beside it.
+
+
+def _multi(post_id: str, products: list[tuple[str, int | None]], source: str = "caption") -> dict:
+    return {
+        "post_id": post_id,
+        "post_type": "product_listing",
+        "products": [
+            {"name": n, "price": {"value": v, "source": "none" if v is None else source}}
+            for n, v in products
+        ],
+    }
+
+
+def _pred(products: list[tuple[str, int | None]], source: str = "caption") -> list[dict]:
+    return [
+        {"name": n, "price": {"value": v, "source": "none" if v is None else source}}
+        for n, v in products
+    ]
+
+
+def test_a_wrong_price_beyond_the_first_product_is_now_counted(tmp_path, monkeypatch, caplog) -> None:
+    """The headline gap. Product 0 is right and products 1-2 are wrong; the
+    legacy metric scores 1/1 = 100% and the all-product metric scores 1/3."""
+    posts = [_multi("p1", [("A", 100), ("B", 200), ("C", 300)])]
+    extract_fn = lambda post, profile: _pred([("A", 100), ("B", 999), ("C", 888)])
+    with caplog.at_level(logging.INFO):
+        _run_stage3(posts, extract_fn, tmp_path, monkeypatch)
+    text = caplog.text
+    assert "Price accuracy (when price exists): 1/1 = 100%" in text   # legacy
+    assert "Price accuracy (when price exists): 1/3 = 33%" in text    # all products
+
+
+def test_under_extraction_is_charged_and_reported(tmp_path, monkeypatch, caplog) -> None:
+    """Returning fewer products than gold is invisible to the first-product
+    metric - it was the failure mode on 4 of 19 multi-product gadgets posts,
+    including one that dropped a real N900,000 product."""
+    posts = [_multi("p1", [("A", 100), ("B", 900000)])]
+    extract_fn = lambda post, profile: _pred([("A", 100)])
+    with caplog.at_level(logging.INFO):
+        rows = _run_stage3(posts, extract_fn, tmp_path, monkeypatch)
+    assert "Price accuracy (when price exists): 1/1 = 100%" in caplog.text
+    assert "Price accuracy (when price exists): 1/2 = 50%" in caplog.text
+    assert "Under-extracted: 1 post(s)" in caplog.text
+    assert rows[0]["gold_product_count"] == 2
+    assert rows[0]["predicted_product_count"] == 1
+
+
+def test_over_extraction_is_reported_not_silently_dropped(tmp_path, monkeypatch, caplog) -> None:
+    posts = [_multi("p1", [("A", 100)])]
+    extract_fn = lambda post, profile: _pred([("A", 100), ("B", 200)])
+    with caplog.at_level(logging.INFO):
+        _run_stage3(posts, extract_fn, tmp_path, monkeypatch)
+    assert "Over-extracted: 1 post(s)" in caplog.text
+
+
+def test_a_hallucinated_price_beyond_the_first_product_fails_loudly(tmp_path, monkeypatch, caplog) -> None:
+    """Brief section 11 is a hard requirement and was only ever checked on
+    product 0. A price invented on product 2 used to be completely silent."""
+    posts = [_multi("p1", [("A", 100), ("B", None)])]
+    extract_fn = lambda post, profile: [
+        {"name": "A", "price": {"value": 100, "source": "caption"}},
+        {"name": "B", "price": {"value": 555, "source": "caption"}},
+    ]
+    with caplog.at_level(logging.INFO):
+        _run_stage3(posts, extract_fn, tmp_path, monkeypatch)
+    assert "HALLUCINATED PRICE" in caplog.text
+    assert "Missing-price recall: 0/1 = 0%" in caplog.text
+
+
+def test_a_product_never_returned_is_not_a_hallucination(tmp_path, monkeypatch, caplog) -> None:
+    """The check is "never invent a price", not "always extract". A gold
+    product with no price that the model simply did not return has invented
+    nothing - it is under-extraction, counted separately."""
+    posts = [_multi("p1", [("A", 100), ("B", None)])]
+    extract_fn = lambda post, profile: _pred([("A", 100)])
+    with caplog.at_level(logging.INFO):
+        _run_stage3(posts, extract_fn, tmp_path, monkeypatch)
+    assert "HALLUCINATED PRICE" not in caplog.text
+    assert "Missing-price recall: 1/1 = 100%" in caplog.text
+    assert "Under-extracted: 1 post(s)" in caplog.text
+
+
+def test_coverage_of_the_legacy_metric_is_reported(tmp_path, monkeypatch, caplog) -> None:
+    """The number that makes the gap visible rather than implied: how much of
+    the priced gold set the first-product metric actually looks at."""
+    posts = [_multi("p1", [("A", 100), ("B", 200), ("C", 300), ("D", 400)])]
+    extract_fn = lambda post, profile: _pred([("A", 100), ("B", 200), ("C", 300), ("D", 400)])
+    with caplog.at_level(logging.INFO):
+        _run_stage3(posts, extract_fn, tmp_path, monkeypatch)
+    assert "Coverage of the legacy metric: 1 of 4 priced products = 25%" in caplog.text
+
+
+def test_an_errored_post_charges_every_gold_product(tmp_path, monkeypatch, caplog) -> None:
+    """A post that raised returned nothing at all, so all of its products are
+    misses - not just the first one."""
+    def boom(post, profile):
+        raise RuntimeError("provider exploded")
+
+    posts = [_multi("p1", [("A", 100), ("B", 200), ("C", 300)])]
+    with caplog.at_level(logging.INFO):
+        _run_stage3(posts, boom, tmp_path, monkeypatch)
+    assert "Price accuracy (when price exists): 0/1 = 0%" in caplog.text
+    assert "Price accuracy (when price exists): 0/3 = 0%" in caplog.text

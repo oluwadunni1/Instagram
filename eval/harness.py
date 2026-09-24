@@ -353,10 +353,33 @@ def name_similarity(predicted: str | None, gold: str | None) -> float:
 
 def score_stage3(posts: list[Post], extract_fn: Callable[[Post, dict | None], list[dict]], model_name: str,
                   cost_per_call: float, vendor_id: str, profile: dict | None = None) -> None:
-    """Scores against the first product in gold's products[] list per
-    post - matches the dummy stub's single-product-always behavior.
-    Once a real multi-product-capable Stage 3 exists, extend this to
-    align predicted[i] <-> gold[i] for every product, not just [0].
+    """Scores extraction against gold, at TWO granularities.
+
+    **First product** (`price_accuracy_first`, etc.) is the legacy metric: it
+    compares predicted[0] against gold[0] and nothing else. Every figure in
+    README.md recorded before 2026-09-24 is this metric, so it is kept
+    unchanged and reported alongside the new one rather than replaced - a
+    number measured one way must stay comparable to the ones beside it.
+
+    **All products** (`price_accuracy_all`, etc.) aligns predicted[i] against
+    gold[i] for every gold product. This is what the first-product metric was
+    hiding: on vendor_gadgets_01 only 31 of 91 priced gold products were ever
+    checked - 34% - because 19 of its 34 product posts carry more than one
+    product and one carries 15.
+
+    Alignment is POSITIONAL, and that is a measured choice, not a convenience.
+    Checked against the cached gemini+OCR predictions: the positional index is
+    also the best name match 71 times out of 76, and all 5 exceptions are posts
+    whose gold products have near-identical names (MacBook Pro 512GB vs 1TB,
+    Dell Latitude i5 vs i7, two Samsung S26 Ultras at different prices). Name
+    matching cannot separate those and would actively mis-align them; caption
+    order can, and both gold and every model emit in caption order.
+
+    A post where the model returns FEWER products than gold has the missing
+    ones charged as misses - which is the point, since under-extraction is
+    invisible to the first-product metric. Extra products beyond gold's count
+    are reported as over-extraction rather than silently dropped.
+
     Writes per-post predictions to
     report/<vendor_id>/stage3_<model>_predictions.json.
 
@@ -370,6 +393,18 @@ def score_stage3(posts: list[Post], extract_fn: Callable[[Post, dict | None], li
     name_scores = []
     total_cost = 0.0
     predictions = []
+
+    # All-product counters. Kept separate from the first-product ones above so
+    # neither metric can quietly become the other.
+    all_price_correct = 0
+    all_price_total = 0
+    all_missing_hits = 0
+    all_missing_total = 0
+    all_name_scores: list[float] = []
+    under_extracted_posts = 0
+    over_extracted_posts = 0
+    gold_product_total = 0
+    predicted_product_total = 0
 
     for post in posts:
         if post.get("post_type") != "product_listing":
@@ -406,10 +441,23 @@ def score_stage3(posts: list[Post], extract_fn: Callable[[Post, dict | None], li
                 missing_price_total += 1
             elif gold_value is not None:
                 price_total += 1
+            # Charge EVERY gold product on this post, not just the first - an
+            # errored post returned nothing, so nothing was extracted.
+            gold_product_total += len(gold_products)
+            under_extracted_posts += 1
+            for gp in gold_products:
+                gp_price = gp.get("price") or {}
+                if gp.get("name"):
+                    all_name_scores.append(0.0)
+                if gp_price.get("source") == "none":
+                    all_missing_total += 1
+                elif gp_price.get("value") is not None:
+                    all_price_total += 1
             predictions.append({
                 "post_id": post["post_id"],
                 "gold_name": gold_name,
                 "gold_price": gold_value,
+                "gold_product_count": len(gold_products),
                 "error": str(exc),
             })
             continue
@@ -434,10 +482,50 @@ def score_stage3(posts: list[Post], extract_fn: Callable[[Post, dict | None], li
                 logger.warning("[stage3 price miss] %s: predicted=%r gold=%r",
                                 post["post_id"], pred_price.get("value"), gold_value)
 
+        # --- all-product pass, positionally aligned -----------------------
+        gold_product_total += len(gold_products)
+        predicted_product_total += len(predicted)
+        if len(predicted) < len(gold_products):
+            under_extracted_posts += 1
+            logger.warning("[stage3 under-extracted] %s: gold has %d product(s), model returned %d",
+                            post["post_id"], len(gold_products), len(predicted))
+        elif len(predicted) > len(gold_products):
+            over_extracted_posts += 1
+            logger.warning("[stage3 over-extracted] %s: gold has %d product(s), model returned %d",
+                            post["post_id"], len(gold_products), len(predicted))
+
+        for i, gold_product in enumerate(gold_products):
+            gp_price = gold_product.get("price") or {}
+            gp_value = gp_price.get("value")
+            gp_source = gp_price.get("source")
+            match = predicted[i] if i < len(predicted) else None
+            match_price = (match or {}).get("price") or {}
+
+            if gold_product.get("name"):
+                all_name_scores.append(name_similarity((match or {}).get("name"), gold_product.get("name")))
+
+            if gp_source == "none":
+                all_missing_total += 1
+                # A product the model never returned cannot have invented a
+                # price, so it counts as a hit - the check is "never invent",
+                # not "always extract". Under-extraction is counted separately.
+                if match is None or match_price.get("source") == "none":
+                    all_missing_hits += 1
+                else:
+                    logger.error("[HALLUCINATED PRICE] %s product %d: pipeline invented %s "
+                                 "when gold says no price exists",
+                                 post["post_id"], i, match_price.get("value"))
+            elif gp_value is not None:
+                all_price_total += 1
+                if match is not None and match_price.get("value") == gp_value:
+                    all_price_correct += 1
+
         predictions.append({
             "post_id": post["post_id"],
             "gold_name": gold_name,
             "gold_price": gold_value,
+            "gold_product_count": len(gold_products),
+            "predicted_product_count": len(predicted),
             "predicted_name": pred_name,
             "predicted_price": pred_price.get("value"),
             "raw_result": predicted
@@ -446,7 +534,12 @@ def score_stage3(posts: list[Post], extract_fn: Callable[[Post, dict | None], li
     price_acc = price_correct / price_total if price_total else 0.0
     missing_recall = missing_price_recall_hits / missing_price_total if missing_price_total else None
 
+    all_price_acc = all_price_correct / all_price_total if all_price_total else 0.0
+    all_missing_recall = all_missing_hits / all_missing_total if all_missing_total else None
+    coverage = price_total / all_price_total if all_price_total else 0.0
+
     logger.info("\nStage 3 (extraction) - model: %s", model_name)
+    logger.info("  -- first product only (legacy, comparable to figures before 2026-09-24) --")
     logger.info("  Price accuracy (when price exists): %d/%d = %.0f%%", price_correct, price_total, price_acc * 100)
     if name_scores:
         avg_name_sim = sum(name_scores) / len(name_scores)
@@ -458,6 +551,26 @@ def score_stage3(posts: list[Post], extract_fn: Callable[[Post, dict | None], li
                      missing_price_recall_hits, missing_price_total, missing_recall * 100, flag)
     else:
         logger.info("  Missing-price recall: n/a (no missing-price posts in this golden set)")
+
+    logger.info("  -- all products (positionally aligned) --")
+    logger.info("  Price accuracy (when price exists): %d/%d = %.0f%%",
+                 all_price_correct, all_price_total, all_price_acc * 100)
+    if all_name_scores:
+        logger.info("  Name similarity (avg): %.0f%% over %d products",
+                     sum(all_name_scores) / len(all_name_scores) * 100, len(all_name_scores))
+    if all_missing_recall is not None:
+        flag = "OK" if all_missing_recall == 1.0 else "*** MUST BE 100% - brief section 11 hard requirement ***"
+        logger.info("  Missing-price recall: %d/%d = %.0f%%  %s",
+                     all_missing_hits, all_missing_total, all_missing_recall * 100, flag)
+    logger.info("  Products: %d gold, %d returned", gold_product_total, predicted_product_total)
+    if under_extracted_posts:
+        logger.info("  Under-extracted: %d post(s) returned fewer products than gold "
+                     "- invisible to the first-product metric", under_extracted_posts)
+    if over_extracted_posts:
+        logger.info("  Over-extracted: %d post(s) returned more products than gold", over_extracted_posts)
+    logger.info("  Coverage of the legacy metric: %d of %d priced products = %.0f%%",
+                 price_total, all_price_total, coverage * 100)
+
     if error_count:
         logger.info("  Errors: %d post(s) failed extraction and were charged as misses", error_count)
     logger.info("  Cost: $%.4f", total_cost)
