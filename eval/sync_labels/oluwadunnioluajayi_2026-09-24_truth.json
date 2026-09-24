@@ -1,0 +1,245 @@
+{
+  "vendor_handle": "oluwadunnioluajayi",
+  "baseline_snapshot_run_id": "snapshot_vendor_gadgets_01_20260922T205835Z",
+  "baseline_date": "2026-09-22",
+  "changes_made": "2026-09-23",
+  "recorded": "2026-09-24, BEFORE any sync was run",
+  "t1_dump": "runs/vendor_gadgets_01/raw/dump_2026-09-24T17-48-51.589842+00-00.json",
+  "derivation": "deleted/new_post/caption_edit/no_op derived by set arithmetic and exact string comparison between the T0 snapshot and the T1 dump - no model and no threshold is involved, so these labels cannot be contaminated by the sync's own output. repost_merge is the one threshold-dependent label and was registered from the vendor's stated intent plus a pHash measurement taken before the sync.",
+  "not_tested_this_round": {
+    "comment_delta": "comments cannot be added to this account; no comment_count moved",
+    "repost_match_phash": "no lightly-edited re-upload was posted (nearest non-exact distance was 18)",
+    "repost_match_embedding": "not deliberately posted; the sync may still report one",
+    "out_of_stock": "no SOLD repost was posted"
+  },
+  "expected_counts": {
+    "caption_edit": 15,
+    "no_op": 24,
+    "deleted": 2,
+    "repost_merge": 1,
+    "new_post": 5
+  },
+  "labels": {
+    "18115331426067887": {
+      "expected": "caption_edit",
+      "planned": null,
+      "edit_kind": "price_or_other",
+      "was_planned": false
+    },
+    "17986005777060517": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17994209417829051": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17868259755637335": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18149430643539602": {
+      "expected": "deleted",
+      "planned": "delete",
+      "note": "deleted by the vendor on 2026-09-23"
+    },
+    "18024559289696773": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18047192480810719": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17908533072539933": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18117403781512663": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17983552128060866": {
+      "expected": "deleted",
+      "planned": "delete",
+      "note": "deleted by the vendor on 2026-09-23"
+    },
+    "17966735571148449": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17909013375530552": {
+      "expected": "caption_edit",
+      "planned": null,
+      "edit_kind": "price_or_other",
+      "was_planned": false
+    },
+    "17875545636631606": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18085616054264180": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18007098038770815": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18163097968466814": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18127850242812986": {
+      "expected": "caption_edit",
+      "planned": null,
+      "edit_kind": "price_or_other",
+      "was_planned": false
+    },
+    "18457546087186979": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17940067572092567": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18190139290395806": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18099765671288015": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17956459401229902": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17919224106434401": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17958045885195473": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17953469082214541": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18136320136714592": {
+      "expected": "caption_edit",
+      "planned": null,
+      "edit_kind": "price_or_other",
+      "was_planned": false
+    },
+    "18351809149247806": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "17868280992643734": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18018200018873070": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18114879538989256": {
+      "expected": "caption_edit",
+      "planned": null,
+      "edit_kind": "price_or_other",
+      "was_planned": false
+    },
+    "17983272389889086": {
+      "expected": "no_op",
+      "planned": null
+    },
+    "18130873003584392": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_cosmetic",
+      "edit_kind": "cosmetic",
+      "was_planned": true
+    },
+    "18093257891291658": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_cosmetic",
+      "edit_kind": "cosmetic",
+      "was_planned": true
+    },
+    "18094596503428757": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_cosmetic",
+      "edit_kind": "cosmetic",
+      "was_planned": true
+    },
+    "17944115412074853": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_cosmetic",
+      "edit_kind": "cosmetic",
+      "was_planned": true
+    },
+    "18103239884214338": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_cosmetic",
+      "edit_kind": "cosmetic",
+      "was_planned": true
+    },
+    "18056670212554989": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_price",
+      "edit_kind": "price_or_other",
+      "was_planned": true
+    },
+    "18027958613896333": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_price",
+      "edit_kind": "price_or_other",
+      "was_planned": true
+    },
+    "18091786415437652": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_price",
+      "edit_kind": "price_or_other",
+      "was_planned": true
+    },
+    "18173692510448068": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_price",
+      "edit_kind": "price_or_other",
+      "was_planned": true
+    },
+    "18051806288800495": {
+      "expected": "caption_edit",
+      "planned": "caption_edit_price",
+      "edit_kind": "price_or_other",
+      "was_planned": true
+    },
+    "18126496534854207": {
+      "expected": "repost_merge",
+      "source_post_id": "18127850242812986",
+      "note": "vendor re-uploaded the saved image file; measured pHash distance 0 before the sync"
+    },
+    "18024234992919845": {
+      "expected": "new_post",
+      "note": "no pHash match to any baseline post or carousel slide (nearest 18-26)"
+    },
+    "17995957056002627": {
+      "expected": "new_post",
+      "note": "no pHash match to any baseline post or carousel slide (nearest 18-26)"
+    },
+    "17936101512124720": {
+      "expected": "new_post",
+      "note": "no pHash match to any baseline post or carousel slide (nearest 18-26)"
+    },
+    "18115618310059974": {
+      "expected": "new_post",
+      "note": "no pHash match to any baseline post or carousel slide (nearest 18-26)"
+    },
+    "18028905143906997": {
+      "expected": "new_post",
+      "note": "no pHash match to any baseline post or carousel slide (nearest 18-26)"
+    }
+  }
+}
