@@ -13,7 +13,8 @@ can be re-run offline without re-hitting the API.
 
 Usage:
     1. Copy .env.example to .env and fill in IG_ACCESS_TOKEN
-    2. python ingest.py <account_label> [--token-env ENV_VAR_NAME]
+    2. uv run ingest/ingest.py <account_label> [--token-env ENV_VAR_NAME]
+       (or: make ingest ACCOUNT=<account_label> TOKEN_ENV=<ENV_VAR_NAME>)
 
     account_label is a folder name YOU choose to identify this
     vendor account locally (e.g. "vendor_fashion_01"). It does not
@@ -34,11 +35,16 @@ Usage:
 Notes:
   - Uses graph.instagram.com per the "Instagram API with Instagram
     Login" product (not graph.facebook.com).
-  - Respects the ~200 calls/user/hour business-use-case rate limit
-    with basic 429 backoff.
-  - Comments contain real people's handles/text — treated as
-    sensitive. This script writes raw dumps to runs/, which must
-    stay out of git (see .gitignore note at bottom of this file).
+  - Respects the ~200 calls/user/hour business-use-case rate limit:
+    backoff on 429/5xx and on network errors, and no comments request
+    for a post whose comments_count is 0.
+  - Raw dumps under runs/ are committed to git (CLAUDE.md) so the
+    experiment re-runs from a clone. That is safe only because Meta
+    withholds comment text while the app is in Development mode, so
+    every dump's `comments` arrays are empty. If App Review ever grants
+    Advanced Access, dumps will carry real people's handles and text,
+    and runs/*/raw/ must move out of git (to DVC, like report/) before
+    the next ingest is committed.
 """
 
 import argparse
@@ -128,19 +134,32 @@ def log_ingest_summary(media_list: list[dict], out_path: Path) -> None:
 
 
 def _get(url: str, params: dict, token: str) -> dict:
-    """GET with basic 429/5xx backoff.
+    """GET with backoff on 429/5xx and on network errors.
 
     The token goes in an Authorization header, never the query string - a
     token in the URL leaks into urllib3's DEBUG log line and into requests'
     exception messages (see pipeline/settings.py::ig_auth_headers).
+
+    A timeout or dropped connection is retried like a 5xx and, once the budget
+    is spent, raised as RuntimeError rather than a bare requests exception. That
+    matters for fetch_comments(), which isolates per-post failures by catching
+    RuntimeError: a raw ConnectionError used to slip past it and abort the whole
+    ingest, and since the dump is only written at the end, one network blip on
+    the last post discarded every post already pulled.
     """
     headers = ig_auth_headers(token)
     for attempt in range(1, MAX_RETRIES + 1):
-        resp = requests.get(url, params=params, headers=headers, timeout=30)
+        wait = RATE_LIMIT_SLEEP_SECONDS * (2 ** (attempt - 1))
+        try:
+            resp = requests.get(url, params=params, headers=headers, timeout=30)
+        except requests.RequestException as exc:
+            logger.warning("[backoff] %s on %s - retry %d/%d in %ds",
+                            type(exc).__name__, redact_tokens(url), attempt, MAX_RETRIES, wait)
+            time.sleep(wait)
+            continue
         if resp.status_code == 200:
             return resp.json()
         if resp.status_code == 429 or resp.status_code >= 500:
-            wait = RATE_LIMIT_SLEEP_SECONDS * (2 ** (attempt - 1))
             logger.warning("[backoff] %s on %s - retry %d/%d in %ds",
                             resp.status_code, redact_tokens(url), attempt, MAX_RETRIES, wait)
             time.sleep(wait)
@@ -271,16 +290,31 @@ def ingest_account(account_label: str, token_env: str = "IG_ACCESS_TOKEN") -> Pa
     media_list = fetch_media_list(token)
     logger.info("  -> %d posts found", len(media_list))
 
-    logger.info("[3/3] Fetching comments per post (this is the slow part)...")
+    logger.info("[3/3] Fetching comments for posts that have any...")
+    skipped = 0
+    probed = False
     for i, post in enumerate(media_list, start=1):
-        post["comments"] = fetch_comments(post["id"], token, debug=(i == 1))
+        # comments_count is real even while comment text is withheld (CLAUDE.md),
+        # so a 0 means there is nothing to fetch: skip the request and its courtesy
+        # sleep. On a 45-post account with one commented post, that was 44 requests
+        # against the ~200/hour budget and ~90s of sleeping, all returning [].
+        # Only an explicit 0 skips; a missing count still fetches, so an API
+        # response without the field cannot silently drop comments.
+        if post.get("comments_count") == 0:
+            post["comments"] = []
+            skipped += 1
+        else:
+            post["comments"] = fetch_comments(post["id"], token, debug=not probed)
+            probed = True
+            time.sleep(RATE_LIMIT_SLEEP_SECONDS)
         logger.info(
             "  [%d/%d]  %s  %-8s  %-*s  %d comments",
             i, len(media_list), post["id"], _media_label(post),
             CAPTION_SNIPPET_CHARS, _caption_snippet(post.get("caption")),
             len(post["comments"]),
         )
-        time.sleep(RATE_LIMIT_SLEEP_SECONDS)
+    if skipped:
+        logger.info("  -> skipped the comments request on %d posts with comments_count 0", skipped)
 
     dump = {
         "account_label": account_label,
