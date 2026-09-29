@@ -648,6 +648,27 @@ scripts/           drivers and checks
 tests/             offline only
 ```
 
+### Experiment configs
+
+`pipeline/config/experiments/` holds only the configs behind a current figure. Every run_id in
+`report/token_log.csv` is prefixed with the config's `name`, so a figure traces back to one file.
+
+| Config | What it runs | Result |
+|---|---|---|
+| `default.yaml` | Gemini text→vision cascade for Stages 2-3, Gemini Stage 1/4 | the active default |
+| `family_gemini.yaml` | same content as `default.yaml`, as the Gemini row of the family comparison | [Model comparison](#model-comparison) |
+| `stage2_jev.yaml` | Jev alone, binary Stage 2 | [Stage 2, re-baselined](#stage-2-re-baselined) |
+| `stage2_hybrid.yaml` | Jev → OCR → Gemini, binary Stage 2 | [Stage 2, re-baselined](#stage-2-re-baselined) |
+| `stage3_ocr.yaml` | `default.yaml` plus the local OCR tier in Stage 3 | [Stage 3, with the OCR tier](#stage-3-with-the-ocr-tier) |
+
+`archive/` keeps the superseded model-comparison configs under their original names, since
+renaming one would orphan its run_ids: `family_{gpt4o_mini,llama,qwen}`,
+`stage2_{gemini,gpt4o_mini,llama,qwen}_cascade`, `stage3_{gpt4o_mini,qwen_cascade}` and
+`stage4_{gemini,gpt4o_mini,llama,qwen}`. They still load, but are not maintained against the
+current code. Nine configs that had never been run, or pointed at a retired model, were deleted
+on 2026-09-29, along with `pipeline/stages/stage2_triage_dummy.py`, which only one of them
+used. They are in git history.
+
 Three identifiers, easily confused:
 
 - `account_label` (`vendor_autos_01`): a local folder name you choose. Need not match Instagram.

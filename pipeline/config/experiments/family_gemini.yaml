@@ -21,7 +21,7 @@ stage2_triage:
   model: Gemini Family (Google AI Studio)
   cost_per_call_usd: 0.0
   note: >-
-    Same cascade as default.yaml and stage2_gemini_cascade.yaml - cheap text Pass A,
+    Same cascade as default.yaml and archive/stage2_gemini_cascade.yaml - cheap text Pass A,
     stronger vision Pass B. Scored 38/41 on vendor_gadgets_01 and 27/30 on
     vendor_autos_01 in the per-stage harness runs.
 

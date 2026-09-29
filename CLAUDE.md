@@ -53,6 +53,7 @@ a target to hit.
 quality — that is the harness's job and always will be. It covers only what the harness
 structurally cannot: credential handling (`test_credentials.py`), the harness's own per-post
 error isolation and `load_stage_fn()`'s reserved-parameter tripwire (`test_harness.py`),
+Stage 0's network-error retry and `comments_count` skip (`test_ingest.py`),
 deterministic Stage 5 routing (`test_stage5_reconcile.py`), the token-log reader every cost
 figure and the run gate depend on (`test_token_log.py`, `test_verify_run.py`), and the
 pre-commit secret scanner (`test_scan_secrets.py`). No test may make a network call, read
@@ -104,7 +105,11 @@ validated by `pipeline/config/experiment_schema.py`. `eval/harness.py::load_stag
 every non-bookkeeping config key as a kwarg into the stage function, so a stage gains a
 tunable simply by accepting a new keyword argument. **Swapping a model is a YAML edit, never a
 code change** — this is a hard requirement from the brief. `default.yaml` is active; the
-sibling files are experiment snapshots and are not kept in sync with it.
+other top-level files are the configs behind the README's current figures. `archive/` holds
+the model-comparison configs whose run_ids appear in `report/token_log.csv` — kept, and kept
+under their original names, because the run_id prefix is the config name. None of these are
+kept in sync with `default.yaml`. Configs that were never run or no longer ran were deleted
+on 2026-09-29; recover one from git history rather than re-creating it by hand.
 
 **Invariant: no stage function may declare a parameter named `model`.** `load_stage_fn()`
 reserves and strips `module`, `function`, `cost_per_call_usd`, `note`, and `model` before
@@ -203,8 +208,9 @@ site that reaches a provider must call it** — the vision Pass B calls bypass
 harness prints is `cost_per_call_usd` × call count, not real spend. Real cost must be computed
 by hand from the log's `prompt_tokens`/`completion_tokens` against the provider's rates.
 
-**Configs labelled `model: dummy-heuristic` still make live LLM calls.** Every `stage2_*.yaml`
-points `stage3_extract.module` at the real `pipeline.stages.stage3_extract`; the zero-cost
+**Configs labelled `model: dummy-heuristic` still make live LLM calls.** Every
+`archive/stage2_*.yaml` and `archive/stage4_*.yaml` points `stage3_extract.module` at the real
+`pipeline.stages.stage3_extract`; the zero-cost
 regex heuristic (`_regex_fallback`) only runs when the LLM call *fails*. Known and documented,
 not fixed.
 

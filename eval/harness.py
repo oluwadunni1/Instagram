@@ -16,7 +16,7 @@ comparable to ones after it (see resolve_profile()).
 
 Usage:
     uv run eval/harness.py
-    uv run eval/harness.py --config pipeline/config/experiments/stage2_gemini_pro.yaml
+    uv run eval/harness.py --config pipeline/config/experiments/stage2_hybrid.yaml
     uv run eval/harness.py --golden eval/golden/vendor_autos_01.json
 """
 
@@ -60,9 +60,8 @@ def load_stage_fn(
             (e.g. run_id/vendor_id for token-usage logging - see
             log_token_usage() in pipeline/llm_client.py). Only stages whose
             functions actually accept these should get them passed by the
-            caller; a stage stub that doesn't make LLM calls (e.g.
-            stage2_triage_dummy.py) still needs matching no-op parameters
-            to accept and ignore them.
+            caller; a stage stub that doesn't make LLM calls still needs
+            matching no-op parameters to accept and ignore them.
 
     Returns:
         (bound_fn, model_name, cost_per_call_usd) - bound_fn takes the post

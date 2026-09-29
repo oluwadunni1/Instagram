@@ -35,7 +35,7 @@ stage2_triage:
   note: >-
     Fixed 2026-09-07. Previously openrouter/google/gemini-flash-1.5-8b, which has been
     retired and 404s - so the ACTIVE DEFAULT config failed every Stage 2 call, and a
-    bare `make harness` was broken. Now the same cascade as stage2_gemini_cascade.yaml
+    bare `make harness` was broken. Now the same cascade as archive/stage2_gemini_cascade.yaml
     (cheap text Pass A, stronger vision Pass B), which scored 27/30 in the 2026-09-01
     comparison. confidence_threshold 0.7 matches every other cascade config.
 
