@@ -10,6 +10,12 @@ inline comments across the codebase cite it as "brief section N".
 
 Python 3.11+, managed with `uv`. Every command below assumes `uv run`.
 
+This checkout is used from both Windows and Ubuntu (WSL) in the same folder. Each OS needs
+its own environment: Windows uses the default `.venv/`, and Ubuntu sets
+`UV_PROJECT_ENVIRONMENT=.venv-linux` in `~/.bashrc`. If both use `.venv/`, each `uv run`
+finds the other OS's environment, deletes it and rebuilds its own — on 2026-10-02 that left
+`.venv/` broken for both, because Windows cannot delete the Linux `lib64` symlink.
+
 ## Commands
 
 `make` (GNU Make) wraps the common invocations; a bare `make` prints the target list with
@@ -204,9 +210,14 @@ over partly-heuristic output and fails `make verify` on the fallback check.
 site that reaches a provider must call it** — the vision Pass B calls bypass
 `complete_structured()` and throttle themselves for exactly this reason.
 
-**`estimated_cost_usd` in `report/token_log.csv` is hardcoded to 0.0.** Every "Cost: $X" the
-harness prints is `cost_per_call_usd` × call count, not real spend. Real cost must be computed
-by hand from the log's `prompt_tokens`/`completion_tokens` against the provider's rates.
+**`estimated_cost_usd` in `report/token_log.csv` is mostly 0.0, and 0.0 does not mean free.**
+Since 2026-09-21 `log_token_usage()` prices each row from `MODEL_RATES` in
+`pipeline/llm_client.py`, but that table holds only Jev. Every Gemini row, every other unpriced
+model, and every row written before 2026-09-21 is 0.0; rows are never recomputed, since the log
+is append-only evidence. `read_run_usage()` reports `priced_calls` beside `calls` — a total
+whose `priced_calls` is short of `calls` understates and must be quoted that way. Every
+"Cost: $X" the harness prints is still `cost_per_call_usd` × call count, not real spend. Real
+Gemini cost must be computed by hand from `prompt_tokens`/`completion_tokens`.
 
 **Configs labelled `model: dummy-heuristic` still make live LLM calls.** Every
 `archive/stage2_*.yaml` and `archive/stage4_*.yaml` points `stage3_extract.module` at the real

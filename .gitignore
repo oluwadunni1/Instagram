@@ -26,6 +26,9 @@
 __pycache__/
 *.pyc
 .venv/
+# The Ubuntu (WSL) side's environment, kept apart from Windows' .venv/ via
+# UV_PROJECT_ENVIRONMENT - see CLAUDE.md.
+.venv-linux/
 *.egg-info/
 build/
 dist/

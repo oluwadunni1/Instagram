@@ -54,7 +54,10 @@ call bypass it and must therefore log and throttle themselves: the vision Pass B
 ## Results
 
 Every figure comes from a run that passed `scripts/verify_run.py`. `report/token_log.csv` is the
-audit trail. Two vendors: `vendor_autos_01` (30 posts), `vendor_gadgets_01` (41 posts).
+audit trail. Two vendors: `vendor_autos_01` (30 labelled posts), `vendor_gadgets_01` (41 posts).
+The autos account has grown since labelling: its raw dumps from 2026-09-04 on carry 40 posts, and
+the 10 newer ones (all published 2026-09-03) are unlabelled. The harness and
+`scripts/score_catalog.py` score only labelled posts, so they never enter a figure here.
 
 > **Stage 2 was re-baselined on 2026-09-21** and the triage row below is stale. The five post
 > types had never been defined anywhere in the repo, so every model was reproducing a class
@@ -118,9 +121,12 @@ Run ids: `stage2_jev_20260921T084428Z`, `stage2_jev_20260921T084716Z`,
 `stage2_hybrid_20260921T091816Z`, `stage2_hybrid_20260921T092310Z`,
 `family_gemini_20260921T081023Z`. All passed the gate.
 
-**The hybrid** runs Jev as a text-only Pass A and escalates two ways: a caption-less post goes
-straight to Gemini vision (skipping Jev entirely, since there is nothing to read), and a
-low-confidence post with a caption goes to Gemini text. Jev alone loses mainly because five
+**The hybrid** runs Jev as a text-only Pass A and escalates two ways. A low-confidence post with
+a caption goes to Gemini text. In the runs above, a caption-less post went straight to Gemini
+vision, skipping Jev since there was nothing to read. That changed later on 2026-09-21: a
+caption-less post now goes to local OCR first, Jev re-runs on the OCR text, and only a post
+where OCR reads nothing or Jev is still unsure reaches vision - the 2026-09-22 runs below made
+zero vision calls. Jev alone loses mainly because five
 gadgets posts have no caption at all and carry their price on the image, which a text-only model
 cannot reach.
 
@@ -577,15 +583,41 @@ out at 56% - see the measured run above.
 
 Golden sets and raw dumps are committed, so a clone can score against the same hand labels.
 
+**Setup.** Install [uv](https://docs.astral.sh/uv/) once, then:
+
 ```bash
-uv sync
+git clone https://github.com/oluwadunni1/Instagram.git
+cd Instagram
+uv sync                       # fetches Python 3.14 (.python-version) and installs into .venv
 cp .env.example .env          # add one provider key, e.g. GEMINI_API_KEY
+uv run pytest -q              # offline sanity check - no key, no network
+```
+
+**Scoring a run:**
+
+```bash
 make harness GOLDEN=eval/golden/vendor_autos_01.json \
              CONFIG=pipeline/config/experiments/default.yaml
 make verify  RUN_ID=<run_id the harness printed> POSTS=30
 ```
 
-`make stage5` re-runs routing off cached predictions with zero LLM calls and needs no key.
+Windows ships no `make`. `make help` prints the `uv run ...` command behind every target; run
+that instead, or use WSL. If one folder is shared between Windows and WSL, give each OS its own
+environment - see `CLAUDE.md`.
+
+What a clone can do on its own, and what needs credentials it will not have:
+
+| Works from a clone | Needs |
+|---|---|
+| Tests | nothing |
+| Harness on the committed golden sets, text-only stages | a provider key in `.env` |
+| Pulling a new account (`make ingest`) | your own Meta app and an Instagram Professional account token |
+| Vision and OCR tiers | live image links - see below |
+| `report/` (predictions, token log) and `data/snapshots/` | R2 credentials for `make data-pull`; the bucket is private |
+
+`make stage5` re-runs routing with zero LLM calls and needs no key, but its inputs are the cached
+predictions in `report/`, which a clone does not have. Run the harness first to regenerate them,
+then point `STAGE2=`/`STAGE3=`/`STAGE4=` at the files it wrote.
 
 **The image links are expired and you cannot refresh them.** `fbcdn.net` URLs carry short-lived
 `oh=`/`oe=` params. `scripts/refresh_media_urls.py` needs a token belonging to the account that
@@ -743,12 +775,13 @@ in the last two cases, by going to look for the artifact and finding it empty.
 - **Single-vendor model rankings did not survive a second vendor.**
 - **Fixed 2026-09-24: only the first product per post used to be scored.** `score_stage3` now
   reports both metrics side by side - see the section below for what the corrected one says.
-- **Every Stage 6 figure came off a golden-derived baseline, not a live pull.** The "before"
-  state was built from `eval/golden/vendor_autos_01.json`, so a sync re-discovered posts the feed
-  already had - four of the reported "new" posts were new only relative to that rebuild. The
-  brief's change-classification precision target (>= 85%) has never been produced at all, because
-  it needs a hand-labelled two-snapshot pair. `PLAN.md` designs that measurement; the code it
-  depends on has landed, the measurement itself has not been run.
+- **Fixed 2026-09-24: Stage 6 used to be measured only off a golden-derived baseline.** The
+  "before" state was built from `eval/golden/vendor_autos_01.json`, so a sync re-discovered posts
+  the feed already had - four of the reported "new" posts were new only relative to that rebuild,
+  and the 87% reduction it produced is superseded. The `PLAN.md` measurement has since been run
+  against a live baseline and a designed change set: 56% reduction, change-classification
+  precision 100% on 23 changed posts. Three of its five cells are near-tautological and only
+  `caption_edit` clears n >= 10 - see [The measured run](#the-measured-run---2026-09-24).
 
 ## Known limits
 
