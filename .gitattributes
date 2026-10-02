@@ -1,0 +1,5 @@
+# Store and check out every text file with LF on every OS. This checkout is
+# shared between Windows (core.autocrlf=true, CRLF on disk) and Ubuntu/WSL (LF),
+# which made Ubuntu's git report 52 files modified when 3 were, and make and
+# shell scripts break on CRLF. eol=lf overrides each machine's own setting.
+* text=auto eol=lf
